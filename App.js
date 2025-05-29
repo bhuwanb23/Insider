@@ -1,7 +1,12 @@
 import React from 'react';
 import { StyleSheet, SafeAreaView, Platform, StatusBar, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import LandingPage from './pages/LandingPage';
+import CompanyDetailsPage from './features/core_company_details/pages/CompanyDetailsPage';
+
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
@@ -18,7 +23,36 @@ export default function App() {
         end={{ x: 1, y: 1 }}
       />
       <SafeAreaView style={styles.safeArea}>
-        <LandingPage />
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Landing"
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: 'transparent',
+                elevation: 0,
+                shadowOpacity: 0,
+              },
+              headerTitleStyle: {
+                fontWeight: 'bold',
+                fontSize: 18,
+              },
+            }}
+          >
+            <Stack.Screen 
+              name="Landing" 
+              component={LandingPage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="CompanyDetails"
+              component={CompanyDetailsPage}
+              options={{ 
+                title: 'Company Details',
+                headerBackTitleVisible: false,
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
       </SafeAreaView>
     </View>
   );
