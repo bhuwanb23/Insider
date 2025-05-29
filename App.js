@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LandingPage from './pages/LandingPage';
 import CompanyDetailsPage from './features/core_company_details/pages/CompanyDetailsPage';
+import JobHiringsPage from './features/job_hirings_insights/pages/JobHiringsPage';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +49,14 @@ export default function App() {
               component={CompanyDetailsPage}
               options={{ 
                 title: 'Company Details',
+                headerBackTitleVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="JobHirings"
+              component={JobHiringsPage}
+              options={{ 
+                title: 'Jobs & Hiring Insights',
                 headerBackTitleVisible: false,
               }}
             />

@@ -79,6 +79,8 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
   const handleTopicPress = (topicKey) => {
     if (topicKey === 'core') {
       navigation.navigate('CompanyDetails');
+    } else if (topicKey === 'jobs') {
+      navigation.navigate('JobHirings');
     } else {
       onSelectTopic(topicKey);
     }
