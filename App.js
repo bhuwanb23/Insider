@@ -7,6 +7,8 @@ import LandingPage from './pages/LandingPage';
 import CompanyDetailsPage from './features/core_company_details/pages/CompanyDetailsPage';
 import JobHiringsPage from './features/job_hirings_insights/pages/JobHiringsPage';
 import InterviewExperiencePage from './features/interview_experience/pages/InterviewExperiencePage';
+import NewsHighlightsPage from './features/news_highlights/pages/NewsHighlightsPage';
+import { NewsProvider } from './features/news_highlights/context/NewsContext';
 
 const Stack = createStackNavigator();
 
@@ -25,52 +27,62 @@ export default function App() {
         end={{ x: 1, y: 1 }}
       />
       <SafeAreaView style={styles.safeArea}>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Landing"
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: 'transparent',
-                elevation: 0,
-                shadowOpacity: 0,
-              },
-              headerTitleStyle: {
-                fontWeight: 'bold',
-                fontSize: 18,
-              },
-            }}
-          >
-            <Stack.Screen 
-              name="Landing" 
-              component={LandingPage}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="CompanyDetails"
-              component={CompanyDetailsPage}
-              options={{ 
-                title: 'Company Details',
-                headerBackTitleVisible: false,
+        <NewsProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName="Landing"
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: 'transparent',
+                  elevation: 0,
+                  shadowOpacity: 0,
+                },
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
               }}
-            />
-            <Stack.Screen
-              name="JobHirings"
-              component={JobHiringsPage}
-              options={{ 
-                title: 'Jobs & Hiring Insights',
-                headerBackTitleVisible: false,
-              }}
-            />
-            <Stack.Screen
-              name="InterviewExperience"
-              component={InterviewExperiencePage}
-              options={{ 
-                title: 'Interview Experience',
-                headerBackTitleVisible: false,
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+            >
+              <Stack.Screen 
+                name="Landing" 
+                component={LandingPage}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="CompanyDetails"
+                component={CompanyDetailsPage}
+                options={{ 
+                  title: 'Company Details',
+                  headerBackTitleVisible: false,
+                }}
+              />
+              <Stack.Screen
+                name="JobHirings"
+                component={JobHiringsPage}
+                options={{ 
+                  title: 'Jobs & Hiring Insights',
+                  headerBackTitleVisible: false,
+                }}
+              />
+              <Stack.Screen
+                name="InterviewExperience"
+                component={InterviewExperiencePage}
+                options={{ 
+                  title: 'Interview Experience',
+                  headerBackTitleVisible: false,
+                }}
+              />
+              <Stack.Screen
+                name="NewsHighlights"
+                component={NewsHighlightsPage}
+                options={{ 
+                  title: 'News & Highlights',
+                  headerBackTitleVisible: false,
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </NewsProvider>
       </SafeAreaView>
     </View>
   );

@@ -83,6 +83,8 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
       navigation.navigate('JobHirings');
     } else if (topicKey === 'interview') {
       navigation.navigate('InterviewExperience');
+    } else if (topicKey === 'insights') {
+      navigation.navigate('NewsHighlights');
     } else {
       onSelectTopic(topicKey);
     }
