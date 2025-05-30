@@ -1,11 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCompany } from '../context/CompanyContext';
+import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 
-export default function Overview() {
-  const { companyData } = useCompany();
-  const { overview } = companyData;
+export default function Overview({ data }) {
+  const { companyData } = useCoreCompanyDetails();
+  
+  // Log raw API response for debugging
+  console.log('Raw API Response in Overview:', JSON.stringify(companyData, null, 2));
+
+  // Use passed data prop if available, otherwise use context data
+  const overviewData = data || companyData?.overview;
+
+  if (!overviewData) {
+    console.log('No overview data available');
+    return (
+      <View style={styles.centerContainer}>
+        <Text>No overview information available</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -17,14 +31,14 @@ export default function Overview() {
           end={{ x: 1, y: 1 }}
         >
           <Text style={styles.heroTitle}>About Us</Text>
-          <Text style={styles.heroText}>{overview.description}</Text>
+          <Text style={styles.heroText}>{overviewData.description}</Text>
         </LinearGradient>
 
         <View style={styles.quickInfo}>
           <View style={styles.quickInfoCard}>
             <Text style={styles.quickInfoIcon}>💡</Text>
             <Text style={styles.quickInfoTitle}>What We Do</Text>
-            <Text style={styles.quickInfoText} numberOfLines={3}>{overview.whatWeDo}</Text>
+            <Text style={styles.quickInfoText} numberOfLines={3}>{overviewData.whatWeDo}</Text>
           </View>
         </View>
 
@@ -34,7 +48,7 @@ export default function Overview() {
             <Text style={styles.marketsSectionTitle}>Key Markets</Text>
           </View>
           <View style={styles.marketsGrid}>
-            {overview.keyMarkets.map((market, index) => (
+            {overviewData.keyMarkets.map((market, index) => (
               <LinearGradient
                 key={index}
                 colors={['#4091FF', '#3F7EF8']}
@@ -57,13 +71,13 @@ export default function Overview() {
           >
             <Text style={styles.cardIcon}>🔭</Text>
             <Text style={styles.cardTitle}>Vision</Text>
-            <Text style={styles.cardText}>{overview.vision}</Text>
+            <Text style={styles.cardText}>{overviewData.vision}</Text>
           </LinearGradient>
 
           <View style={styles.missionCard}>
             <Text style={styles.cardIcon}>🎯</Text>
             <Text style={[styles.cardTitle, styles.missionTitle]}>Mission</Text>
-            <Text style={[styles.cardText, styles.missionText]}>{overview.mission}</Text>
+            <Text style={[styles.cardText, styles.missionText]}>{overviewData.mission}</Text>
           </View>
         </View>
 
@@ -73,7 +87,7 @@ export default function Overview() {
             <Text style={styles.sectionTitle}>Core Values</Text>
           </View>
           <View style={styles.valuesGrid}>
-            {overview.coreValues.map((value, index) => (
+            {overviewData.coreValues.map((value, index) => (
               <LinearGradient
                 key={index}
                 colors={['#8257E5', '#D658D6']}
@@ -93,7 +107,7 @@ export default function Overview() {
             <Text style={styles.sectionTitle}>Global Presence</Text>
           </View>
           <View style={styles.presenceGrid}>
-            {overview.globalPresence.map((country, index) => (
+            {overviewData.globalPresence.map((country, index) => (
               <View key={index} style={styles.countryCard}>
                 <Text style={styles.countryText}>{country}</Text>
               </View>
@@ -310,5 +324,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#4158D0',
     fontWeight: '500',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 }); 

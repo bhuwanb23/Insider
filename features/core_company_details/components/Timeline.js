@@ -1,54 +1,45 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Animatable from 'react-native-animatable';
-import { useCompany } from '../context/CompanyContext';
+import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 
-export default function Timeline() {
-  const { companyData } = useCompany();
-  const { timeline } = companyData;
+export default function Timeline({ data }) {
+  const { companyData } = useCoreCompanyDetails();
+  
+  // Log raw API response for debugging
+  console.log('Raw API Response in Timeline:', JSON.stringify(companyData, null, 2));
+
+  // Use passed data prop if available, otherwise use context data
+  const timelineData = data || companyData?.timeline;
+
+  if (!timelineData || timelineData.length === 0) {
+    console.log('No timeline data available');
+    return (
+      <View style={styles.centerContainer}>
+        <Text>No timeline information available</Text>
+      </View>
+    );
+  }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <LinearGradient
-        colors={['#4158D0', '#C850C0']}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <Text style={styles.headerTitle}>Company Timeline</Text>
-        <Text style={styles.headerSubtitle}>Key milestones in our journey</Text>
-      </LinearGradient>
-
-      <View style={styles.timelineContainer}>
-        {timeline.map((event, index) => (
-          <Animatable.View
-            key={index}
-            animation="fadeInUp"
-            delay={index * 200}
-            style={styles.timelineItem}
-          >
+    <ScrollView style={styles.container}>
+      <View style={styles.timeline}>
+        {timelineData.map((item, index) => (
+          <View key={index} style={styles.timelineItem}>
             <View style={styles.timelineLine} />
-            <View style={styles.timelineDot}>
+            <View style={styles.timelineDot} />
+            <View style={styles.timelineContent}>
+              <Text style={styles.year}>{item.year}</Text>
               <LinearGradient
                 colors={['#4158D0', '#C850C0']}
-                style={styles.dot}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              />
-            </View>
-            <View style={styles.timelineContent}>
-              <Text style={styles.year}>{event.year}</Text>
-              <LinearGradient
-                colors={['#ffffff', '#f8f9fa']}
                 style={styles.eventCard}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+                end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.eventText}>{event.event}</Text>
+                <Text style={styles.eventText}>{item.event}</Text>
               </LinearGradient>
             </View>
-          </Animatable.View>
+          </View>
         ))}
       </View>
     </ScrollView>
@@ -59,84 +50,56 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+    padding: 16,
   },
-  header: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-  },
-  timelineContainer: {
-    padding: 24,
+  timeline: {
+    paddingTop: 16,
   },
   timelineItem: {
     flexDirection: 'row',
-    marginBottom: 32,
+    marginBottom: 24,
     position: 'relative',
   },
   timelineLine: {
     position: 'absolute',
-    left: 35,
+    left: 15,
     top: 0,
-    bottom: -40,
+    bottom: -24,
     width: 2,
     backgroundColor: 'rgba(65, 88, 208, 0.2)',
   },
   timelineDot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#fff',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#4158D0',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     zIndex: 1,
-  },
-  dot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
   },
   timelineContent: {
     flex: 1,
-    paddingLeft: 8,
   },
   year: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#4158D0',
+    color: '#1a1a1a',
     marginBottom: 8,
   },
   eventCard: {
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    padding: 12,
+    borderRadius: 8,
   },
   eventText: {
-    fontSize: 16,
-    color: '#1a1a1a',
-    lineHeight: 24,
+    color: '#fff',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 }); 

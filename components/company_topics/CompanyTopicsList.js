@@ -20,11 +20,11 @@ const GRADIENTS = {
 // Map topic keys to their respective navigation routes and screens
 const TOPIC_ROUTES = {
   core: {
-    screen: 'CoreCompanyDetails',
+    screen: 'CompanyDetails',
     params: { path: 'features/core_company_details' }
   },
   jobs: {
-    screen: 'JobHiringsInsights',
+    screen: 'JobHirings',
     params: { path: 'features/job_hirings_insights' }
   },
   interview: {

@@ -6,34 +6,92 @@ import SearchCompany from '../components/search_page/SearchCompany';
 import CompanyTopicsList from '../components/company_topics/CompanyTopicsList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInContext';
+import { useCoreCompanyDetails } from '../features/core_company_details/context/CoreCompanyDetailsContext';
+import { getCompanyWaysToGetIn, getCoreCompanyDetails } from '../api/api';
 
 export default function SearchPage({ navigation, onBack }) {
   const [searchedCompany, setSearchedCompany] = useState(null);
-  const { loading, error, fetchCompanyData, waysData, clearData } = useWaysToGetIn();
+  const { 
+    loading: waysLoading, 
+    error: waysError, 
+    fetchCompanyData: fetchWaysData, 
+    waysData, 
+    clearData: clearWaysData 
+  } = useWaysToGetIn();
+
+  const {
+    loading: coreLoading,
+    error: coreError,
+    fetchCompanyData: fetchCoreData,
+    companyData: coreData,
+    clearData: clearCoreData
+  } = useCoreCompanyDetails();
 
   useEffect(() => {
     // Clear data when component unmounts
-    return () => clearData();
+    return () => {
+      clearWaysData();
+      clearCoreData();
+    };
   }, []);
 
   const handleSearch = async (company) => {
     if (!company?.trim()) return;
+    
+    console.log('Searching for company:', company);
     setSearchedCompany(company);
-    await fetchCompanyData(company);
+    
+    try {
+      console.log('Fetching company data...');
+      
+      // Fetch both ways to get in and core company details
+      const [waysResponse, coreResponse] = await Promise.all([
+        getCompanyWaysToGetIn(company),
+        getCoreCompanyDetails(company)
+      ]);
+
+      console.log('Ways to Get In Response:', waysResponse);
+      console.log('Core Company Details Response:', coreResponse);
+
+      // Update context with fetched data
+      fetchWaysData(company, waysResponse);
+      fetchCoreData(company, coreResponse);
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Handle error appropriately
+    }
   };
 
   const handleSelectTopic = (topicKey) => {
     if (navigation) {
+      console.log('Selecting topic:', topicKey);
+      console.log('Current core data:', coreData);
+      
       // Navigate to the appropriate screen based on the topic
       switch (topicKey) {
         case 'waysin':
+          if (!waysData) {
+            console.error('Ways to get in data not available');
+            return;
+          }
           navigation.navigate('WaysToGetIn', {
             company: searchedCompany,
-            initialTopic: 'CAMPUS' // Default to campus recruitment
+            initialTopic: 'CAMPUS'
           });
           break;
         case 'core':
-          navigation.navigate('CompanyDetails', { company: searchedCompany });
+          if (!coreData) {
+            console.error('Core company data not available');
+            return;
+          }
+          console.log('Navigating to CompanyDetails with data:', {
+            company: searchedCompany,
+            companyData: coreData
+          });
+          navigation.navigate('CompanyDetails', { 
+            company: searchedCompany
+          });
           break;
         case 'jobs':
           navigation.navigate('JobHirings', { company: searchedCompany });
@@ -57,7 +115,8 @@ export default function SearchPage({ navigation, onBack }) {
   };
 
   const handleBackToLanding = () => {
-    clearData();
+    clearWaysData();
+    clearCoreData();
     setSearchedCompany(null);
     if (onBack) {
       onBack();
@@ -65,15 +124,20 @@ export default function SearchPage({ navigation, onBack }) {
   };
 
   const handleBackToSearch = () => {
-    clearData();
+    clearWaysData();
+    clearCoreData();
     setSearchedCompany(null);
   };
 
+  const isLoading = waysLoading || coreLoading;
+  const error = waysError || coreError;
+
   // Show company topics list if we have data
-  if (searchedCompany && waysData && !loading && !error) {
+  if (searchedCompany && waysData && coreData && !isLoading && !error) {
     return (
       <CompanyTopicsList 
         company={searchedCompany}
+        companyData={coreData} // Pass core data to topics list
       />
     );
   }
@@ -95,7 +159,7 @@ export default function SearchPage({ navigation, onBack }) {
       <View style={styles.content}>
         <SearchCompany onSearch={handleSearch} />
         
-        {loading && (
+        {isLoading && (
           <View style={styles.loadingContainer}>
             <LoadingSpinner message={`Fetching information about ${searchedCompany}...`} />
           </View>

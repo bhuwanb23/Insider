@@ -1,77 +1,62 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Animatable from 'react-native-animatable';
-import { useCompany } from '../context/CompanyContext';
+import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 
-export default function Leadership() {
-  const { companyData } = useCompany();
-  const { basicIdentity } = companyData;
+export default function Leadership({ data }) {
+  const { companyData } = useCoreCompanyDetails();
+  
+  // Log raw API response for debugging
+  console.log('Raw API Response in Leadership:', JSON.stringify(companyData, null, 2));
+
+  // Use passed data prop if available, otherwise use context data
+  const leadershipData = data || companyData?.basicIdentity?.keyPeople;
+
+  if (!leadershipData || leadershipData.length === 0) {
+    console.log('No leadership data available');
+    return (
+      <View style={styles.centerContainer}>
+        <Text>No leadership information available</Text>
+      </View>
+    );
+  }
 
   const handleLinkedInPress = (url) => {
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <LinearGradient
-        colors={['#4158D0', '#C850C0']}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <Animatable.Text animation="fadeInDown" style={styles.headerTitle}>
-          Leadership Team
-        </Animatable.Text>
-        <Animatable.Text animation="fadeIn" delay={200} style={styles.headerSubtitle}>
-          Meet the people driving our success
-        </Animatable.Text>
-      </LinearGradient>
-
-      <View style={styles.content}>
-        {basicIdentity.keyPeople.map((person, index) => (
-          <Animatable.View
-            key={index}
-            animation="fadeInUp"
-            delay={index * 150}
-            style={styles.card}
-          >
-            <LinearGradient
-              colors={['#ffffff', '#f8f9fa']}
-              style={styles.cardContent}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: person.image }}
-                  style={styles.profileImage}
-                />
-                {person.linkedIn && (
-                  <TouchableOpacity
-                    style={styles.linkedInButton}
-                    onPress={() => handleLinkedInPress(person.linkedIn)}
+    <ScrollView style={styles.container}>
+      <View style={styles.grid}>
+        {leadershipData.map((leader, index) => (
+          <View key={index} style={styles.leaderCard}>
+            <Image 
+              source={{ uri: leader.image }} 
+              style={styles.leaderImage}
+              resizeMode="cover"
+            />
+            <View style={styles.leaderInfo}>
+              <Text style={styles.leaderName}>{leader.name}</Text>
+              <Text style={styles.leaderRole}>{leader.role}</Text>
+              {leader.linkedIn && (
+                <TouchableOpacity
+                  onPress={() => handleLinkedInPress(leader.linkedIn)}
+                  style={styles.linkedInButton}
+                >
+                  <LinearGradient
+                    colors={['#0077B5', '#00A0DC']}
+                    style={styles.linkedInGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
                   >
-                    <LinearGradient
-                      colors={['#0077B5', '#00A0DC']}
-                      style={styles.linkedInGradient}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                    >
-                      <Text style={styles.linkedInText}>in</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                )}
-              </View>
-              <View style={styles.profileInfo}>
-                <Text style={styles.name}>{person.name}</Text>
-                <Text style={styles.role}>{person.role}</Text>
-                {person.bio && (
-                  <Text style={styles.bio} numberOfLines={2}>{person.bio}</Text>
-                )}
-              </View>
-            </LinearGradient>
-          </Animatable.View>
+                    <Text style={styles.linkedInText}>View Profile</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
         ))}
       </View>
     </ScrollView>
@@ -81,89 +66,67 @@ export default function Leadership() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
     backgroundColor: '#f8f9fa',
   },
-  header: {
-    padding: 20,
-    alignItems: 'center',
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 16,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 6,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-  },
-  content: {
-    padding: 16,
-  },
-  card: {
-    marginBottom: 16,
+  leaderCard: {
+    width: '48%',
+    backgroundColor: '#fff',
     borderRadius: 12,
+    padding: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    backgroundColor: 'white',
   },
-  cardContent: {
-    flexDirection: 'row',
-    padding: 12,
-    borderRadius: 12,
+  leaderImage: {
+    width: '100%',
+    height: 120,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  leaderInfo: {
     alignItems: 'center',
   },
-  imageContainer: {
-    position: 'relative',
-    marginRight: 12,
+  leaderName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 4,
+    textAlign: 'center',
   },
-  profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  leaderRole: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+    textAlign: 'center',
   },
   linkedInButton: {
-    position: 'absolute',
-    bottom: -6,
-    right: -6,
-    borderRadius: 12,
+    width: '100%',
+    borderRadius: 8,
     overflow: 'hidden',
   },
   linkedInGradient: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     alignItems: 'center',
   },
   linkedInText: {
     color: '#fff',
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '600',
   },
-  profileInfo: {
+  centerContainer: {
     flex: 1,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 2,
-  },
-  role: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 4,
-  },
-  bio: {
-    fontSize: 12,
-    color: '#444',
-    lineHeight: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 }); 

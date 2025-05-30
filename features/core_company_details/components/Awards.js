@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCompany } from '../context/CompanyContext';
+import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 
 const CATEGORY_GRADIENTS = {
   workplace: ['#4158D0', '#C850C0'],
@@ -19,9 +19,23 @@ const CATEGORY_ICONS = {
   product: '🏆',
 };
 
-export default function Awards() {
-  const { companyData } = useCompany();
-  const { recognition } = companyData;
+export default function Awards({ data }) {
+  const { companyData } = useCoreCompanyDetails();
+  
+  // Log raw API response for debugging
+  console.log('Raw API Response in Awards:', JSON.stringify(companyData, null, 2));
+
+  // Use passed data prop if available, otherwise use context data
+  const awardsData = data || companyData?.recognition;
+
+  if (!awardsData) {
+    console.log('No awards data available');
+    return (
+      <View style={styles.centerContainer}>
+        <Text>No awards information available</Text>
+      </View>
+    );
+  }
 
   const handleSourcePress = (url) => {
     if (url) {
@@ -67,36 +81,30 @@ export default function Awards() {
     </View>
   );
 
-  const renderCategory = (title, awards, category) => (
-    <View style={styles.categorySection}>
-      <View style={styles.categoryHeader}>
-        <Text style={styles.categoryIcon}>{CATEGORY_ICONS[category]}</Text>
-        <Text style={styles.categoryTitle}>{title}</Text>
+  const renderCategory = (title, awards, category) => {
+    if (!awards || awards.length === 0) return null;
+    
+    return (
+      <View style={styles.categorySection}>
+        <View style={styles.categoryHeader}>
+          <Text style={styles.categoryIcon}>{CATEGORY_ICONS[category]}</Text>
+          <Text style={styles.categoryTitle}>{title}</Text>
+        </View>
+        <View style={styles.awardsGrid}>
+          {awards.map(award => renderAwardCard(award, category))}
+        </View>
       </View>
-      <View style={styles.awardsGrid}>
-        {awards.map(award => renderAwardCard(award, category))}
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <LinearGradient
-        colors={['#4158D0', '#C850C0']}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <Text style={styles.headerTitle}>Awards & Recognition</Text>
-        <Text style={styles.headerSubtitle}>Our achievements and milestones</Text>
-      </LinearGradient>
-
       <View style={styles.content}>
-        {recognition.workplace && renderCategory('Workplace Excellence', recognition.workplace, 'workplace')}
-        {recognition.rankings && renderCategory('Rankings & Lists', recognition.rankings, 'rankings')}
-        {recognition.media && renderCategory('Media Recognition', recognition.media, 'media')}
-        {recognition.csr && renderCategory('CSR & Sustainability', recognition.csr, 'csr')}
-        {recognition.product && renderCategory('Product Excellence', recognition.product, 'product')}
+        {renderCategory('Workplace Excellence', awardsData.workplace, 'workplace')}
+        {renderCategory('Rankings & Lists', awardsData.rankings, 'rankings')}
+        {renderCategory('Media Recognition', awardsData.media, 'media')}
+        {renderCategory('CSR & Sustainability', awardsData.csr, 'csr')}
+        {renderCategory('Product Excellence', awardsData.product, 'product')}
       </View>
     </ScrollView>
   );
@@ -106,24 +114,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
-  },
-  header: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
   },
   content: {
     padding: 16,
@@ -224,5 +214,11 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#fff',
     fontWeight: '600',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 }); 

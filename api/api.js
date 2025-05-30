@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { getCompanyAnalysisPrompt, getCompanyCulturePrompt } from './prompts.js';
+import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetailsPrompt } from './prompts.js';
 
 const a4fApiKey = "ddc-a4f-7132f706565644e3a56187c91c66d168";
 const a4fBaseUrl = 'https://api.a4f.co/v1';
@@ -16,6 +16,40 @@ const cleanJsonResponse = (response) => {
     // Trim any whitespace
     cleaned = cleaned.trim();
     return cleaned;
+};
+
+// Helper function to make API calls and handle responses
+const makeApiCall = async (prompt, label) => {
+    try {
+        const completion = await client.chat.completions.create({
+            model: "provider-4/claude-3.7-sonnet",
+            messages: [
+                { role: "user", content: prompt }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+            response_format: { type: "json_object" }
+        });
+
+        const responseContent = completion.choices[0].message.content;
+        console.log(`Raw ${label} API Response:`, responseContent);
+
+        const cleanedResponse = cleanJsonResponse(responseContent);
+        console.log(`Cleaned ${label} Response:`, cleanedResponse);
+
+        try {
+            const parsedResponse = JSON.parse(cleanedResponse);
+            console.log(`Successfully parsed ${label} response as JSON`);
+            return parsedResponse;
+        } catch (parseError) {
+            console.error(`Failed to parse ${label} API response as JSON:`, parseError);
+            console.error('Cleaned response content:', cleanedResponse);
+            throw new Error(`Invalid JSON response from API: ${parseError.message}`);
+        }
+    } catch (error) {
+        console.error(`Error getting ${label}:`, error);
+        throw error;
+    }
 };
 
 // Test the API connection
@@ -36,75 +70,21 @@ export const testApiConnection = async () => {
 };
 
 export const getCompanyWaysToGetIn = async (companyName) => {
-    try {
-        console.log(`Fetching data for company: ${companyName}`);
-        
-        const completion = await client.chat.completions.create({
-            model: "provider-4/claude-3.7-sonnet",
-            messages: [
-                { role: "user", content: getCompanyAnalysisPrompt(companyName) }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000,
-            response_format: { type: "json_object" }
-        });
-
-        const responseContent = completion.choices[0].message.content;
-        console.log('Raw API Response:', responseContent);
-
-        // Clean the response before parsing
-        const cleanedResponse = cleanJsonResponse(responseContent);
-        console.log('Cleaned Response:', cleanedResponse);
-
-        try {
-            const parsedResponse = JSON.parse(cleanedResponse);
-            console.log('Successfully parsed response as JSON');
-            return parsedResponse;
-        } catch (parseError) {
-            console.error('Failed to parse API response as JSON:', parseError);
-            console.error('Cleaned response content:', cleanedResponse);
-            throw new Error(`Invalid JSON response from API: ${parseError.message}`);
-        }
-    } catch (error) {
-        console.error('Error getting company ways to get in:', error);
-        throw error;
-    }
+    console.log(`Fetching ways to get in data for company: ${companyName}`);
+    const prompt = getCompanyAnalysisPrompt(companyName);
+    return makeApiCall(prompt, 'Ways to Get In');
 };
 
 export const getCompanyCulture = async (companyName) => {
-    try {
-        console.log(`Fetching culture data for company: ${companyName}`);
-        
-        const completion = await client.chat.completions.create({
-            model: "provider-4/claude-3.7-sonnet",
-            messages: [
-                { role: "user", content: getCompanyCulturePrompt(companyName) }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000,
-            response_format: { type: "json_object" }
-        });
+    console.log(`Fetching culture data for company: ${companyName}`);
+    const prompt = getCompanyCulturePrompt(companyName);
+    return makeApiCall(prompt, 'Culture');
+};
 
-        const responseContent = completion.choices[0].message.content;
-        console.log('Raw Culture API Response:', responseContent);
-
-        // Clean the response before parsing
-        const cleanedResponse = cleanJsonResponse(responseContent);
-        console.log('Cleaned Culture Response:', cleanedResponse);
-
-        try {
-            const parsedResponse = JSON.parse(cleanedResponse);
-            console.log('Successfully parsed culture response as JSON');
-            return parsedResponse;
-        } catch (parseError) {
-            console.error('Failed to parse culture API response as JSON:', parseError);
-            console.error('Cleaned culture response content:', cleanedResponse);
-            throw new Error(`Invalid JSON response from API: ${parseError.message}`);
-        }
-    } catch (error) {
-        console.error('Error getting company culture:', error);
-        throw error;
-    }
+export const getCoreCompanyDetails = async (companyName) => {
+    console.log(`Fetching core company details for company: ${companyName}`);
+    const prompt = getCoreCompanyDetailsPrompt(companyName);
+    return makeApiCall(prompt, 'Core Company Details');
 };
 
 // Example usage

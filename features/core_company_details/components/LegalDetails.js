@@ -1,11 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCompany } from '../context/CompanyContext';
+import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 
-export default function LegalDetails() {
-  const { companyData } = useCompany();
-  const { legalDetails } = companyData;
+export default function LegalDetails({ data }) {
+  const { companyData } = useCoreCompanyDetails();
+  
+  // Log raw API response for debugging
+  console.log('Raw API Response in LegalDetails:', JSON.stringify(companyData, null, 2));
+
+  // Use passed data prop if available, otherwise use context data
+  const legalData = data || companyData?.legalDetails;
+
+  if (!legalData) {
+    console.log('No legal details available');
+    return (
+      <View style={styles.centerContainer}>
+        <Text>No legal information available</Text>
+      </View>
+    );
+  }
 
   const renderCertification = (cert, index) => (
     <View key={index} style={styles.certCard}>
@@ -46,12 +60,12 @@ export default function LegalDetails() {
             <Text style={styles.sectionTitle}>Company Type</Text>
           </View>
           <View style={styles.typeCard}>
-            <Text style={styles.typeValue}>{legalDetails.companyType}</Text>
+            <Text style={styles.typeValue}>{legalData.companyType}</Text>
           </View>
         </View>
 
         {/* Legal Structure Section */}
-        {legalDetails.legalStructure && (
+        {legalData.legalStructure && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>📋</Text>
@@ -60,54 +74,58 @@ export default function LegalDetails() {
             <View style={styles.structureDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Type</Text>
-                <Text style={styles.detailValue}>{legalDetails.legalStructure.type}</Text>
+                <Text style={styles.detailValue}>{legalData.legalStructure.type}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Registration</Text>
-                <Text style={styles.detailValue}>{legalDetails.legalStructure.registrationNumber}</Text>
+                <Text style={styles.detailValue}>{legalData.legalStructure.registrationNumber}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Incorporated</Text>
-                <Text style={styles.detailValue}>{legalDetails.legalStructure.incorporationDate}</Text>
+                <Text style={styles.detailValue}>{legalData.legalStructure.incorporationDate}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Fiscal Year</Text>
+                <Text style={styles.detailValue}>{legalData.legalStructure.fiscalYear}</Text>
               </View>
             </View>
           </View>
         )}
 
         {/* Parent Company Section */}
-        {legalDetails.parentCompany && (
+        {legalData.parentCompany && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>🏢</Text>
               <Text style={styles.sectionTitle}>Parent Company</Text>
             </View>
             <View style={styles.parentCompanyCard}>
-              {legalDetails.parentCompany.logo && (
+              {legalData.parentCompany.logo && (
                 <Image 
-                  source={{ uri: legalDetails.parentCompany.logo }}
+                  source={{ uri: legalData.parentCompany.logo }}
                   style={styles.companyLogo}
                   resizeMode="contain"
                 />
               )}
               <View style={styles.companyInfo}>
-                <Text style={styles.companyName}>{legalDetails.parentCompany.name}</Text>
+                <Text style={styles.companyName}>{legalData.parentCompany.name}</Text>
                 <Text style={styles.companyDetail}>
-                  {legalDetails.parentCompany.relationship} ({legalDetails.parentCompany.ownershipPercentage}%)
+                  {legalData.parentCompany.relationship} ({legalData.parentCompany.ownershipPercentage}%)
                 </Text>
-                <Text style={styles.companyLocation}>{legalDetails.parentCompany.headquartered}</Text>
+                <Text style={styles.companyLocation}>{legalData.parentCompany.headquartered}</Text>
               </View>
             </View>
           </View>
         )}
 
         {/* Subsidiaries Section */}
-        {legalDetails.subsidiaries && legalDetails.subsidiaries.length > 0 && (
+        {legalData.subsidiaries && legalData.subsidiaries.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>🔄</Text>
               <Text style={styles.sectionTitle}>Subsidiaries</Text>
             </View>
-            {legalDetails.subsidiaries.map((subsidiary, index) => (
+            {legalData.subsidiaries.map((subsidiary, index) => (
               <View key={index} style={styles.subsidiaryCard}>
                 {subsidiary.logo && (
                   <Image 
@@ -136,14 +154,14 @@ export default function LegalDetails() {
         )}
 
         {/* Compliance Section */}
-        {legalDetails.compliance?.certifications && (
+        {legalData.compliance?.certifications && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>✅</Text>
               <Text style={styles.sectionTitle}>Compliance & Certifications</Text>
             </View>
             <View style={styles.certificationsGrid}>
-              {legalDetails.compliance.certifications.map((cert, index) => 
+              {legalData.compliance.certifications.map((cert, index) => 
                 renderCertification(cert, index)
               )}
             </View>
@@ -151,74 +169,58 @@ export default function LegalDetails() {
         )}
 
         {/* Funding History Section */}
-        {legalDetails.fundingHistory?.rounds && (
+        {legalData.fundingHistory && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>💰</Text>
               <Text style={styles.sectionTitle}>Funding History</Text>
             </View>
-            <View style={styles.fundingTimeline}>
-              {legalDetails.fundingHistory.rounds.map((round, index) => 
-                renderFundingRound(round, index)
-              )}
+            <View style={styles.fundingCard}>
+              <Text style={styles.currentStage}>
+                Current Stage: {legalData.fundingHistory.currentStage}
+              </Text>
+              <View style={styles.timeline}>
+                {legalData.fundingHistory.rounds.map((round, index) => (
+                  <View key={index} style={styles.timelineItem}>
+                    <View style={styles.timelineDot} />
+                    <View style={styles.timelineContent}>
+                      <Text style={styles.roundStage}>{round.stage}</Text>
+                      <Text style={styles.roundYear}>{round.year}</Text>
+                      <Text style={styles.roundAmount}>{round.amount}</Text>
+                      <Text style={styles.roundInvestor}>{round.leadInvestor}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
         )}
 
         {/* Stock Information Section */}
-        {legalDetails.stockInfo && (
+        {legalData.stockInfo && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>📈</Text>
               <Text style={styles.sectionTitle}>Stock Information</Text>
             </View>
-            <LinearGradient
-              colors={['#4158D0', '#C850C0']}
-              style={styles.stockCard}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <View style={styles.stockGrid}>
-                <View style={styles.stockItem}>
-                  <Text style={styles.stockLabel}>Exchange</Text>
-                  <Text style={styles.stockValue}>{legalDetails.stockInfo.exchange}</Text>
-                </View>
-                <View style={styles.stockItem}>
-                  <Text style={styles.stockLabel}>Ticker</Text>
-                  <Text style={styles.stockValue}>{legalDetails.stockInfo.ticker}</Text>
-                </View>
-                <View style={styles.stockItem}>
-                  <Text style={styles.stockLabel}>Market Cap</Text>
-                  <Text style={styles.stockValue}>{legalDetails.stockInfo.marketCap}</Text>
-                </View>
-                <View style={styles.stockItem}>
-                  <Text style={styles.stockLabel}>Shares</Text>
-                  <Text style={styles.stockValue}>{legalDetails.stockInfo.sharesOutstanding}</Text>
-                </View>
+            <View style={styles.stockCard}>
+              <View style={styles.stockRow}>
+                <Text style={styles.stockLabel}>Exchange</Text>
+                <Text style={styles.stockValue}>{legalData.stockInfo.exchange}</Text>
               </View>
-              {legalDetails.stockInfo.ipoDetails && (
-                <>
-                  <View style={styles.ipoDivider} />
-                  <View style={styles.ipoInfo}>
-                    <Text style={styles.ipoTitle}>IPO Details</Text>
-                    <View style={styles.ipoGrid}>
-                      <View style={styles.ipoItem}>
-                        <Text style={styles.ipoLabel}>Date</Text>
-                        <Text style={styles.ipoValue}>{legalDetails.stockInfo.ipoDetails.date}</Text>
-                      </View>
-                      <View style={styles.ipoItem}>
-                        <Text style={styles.ipoLabel}>Initial Price</Text>
-                        <Text style={styles.ipoValue}>{legalDetails.stockInfo.ipoDetails.initialPrice}</Text>
-                      </View>
-                      <View style={styles.ipoItem}>
-                        <Text style={styles.ipoLabel}>Valuation</Text>
-                        <Text style={styles.ipoValue}>{legalDetails.stockInfo.ipoDetails.initialValuation}</Text>
-                      </View>
-                    </View>
-                  </View>
-                </>
-              )}
-            </LinearGradient>
+              <View style={styles.stockRow}>
+                <Text style={styles.stockLabel}>Ticker</Text>
+                <Text style={styles.stockValue}>{legalData.stockInfo.ticker}</Text>
+              </View>
+              <View style={styles.stockRow}>
+                <Text style={styles.stockLabel}>Market Cap</Text>
+                <Text style={styles.stockValue}>{legalData.stockInfo.marketCap}</Text>
+              </View>
+              <View style={styles.stockRow}>
+                <Text style={styles.stockLabel}>Shares Outstanding</Text>
+                <Text style={styles.stockValue}>{legalData.stockInfo.sharesOutstanding}</Text>
+              </View>
+            </View>
           </View>
         )}
       </View>
@@ -396,30 +398,42 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#888',
   },
-  fundingTimeline: {
+  fundingCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+  },
+  currentStage: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  timeline: {
     gap: 12,
   },
-  fundingRound: {
+  timelineItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  roundBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 12,
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#4158D0',
+    marginRight: 8,
+  },
+  timelineContent: {
+    flex: 1,
   },
   roundStage: {
     fontSize: 12,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  roundDetails: {
-    flex: 1,
+    color: '#666',
+    marginBottom: 2,
   },
   roundYear: {
     fontSize: 12,
-    color: '#666',
+    color: '#888',
     marginBottom: 2,
   },
   roundAmount: {
@@ -437,14 +451,10 @@ const styles = StyleSheet.create({
     padding: 16,
     overflow: 'hidden',
   },
-  stockGrid: {
+  stockRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-  },
-  stockItem: {
-    flex: 1,
-    minWidth: '40%',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
   stockLabel: {
     fontSize: 11,
@@ -454,38 +464,6 @@ const styles = StyleSheet.create({
   stockValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
-  },
-  ipoDivider: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginVertical: 16,
-  },
-  ipoInfo: {
-    marginTop: 8,
-  },
-  ipoTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 12,
-  },
-  ipoGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  ipoItem: {
-    flex: 1,
-  },
-  ipoLabel: {
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 4,
-  },
-  ipoValue: {
-    fontSize: 13,
-    fontWeight: '600',
     color: '#fff',
   },
   typeCard: {
@@ -498,5 +476,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1a1a1a',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 }); 

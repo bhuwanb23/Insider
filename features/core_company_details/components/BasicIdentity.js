@@ -1,14 +1,30 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Linking, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCompany } from '../context/CompanyContext';
+import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 
-export default function BasicIdentity() {
-  const { companyData } = useCompany();
-  const { basicIdentity } = companyData;
+export default function BasicIdentity({ data }) {
+  const { companyData } = useCoreCompanyDetails();
+  
+  // Log raw API response for debugging
+  console.log('Raw API Response in BasicIdentity:', JSON.stringify(companyData, null, 2));
+
+  // Use passed data prop if available, otherwise use context data
+  const identityData = data || companyData?.basicIdentity;
+
+  if (!identityData) {
+    console.log('No identity data available');
+    return (
+      <View style={styles.centerContainer}>
+        <Text>No basic identity information available</Text>
+      </View>
+    );
+  }
 
   const handleLinkedInPress = (url) => {
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
 
   return (
@@ -21,13 +37,13 @@ export default function BasicIdentity() {
       >
         <View style={styles.header}>
           <Image 
-            source={{ uri: basicIdentity.logo }} 
+            source={{ uri: identityData.logo }} 
             style={styles.logo}
             resizeMode="contain"
           />
           <View style={styles.titleContainer}>
-            <Text style={styles.companyName}>{basicIdentity.name}</Text>
-            <Text style={styles.tagline}>{basicIdentity.tagline}</Text>
+            <Text style={styles.companyName}>{identityData.name}</Text>
+            <Text style={styles.tagline}>{identityData.tagline}</Text>
           </View>
         </View>
       </LinearGradient>
@@ -37,12 +53,12 @@ export default function BasicIdentity() {
           <View style={styles.quickInfoItem}>
             <Text style={styles.quickInfoIcon}>🏢</Text>
             <Text style={styles.quickInfoLabel}>Industry</Text>
-            <Text style={styles.quickInfoValue}>{basicIdentity.industry}</Text>
+            <Text style={styles.quickInfoValue}>{identityData.industry}</Text>
           </View>
           <View style={styles.quickInfoItem}>
             <Text style={styles.quickInfoIcon}>📅</Text>
             <Text style={styles.quickInfoLabel}>Founded</Text>
-            <Text style={styles.quickInfoValue}>{basicIdentity.foundedYear}</Text>
+            <Text style={styles.quickInfoValue}>{identityData.foundedYear}</Text>
           </View>
         </View>
 
@@ -52,7 +68,7 @@ export default function BasicIdentity() {
               <Text style={styles.labelIcon}>📍</Text>
               <Text style={styles.label}>Headquarters</Text>
             </View>
-            <Text style={styles.value}>{basicIdentity.headquarters}</Text>
+            <Text style={styles.value}>{identityData.headquarters}</Text>
           </View>
 
           <View style={styles.infoRow}>
@@ -63,14 +79,14 @@ export default function BasicIdentity() {
             <View style={styles.employeeStats}>
               <View style={styles.employeeCount}>
                 <Text style={styles.employeeNumber}>
-                  {basicIdentity.employees.global.toLocaleString()}
+                  {identityData.employees?.global?.toLocaleString() || 'N/A'}
                 </Text>
                 <Text style={styles.employeeLabel}>Global</Text>
               </View>
-              {basicIdentity.employees.india && (
+              {identityData.employees?.india && (
                 <View style={styles.employeeCount}>
                   <Text style={styles.employeeNumber}>
-                    {basicIdentity.employees.india.toLocaleString()}
+                    {identityData.employees.india.toLocaleString()}
                   </Text>
                   <Text style={styles.employeeLabel}>India</Text>
                 </View>
@@ -79,47 +95,51 @@ export default function BasicIdentity() {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Key People</Text>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.peopleScrollContainer}
-        >
-          {basicIdentity.keyPeople.map((person, index) => (
-            <LinearGradient
-              key={index}
-              colors={['#ffffff', '#f8f9fa']}
-              style={styles.personCard}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+        {identityData.keyPeople && identityData.keyPeople.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Key People</Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.peopleScrollContainer}
             >
-              <Image 
-                source={{ uri: person.image }} 
-                style={styles.personImage}
-                resizeMode="cover"
-              />
-              <View style={styles.personInfo}>
-                <Text style={styles.personName} numberOfLines={1}>{person.name}</Text>
-                <Text style={styles.personRole} numberOfLines={2}>{person.role}</Text>
-                {person.linkedIn && (
-                  <TouchableOpacity
-                    style={styles.linkedInButton}
-                    onPress={() => handleLinkedInPress(person.linkedIn)}
-                  >
-                    <LinearGradient
-                      colors={['#0077B5', '#00A0DC']}
-                      style={styles.linkedInGradient}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                    >
-                      <Text style={styles.linkedInText}>View Profile</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </LinearGradient>
-          ))}
-        </ScrollView>
+              {identityData.keyPeople.map((person, index) => (
+                <LinearGradient
+                  key={index}
+                  colors={['#ffffff', '#f8f9fa']}
+                  style={styles.personCard}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Image 
+                    source={{ uri: person.image }} 
+                    style={styles.personImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.personInfo}>
+                    <Text style={styles.personName} numberOfLines={1}>{person.name}</Text>
+                    <Text style={styles.personRole} numberOfLines={2}>{person.role}</Text>
+                    {person.linkedIn && (
+                      <TouchableOpacity
+                        style={styles.linkedInButton}
+                        onPress={() => handleLinkedInPress(person.linkedIn)}
+                      >
+                        <LinearGradient
+                          colors={['#0077B5', '#00A0DC']}
+                          style={styles.linkedInGradient}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                        >
+                          <Text style={styles.linkedInText}>View Profile</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </LinearGradient>
+              ))}
+            </ScrollView>
+          </>
+        )}
       </View>
     </ScrollView>
   );
@@ -315,5 +335,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 }); 

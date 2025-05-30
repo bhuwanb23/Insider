@@ -16,6 +16,7 @@ import { NewsProvider } from './features/news_highlights/context/NewsContext';
 import { WaysToGetInProvider } from './features/ways_to_get_in/context/WaysToGetInContext';
 import { TechStackProvider } from './features/tech_stack/context/TechStackContext';
 import { WorkCultureProvider } from './features/work_culture/context/WorkCultureContext';
+import { CoreCompanyDetailsProvider } from './features/core_company_details/context/CoreCompanyDetailsContext';
 
 const Stack = createStackNavigator();
 
@@ -39,135 +40,137 @@ export default function App() {
         />
         <NavigationContainer>
           <NewsProvider>
-            <WaysToGetInProvider>
-              <TechStackProvider>
-                <WorkCultureProvider>
-                  <Stack.Navigator
-                    initialRouteName="Landing"
-                    screenOptions={{
-                      headerStyle: {
-                        backgroundColor: '#ffffff',
-                        elevation: 0,
-                        shadowOpacity: 0,
-                        height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
-                      },
-                      headerTitleStyle: {
-                        fontWeight: 'bold',
-                        fontSize: 18,
-                      },
-                      headerBackTitleVisible: false,
-                      headerTitleAlign: 'center',
-                      headerLeftContainerStyle: {
-                        paddingLeft: 16,
-                      },
-                      headerRightContainerStyle: {
-                        paddingRight: 16,
-                      },
-                      cardStyle: {
-                        backgroundColor: 'transparent',
-                      },
-                    }}
-                  >
-                    <Stack.Screen 
-                      name="Landing" 
-                      component={LandingPage}
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="CompanyDetails"
-                      component={CompanyDetailsPage}
-                      options={{ 
-                        title: 'Company Details',
+            <CoreCompanyDetailsProvider>
+              <WaysToGetInProvider>
+                <TechStackProvider>
+                  <WorkCultureProvider>
+                    <Stack.Navigator
+                      initialRouteName="Landing"
+                      screenOptions={{
                         headerStyle: {
                           backgroundColor: '#ffffff',
                           elevation: 0,
                           shadowOpacity: 0,
                           height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
                         },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="JobHirings"
-                      component={JobHiringsPage}
-                      options={{ 
-                        title: 'Jobs & Hiring Insights',
-                        headerStyle: {
-                          backgroundColor: '#ffffff',
-                          elevation: 0,
-                          shadowOpacity: 0,
-                          height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                        headerTitleStyle: {
+                          fontWeight: 'bold',
+                          fontSize: 18,
+                        },
+                        headerBackTitleVisible: false,
+                        headerTitleAlign: 'center',
+                        headerLeftContainerStyle: {
+                          paddingLeft: 16,
+                        },
+                        headerRightContainerStyle: {
+                          paddingRight: 16,
+                        },
+                        cardStyle: {
+                          backgroundColor: 'transparent',
                         },
                       }}
-                    />
-                    <Stack.Screen
-                      name="InterviewExperience"
-                      component={InterviewExperiencePage}
-                      options={{ 
-                        title: 'Interview Experience',
-                        headerStyle: {
-                          backgroundColor: '#ffffff',
-                          elevation: 0,
-                          shadowOpacity: 0,
-                          height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="NewsHighlights"
-                      component={NewsHighlightsPage}
-                      options={{ 
-                        title: 'News & Highlights',
-                        headerStyle: {
-                          backgroundColor: '#ffffff',
-                          elevation: 0,
-                          shadowOpacity: 0,
-                          height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="WaysToGetIn"
-                      component={WaysToGetInPage}
-                      options={{ 
-                        title: 'Ways to Get In',
-                        headerStyle: {
-                          backgroundColor: '#ffffff',
-                          elevation: 0,
-                          shadowOpacity: 0,
-                          height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="TechStack"
-                      component={TechStackPage}
-                      options={{ 
-                        title: 'Tech Stack & Tools',
-                        headerStyle: {
-                          backgroundColor: '#ffffff',
-                          elevation: 0,
-                          shadowOpacity: 0,
-                          height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="WorkCulture"
-                      component={WorkCulturePage}
-                      options={{ 
-                        title: 'Work Culture & Life',
-                        headerStyle: {
-                          backgroundColor: '#ffffff',
-                          elevation: 0,
-                          shadowOpacity: 0,
-                          height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
-                        },
-                      }}
-                    />
-                  </Stack.Navigator>
-                </WorkCultureProvider>
-              </TechStackProvider>
-            </WaysToGetInProvider>
+                    >
+                      <Stack.Screen 
+                        name="Landing" 
+                        component={LandingPage}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="CompanyDetails"
+                        component={CompanyDetailsPage}
+                        options={{ 
+                          title: 'Company Details',
+                          headerStyle: {
+                            backgroundColor: '#ffffff',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="JobHirings"
+                        component={JobHiringsPage}
+                        options={{ 
+                          title: 'Jobs & Hiring Insights',
+                          headerStyle: {
+                            backgroundColor: '#ffffff',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="InterviewExperience"
+                        component={InterviewExperiencePage}
+                        options={{ 
+                          title: 'Interview Experience',
+                          headerStyle: {
+                            backgroundColor: '#ffffff',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="NewsHighlights"
+                        component={NewsHighlightsPage}
+                        options={{ 
+                          title: 'News & Highlights',
+                          headerStyle: {
+                            backgroundColor: '#ffffff',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="WaysToGetIn"
+                        component={WaysToGetInPage}
+                        options={{ 
+                          title: 'Ways to Get In',
+                          headerStyle: {
+                            backgroundColor: '#ffffff',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="TechStack"
+                        component={TechStackPage}
+                        options={{ 
+                          title: 'Tech Stack & Tools',
+                          headerStyle: {
+                            backgroundColor: '#ffffff',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="WorkCulture"
+                        component={WorkCulturePage}
+                        options={{ 
+                          title: 'Work Culture & Life',
+                          headerStyle: {
+                            backgroundColor: '#ffffff',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          },
+                        }}
+                      />
+                    </Stack.Navigator>
+                  </WorkCultureProvider>
+                </TechStackProvider>
+              </WaysToGetInProvider>
+            </CoreCompanyDetailsProvider>
           </NewsProvider>
         </NavigationContainer>
       </View>
