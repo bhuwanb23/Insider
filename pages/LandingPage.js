@@ -14,8 +14,12 @@ export default function LandingPage() {
     { useNativeDriver: true }
   );
 
+  const handleBackToLanding = () => {
+    setShowSearch(false);
+  };
+
   if (showSearch) {
-    return <SearchPage />;
+    return <SearchPage onBack={handleBackToLanding} />;
   }
 
   return (
