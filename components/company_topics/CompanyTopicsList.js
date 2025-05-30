@@ -7,68 +7,63 @@ import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 
 const GRADIENTS = {
-  blue: ['#4091FF', '#3F7EF8'],
-  purple: ['#8257E5', '#D658D6'],
-  orange: ['#FF9140', '#FBC748'],
-  teal: ['#0984e3', '#00b894'],
   violet: ['#4158D0', '#C850C0'],
+  sunset: ['#FF512F', '#F09819'],
+  ocean: ['#2E3192', '#1BFFFF'],
+  forest: ['#134E5E', '#71B280'],
+  berry: ['#8E2DE2', '#4A00E0'],
+  coral: ['#FF416C', '#FF4B2B'],
+  sky: ['#0082c8', '#667db6'],
 };
 
 const topics = [
-  { 
-    key: 'core', 
-    label: 'Core Company Profile', 
+  {
+    key: 'core',
+    label: 'Core Company Profile',
     icon: '🏢',
     gradient: GRADIENTS.violet,
     description: 'What the company does'
   },
-  { 
-    key: 'jobs', 
-    label: 'Jobs & Hiring Insights', 
+  {
+    key: 'jobs',
+    label: 'Jobs & Hiring Insights',
     icon: '💼',
-    gradient: GRADIENTS.blue,
+    gradient: GRADIENTS.sunset,
     description: 'Where & how to get hired'
   },
-  { 
-    key: 'interview', 
-    label: 'Interview Experience & Questions', 
+  {
+    key: 'interview',
+    label: 'Interview Experience & Questions',
     icon: '🧠',
-    gradient: GRADIENTS.purple,
+    gradient: GRADIENTS.ocean,
     description: 'Real questions and interview rounds'
   },
-  { 
-    key: 'culture', 
-    label: 'Work Culture & Life', 
+  {
+    key: 'culture',
+    label: 'Work Culture & Life',
     icon: '🌿',
-    gradient: GRADIENTS.teal,
+    gradient: GRADIENTS.forest,
     description: 'Intern experience, work-life balance'
   },
-  { 
-    key: 'reviews', 
-    label: 'Employee Stories & Reviews', 
-    icon: '⭐',
-    gradient: GRADIENTS.orange,
-    description: 'Real voices from the inside'
-  },
-  { 
-    key: 'techstack', 
-    label: 'Tech Stack & Tools Used', 
+  {
+    key: 'techstack',
+    label: 'Tech Stack & Tools Used',
     icon: '🛠️',
-    gradient: GRADIENTS.violet,
+    gradient: GRADIENTS.berry,
     description: 'Know what they use'
   },
-  { 
-    key: 'waysin', 
-    label: 'Ways to Get In', 
+  {
+    key: 'waysin',
+    label: 'Ways to Get In',
     icon: '🚪',
-    gradient: GRADIENTS.blue,
+    gradient: GRADIENTS.coral,
     description: 'Entry channels like referrals, portals'
   },
-  { 
-    key: 'insights', 
-    label: 'Recent News & Highlights', 
+  {
+    key: 'insights',
+    label: 'Recent News & Highlights',
     icon: '📈',
-    gradient: GRADIENTS.purple,
+    gradient: GRADIENTS.sky,
     description: 'Campus drives, innovations'
   },
 ];
@@ -97,13 +92,13 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
   };
 
   const renderItem = ({ item, index }) => (
-    <Animatable.View 
-      animation="fadeInUp" 
+    <Animatable.View
+      animation="fadeInUp"
       delay={index * 150}
       style={styles.cardWrapper}
     >
-      <TouchableOpacity 
-        style={styles.card} 
+      <TouchableOpacity
+        style={styles.card}
         onPress={() => handleTopicPress(item.key)}
         activeOpacity={0.9}
       >
