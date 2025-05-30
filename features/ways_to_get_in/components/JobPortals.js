@@ -4,18 +4,22 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
 
 export default function JobPortals() {
-  const waysData = useWaysToGetIn();
-  const { jobPortals } = waysData;
+  const { waysData } = useWaysToGetIn();
+  const jobPortals = waysData?.jobPortals;
 
   const handlePlatformPress = (url) => {
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
+
+  if (!jobPortals) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sectionIcon}>{jobPortals.icon}</Text>
-        <Text style={styles.title}>{jobPortals.title}</Text>
+        <Text style={styles.sectionIcon}>{jobPortals.icon || '🔍'}</Text>
+        <Text style={styles.title}>{jobPortals.title || 'Job Portals'}</Text>
       </View>
 
       <LinearGradient
@@ -30,7 +34,7 @@ export default function JobPortals() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Popular Platforms</Text>
         <View style={styles.platformsList}>
-          {jobPortals.platforms.map((platform, index) => (
+          {jobPortals.platforms?.map((platform, index) => (
             <TouchableOpacity
               key={index}
               style={styles.platformItem}
@@ -54,7 +58,7 @@ export default function JobPortals() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Pro Tips</Text>
         <View style={styles.tipsList}>
-          {jobPortals.tips.map((tip, index) => (
+          {jobPortals.tips?.map((tip, index) => (
             <View key={index} style={styles.tipItem}>
               <Text style={styles.tipIcon}>💡</Text>
               <Text style={styles.tipText}>{tip}</Text>

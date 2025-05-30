@@ -4,14 +4,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
 
 export default function Referrals() {
-  const waysData = useWaysToGetIn();
-  const { referrals } = waysData;
+  const { waysData } = useWaysToGetIn();
+  const referrals = waysData?.referrals;
+
+  if (!referrals) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sectionIcon}>{referrals.icon}</Text>
-        <Text style={styles.title}>{referrals.title}</Text>
+        <Text style={styles.sectionIcon}>{referrals.icon || '👥'}</Text>
+        <Text style={styles.title}>{referrals.title || 'Referrals'}</Text>
       </View>
 
       <LinearGradient
@@ -26,7 +28,7 @@ export default function Referrals() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>How to Ask for a Referral</Text>
         <View style={styles.stepsList}>
-          {referrals.howToAsk.map((step, index) => (
+          {referrals.howToAsk?.map((step, index) => (
             <View key={index} style={styles.stepItem}>
               <LinearGradient
                 colors={['rgba(65, 88, 208, 0.1)', 'rgba(200, 80, 192, 0.1)']}
@@ -47,7 +49,7 @@ export default function Referrals() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Networking Tips</Text>
         <View style={styles.tipsList}>
-          {referrals.tips.map((tip, index) => (
+          {referrals.tips?.map((tip, index) => (
             <View key={index} style={styles.tipItem}>
               <Text style={styles.tipIcon}>💡</Text>
               <Text style={styles.tipText}>{tip}</Text>

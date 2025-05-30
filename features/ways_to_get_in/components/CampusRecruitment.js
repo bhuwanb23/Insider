@@ -4,14 +4,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
 
 export default function CampusRecruitment() {
-  const waysData = useWaysToGetIn();
-  const { campusRecruitment } = waysData;
+  const { waysData } = useWaysToGetIn();
+  const campusRecruitment = waysData?.campusRecruitment;
+
+  if (!campusRecruitment) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sectionIcon}>{campusRecruitment.icon}</Text>
-        <Text style={styles.title}>{campusRecruitment.title}</Text>
+        <Text style={styles.sectionIcon}>{campusRecruitment.icon || '🎓'}</Text>
+        <Text style={styles.title}>{campusRecruitment.title || 'Campus Recruitment'}</Text>
       </View>
 
       <LinearGradient
@@ -29,7 +31,7 @@ export default function CampusRecruitment() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Process Overview</Text>
         <View style={styles.detailsList}>
-          {campusRecruitment.details.map((detail, index) => (
+          {campusRecruitment.details?.map((detail, index) => (
             <View key={index} style={styles.detailItem}>
               <LinearGradient
                 colors={['rgba(65, 88, 208, 0.1)', 'rgba(200, 80, 192, 0.1)']}
@@ -48,7 +50,7 @@ export default function CampusRecruitment() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Pro Tips</Text>
         <View style={styles.tipsList}>
-          {campusRecruitment.tips.map((tip, index) => (
+          {campusRecruitment.tips?.map((tip, index) => (
             <View key={index} style={styles.tipItem}>
               <Text style={styles.tipIcon}>💡</Text>
               <Text style={styles.tipText}>{tip}</Text>

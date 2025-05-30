@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
@@ -14,6 +15,41 @@ const GRADIENTS = {
   berry: ['#8E2DE2', '#4A00E0'],
   coral: ['#FF416C', '#FF4B2B'],
   sky: ['#0082c8', '#667db6'],
+};
+
+// Map topic keys to their respective navigation routes and screens
+const TOPIC_ROUTES = {
+  core: {
+    screen: 'CoreCompanyDetails',
+    params: { path: 'features/core_company_details' }
+  },
+  jobs: {
+    screen: 'JobHiringsInsights',
+    params: { path: 'features/job_hirings_insights' }
+  },
+  interview: {
+    screen: 'InterviewExperience',
+    params: { path: 'features/interview_experience' }
+  },
+  culture: {
+    screen: 'WorkCulture',
+    params: { path: 'features/work_culture' }
+  },
+  techstack: {
+    screen: 'TechStack',
+    params: { path: 'features/tech_stack' }
+  },
+  waysin: {
+    screen: 'WaysToGetIn',
+    params: { 
+      path: 'features/ways_to_get_in',
+      initialTopic: 'CAMPUS' // Match the SECTIONS key in WaysToGetInPage
+    }
+  },
+  insights: {
+    screen: 'NewsHighlights',
+    params: { path: 'features/news_highlights' }
+  }
 };
 
 const topics = [
@@ -68,26 +104,24 @@ const topics = [
   },
 ];
 
-export default function CompanyTopicsList({ company, onSelectTopic }) {
+export default function CompanyTopicsList({ company }) {
   const navigation = useNavigation();
 
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
   const handleTopicPress = (topicKey) => {
-    if (topicKey === 'core') {
-      navigation.navigate('CompanyDetails');
-    } else if (topicKey === 'jobs') {
-      navigation.navigate('JobHirings');
-    } else if (topicKey === 'interview') {
-      navigation.navigate('InterviewExperience');
-    } else if (topicKey === 'insights') {
-      navigation.navigate('NewsHighlights');
-    } else if (topicKey === 'waysin') {
-      navigation.navigate('WaysToGetIn');
-    } else if (topicKey === 'techstack') {
-      navigation.navigate('TechStack');
-    } else if (topicKey === 'culture') {
-      navigation.navigate('WorkCulture');
+    const route = TOPIC_ROUTES[topicKey];
+    if (route) {
+      navigation.navigate(route.screen, {
+        company,
+        ...route.params,
+        // Add any additional params needed by the feature
+        timestamp: new Date().getTime() // Ensure unique navigation
+      });
     } else {
-      onSelectTopic(topicKey);
+      console.warn(`No route found for topic: ${topicKey}`);
     }
   };
 
@@ -100,7 +134,7 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
       <TouchableOpacity
         style={styles.card}
         onPress={() => handleTopicPress(item.key)}
-        activeOpacity={0.9}
+        activeOpacity={0.7}
       >
         <LinearGradient
           colors={item.gradient}
@@ -113,8 +147,16 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
           </View>
           <View style={styles.contentContainer}>
             <Text style={styles.cardLabel}>{item.label}</Text>
-            <Text style={styles.cardDescription}>{item.description}</Text>
+            <Text style={styles.cardDescription} numberOfLines={2}>
+              {item.description}
+            </Text>
           </View>
+          <MaterialCommunityIcons 
+            name="chevron-right" 
+            size={24} 
+            color="rgba(255, 255, 255, 0.8)" 
+            style={styles.arrowIcon}
+          />
         </LinearGradient>
       </TouchableOpacity>
     </Animatable.View>
@@ -128,12 +170,20 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      <Animatable.Text animation="fadeInDown" style={styles.header}>
-        <Text style={styles.icon}>🏢</Text> {company}
-      </Animatable.Text>
+      
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
+        </TouchableOpacity>
+        <Animatable.Text animation="fadeInDown" style={styles.headerText}>
+          <Text style={styles.icon}>🏢</Text> {company}
+        </Animatable.Text>
+      </View>
+
       <Animatable.Text animation="fadeIn" delay={200} style={styles.subHeader}>
         Explore topics about {company}
       </Animatable.Text>
+
       <FlatList
         data={topics}
         renderItem={renderItem}
@@ -148,17 +198,30 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
     backgroundColor: 'transparent',
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(65, 88, 208, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  headerText: {
+    flex: 1,
     fontSize: 32,
     fontWeight: 'bold',
     color: '#2d3436',
-    marginBottom: 10,
-    textAlign: 'center',
     letterSpacing: 1,
-    paddingHorizontal: 20,
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
@@ -228,5 +291,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.9)',
     lineHeight: 20,
+  },
+  arrowIcon: {
+    marginLeft: 12,
   },
 }); 

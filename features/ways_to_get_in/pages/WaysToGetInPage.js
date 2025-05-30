@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import CampusRecruitment from '../components/CampusRecruitment';
 import JobPortals from '../components/JobPortals';
@@ -8,41 +8,106 @@ import HackathonsCompetitions from '../components/HackathonsCompetitions';
 import ColdOutreach from '../components/ColdOutreach';
 import InternshipConversion from '../components/InternshipConversion';
 import ContractRoles from '../components/ContractRoles';
+import { useWaysToGetIn } from '../context/WaysToGetInContext';
 
 const SECTIONS = {
-  CAMPUS: { title: 'Campus Recruitment', icon: '🎓' },
-  PORTALS: { title: 'Job Portals', icon: '🔍' },
-  REFERRALS: { title: 'Referrals', icon: '👥' },
-  HACKATHONS: { title: 'Hackathons', icon: '🧩' },
-  OUTREACH: { title: 'Cold Outreach', icon: '✉️' },
-  INTERNSHIP: { title: 'Internship → Full-Time', icon: '🚀' },
-  CONTRACT: { title: 'Contract Roles', icon: '💼' },
+  CAMPUS: { title: 'Campus Recruitment', icon: '🎓', key: 'campusRecruitment' },
+  PORTALS: { title: 'Job Portals', icon: '🔍', key: 'jobPortals' },
+  REFERRALS: { title: 'Referrals', icon: '👥', key: 'referrals' },
+  HACKATHONS: { title: 'Hackathons', icon: '🧩', key: 'hackathons' },
+  OUTREACH: { title: 'Cold Outreach', icon: '✉️', key: 'coldOutreach' },
+  INTERNSHIP: { title: 'Internship → Full-Time', icon: '🚀', key: 'internshipConversion' },
+  CONTRACT: { title: 'Contract Roles', icon: '💼', key: 'contractRoles' },
 };
 
 const { width } = Dimensions.get('window');
 
-export default function WaysToGetInPage() {
-  const [activeSection, setActiveSection] = useState(SECTIONS.CAMPUS);
+export default function WaysToGetInPage({ route }) {
+  const { waysData } = useWaysToGetIn();
+  const [activeSection, setActiveSection] = useState(SECTIONS.CAMPUS || Object.values(SECTIONS)[0]);
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const slideAnim = React.useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    // Set initial topic if provided in route params
+    if (route?.params?.initialTopic) {
+      const section = SECTIONS[route.params.initialTopic];
+      if (section) {
+        setActiveSection(section);
+      }
+    }
+
+    // Animate component entry
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [route?.params?.initialTopic]);
 
   const renderContent = () => {
-    switch (activeSection) {
-      case SECTIONS.CAMPUS:
+    if (!waysData) return null;
+
+    switch (activeSection?.key) {
+      case 'campusRecruitment':
         return <CampusRecruitment />;
-      case SECTIONS.PORTALS:
+      case 'jobPortals':
         return <JobPortals />;
-      case SECTIONS.REFERRALS:
+      case 'referrals':
         return <Referrals />;
-      case SECTIONS.HACKATHONS:
+      case 'hackathons':
         return <HackathonsCompetitions />;
-      case SECTIONS.OUTREACH:
+      case 'coldOutreach':
         return <ColdOutreach />;
-      case SECTIONS.INTERNSHIP:
+      case 'internshipConversion':
         return <InternshipConversion />;
-      case SECTIONS.CONTRACT:
+      case 'contractRoles':
         return <ContractRoles />;
       default:
         return <CampusRecruitment />;
     }
+  };
+
+  const renderTab = (key, section) => {
+    if (!section) return null;
+    
+    const isActive = activeSection?.key === section.key;
+    
+    return (
+      <TouchableOpacity
+        key={key}
+        style={[
+          styles.tab,
+          isActive && styles.activeTab,
+        ]}
+        onPress={() => setActiveSection(section)}
+        activeOpacity={0.7}
+      >
+        <LinearGradient
+          colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+          style={styles.tabGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.tabIcon}>{section.icon || '📍'}</Text>
+          <Text
+            style={[
+              styles.tabText,
+              isActive && styles.activeTabText,
+            ]}
+          >
+            {section.title || 'Section'}
+          </Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -59,41 +124,25 @@ export default function WaysToGetInPage() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}
         >
-          {Object.entries(SECTIONS).map(([key, section]) => (
-            <TouchableOpacity
-              key={key}
-              style={[
-                styles.tab,
-                activeSection === SECTIONS[key] && styles.activeTab,
-              ]}
-              onPress={() => setActiveSection(SECTIONS[key])}
-            >
-              <LinearGradient
-                colors={activeSection === SECTIONS[key] ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                style={styles.tabGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Text style={styles.tabIcon}>{section.icon}</Text>
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeSection === SECTIONS[key] && styles.activeTabText,
-                  ]}
-                >
-                  {section.title}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
+          {Object.entries(SECTIONS).map(([key, section]) => renderTab(key, section))}
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.contentContainer}>
-          {renderContent()}
-        </View>
-      </ScrollView>
+      <Animated.View 
+        style={[
+          styles.content,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }
+        ]}
+      >
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.contentContainer}>
+            {renderContent()}
+          </View>
+        </ScrollView>
+      </Animated.View>
     </LinearGradient>
   );
 }

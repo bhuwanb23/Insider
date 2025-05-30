@@ -4,14 +4,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
 
 export default function InternshipConversion() {
-  const waysData = useWaysToGetIn();
-  const { internshipConversion } = waysData;
+  const { waysData } = useWaysToGetIn();
+  const internshipConversion = waysData?.internshipConversion;
+
+  if (!internshipConversion) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sectionIcon}>{internshipConversion.icon}</Text>
-        <Text style={styles.title}>{internshipConversion.title}</Text>
+        <Text style={styles.sectionIcon}>{internshipConversion.icon || '🚀'}</Text>
+        <Text style={styles.title}>{internshipConversion.title || 'Internship Conversion'}</Text>
       </View>
 
       <LinearGradient
@@ -29,11 +31,11 @@ export default function InternshipConversion() {
       <View style={styles.statsCard}>
         <View style={styles.rateContainer}>
           <Text style={styles.rateLabel}>Average Conversion Rate</Text>
-          <Text style={styles.rateValue}>{internshipConversion.conversionStats.rate}</Text>
+          <Text style={styles.rateValue}>{internshipConversion.conversionStats?.rate}</Text>
         </View>
         <View style={styles.factorsContainer}>
           <Text style={styles.factorsTitle}>Key Factors</Text>
-          {internshipConversion.conversionStats.factors.map((factor, index) => (
+          {internshipConversion.conversionStats?.factors?.map((factor, index) => (
             <View key={index} style={styles.factorItem}>
               <LinearGradient
                 colors={['rgba(65, 88, 208, 0.1)', 'rgba(200, 80, 192, 0.1)']}
@@ -52,7 +54,7 @@ export default function InternshipConversion() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Success Tips</Text>
         <View style={styles.tipsList}>
-          {internshipConversion.tips.map((tip, index) => (
+          {internshipConversion.tips?.map((tip, index) => (
             <View key={index} style={styles.tipItem}>
               <LinearGradient
                 colors={['#4158D0', '#C850C0']}

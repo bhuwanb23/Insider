@@ -1,28 +1,42 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Share, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
 
 export default function ColdOutreach() {
-  const waysData = useWaysToGetIn();
-  const { coldOutreach } = waysData;
+  const { waysData } = useWaysToGetIn();
+  const coldOutreach = waysData?.coldOutreach;
+
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const handleShareTemplate = async () => {
+    if (!coldOutreach?.emailTemplate) return;
+
     try {
       await Share.share({
         title: coldOutreach.emailTemplate.subject,
         message: coldOutreach.emailTemplate.body,
       });
     } catch (error) {
-      console.error(error);
+      console.error('Error sharing template:', error);
     }
   };
 
+  if (!coldOutreach) return null;
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <View style={styles.header}>
-        <Text style={styles.sectionIcon}>{coldOutreach.icon}</Text>
-        <Text style={styles.title}>{coldOutreach.title}</Text>
+        <Text style={styles.sectionIcon}>{coldOutreach.icon || '✉️'}</Text>
+        <Text style={styles.title}>{coldOutreach.title || 'Cold Outreach'}</Text>
       </View>
 
       <LinearGradient
@@ -39,11 +53,12 @@ export default function ColdOutreach() {
         <View style={styles.templateCard}>
           <View style={styles.templateHeader}>
             <Text style={styles.templateSubject}>
-              Subject: {coldOutreach.emailTemplate.subject}
+              Subject: {coldOutreach.emailTemplate?.subject}
             </Text>
             <TouchableOpacity
               style={styles.shareButton}
               onPress={handleShareTemplate}
+              activeOpacity={0.7}
             >
               <Text style={styles.shareIcon}>📋</Text>
               <Text style={styles.shareText}>Copy</Text>
@@ -51,7 +66,7 @@ export default function ColdOutreach() {
           </View>
           <View style={styles.templateBody}>
             <Text style={styles.templateText}>
-              {coldOutreach.emailTemplate.body}
+              {coldOutreach.emailTemplate?.body}
             </Text>
           </View>
           <View style={styles.templateNote}>
@@ -66,7 +81,7 @@ export default function ColdOutreach() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Best Practices</Text>
         <View style={styles.tipsList}>
-          {coldOutreach.tips.map((tip, index) => (
+          {coldOutreach.tips?.map((tip, index) => (
             <View key={index} style={styles.tipItem}>
               <LinearGradient
                 colors={['rgba(65, 88, 208, 0.1)', 'rgba(200, 80, 192, 0.1)']}
@@ -88,7 +103,7 @@ export default function ColdOutreach() {
           Always maintain professionalism and respect the recipient's time. Follow up only once if you don't receive a response.
         </Text>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -114,6 +129,11 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 16,
     marginBottom: 24,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   description: {
     color: '#fff',

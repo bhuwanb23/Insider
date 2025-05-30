@@ -1,4 +1,5 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { getCompanyWaysToGetIn } from '../../../api/api';
 
 const WaysToGetInContext = createContext();
 
@@ -11,135 +12,83 @@ export const useWaysToGetIn = () => {
 };
 
 export const WaysToGetInProvider = ({ children }) => {
-  const waysData = {
-    campusRecruitment: {
-      title: "Campus Recruitment",
-      description: "Through university tie-ups and placement cells",
-      icon: "🎓",
-      badge: "Usually Final-Year",
-      details: [
-        "Pre-placement talks and workshops",
-        "On-campus interviews",
-        "Multiple rounds: aptitude, technical, HR",
-        "Batch placements",
-      ],
-      tips: [
-        "Maintain good academic record",
-        "Participate in campus activities",
-        "Build projects and portfolio",
-        "Practice for aptitude tests",
-      ],
-    },
-    jobPortals: {
-      title: "Job Portals",
-      description: "Posted via LinkedIn, Naukri, Indeed, or company career page",
-      icon: "🔍",
-      platforms: [
-        { name: "LinkedIn", url: "https://linkedin.com/jobs" },
-        { name: "AngelList", url: "https://angel.co" },
-        { name: "Glassdoor", url: "https://glassdoor.com" },
-      ],
-      tips: [
-        "Keep profile updated",
-        "Set job alerts",
-        "Follow company pages",
-        "Network actively",
-      ],
-    },
-    referrals: {
-      title: "Referrals",
-      description: "Get recommended by an existing employee",
-      icon: "👥",
-      howToAsk: [
-        "Research the company and role thoroughly",
-        "Prepare your pitch and resume",
-        "Connect professionally",
-        "Follow up appropriately",
-      ],
-      tips: [
-        "Build genuine connections",
-        "Attend networking events",
-        "Join professional communities",
-        "Maintain relationships",
-      ],
-    },
-    hackathons: {
-      title: "Hackathons & Competitions",
-      description: "Participate in hiring contests hosted on platforms like HackerRank, Unstop, Devfolio",
-      icon: "🧩",
-      platforms: [
-        { name: "HackerRank", url: "https://hackerrank.com" },
-        { name: "Unstop", url: "https://unstop.com" },
-        { name: "Devfolio", url: "https://devfolio.co" },
-      ],
-      activeContests: [], // To be populated dynamically
-    },
-    coldOutreach: {
-      title: "Cold Outreach",
-      description: "Emailing relevant hiring managers with a strong pitch",
-      icon: "✉️",
-      emailTemplate: {
-        subject: "Interested in [Role] opportunities at [Company]",
-        body: `Dear [Name],
+  const [waysData, setWaysData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-I hope this email finds you well. I came across the [Role] position at [Company] and I'm very interested in joining your team.
+  const validateData = (data) => {
+    const requiredFields = [
+      'campusRecruitment',
+      'jobPortals',
+      'referrals',
+      'hackathons',
+      'coldOutreach',
+      'internshipConversion',
+      'contractRoles'
+    ];
 
-[2-3 sentences about relevant experience and why you're a good fit]
+    const missingFields = requiredFields.filter(field => !data[field]);
+    
+    if (missingFields.length > 0) {
+      throw new Error(`Invalid data structure: Missing required fields: ${missingFields.join(', ')}`);
+    }
 
-I've attached my resume for your review. I would greatly appreciate the opportunity to discuss how I can contribute to [Company].
+    return true;
+  };
 
-Best regards,
-[Your Name]`,
-      },
-      tips: [
-        "Research thoroughly",
-        "Personalize each message",
-        "Be concise and professional",
-        "Follow up after a week",
-      ],
-    },
-    internshipConversion: {
-      title: "Internship → Full-Time",
-      description: "Many interns are converted to full-time roles",
-      icon: "🚀",
-      badge: "High Conversion Rate",
-      tips: [
-        "Deliver high-quality work",
-        "Show initiative",
-        "Build relationships",
-        "Express interest in full-time role",
-      ],
-      conversionStats: {
-        rate: "75%",
-        factors: [
-          "Performance during internship",
-          "Team fit",
-          "Business requirements",
-          "Budget availability",
-        ],
-      },
-    },
-    contractRoles: {
-      title: "Freelancing / Contract Roles",
-      description: "Short-term opportunities via Upwork, Toptal or directly",
-      icon: "💼",
-      badge: "Flexible Work",
-      platforms: [
-        { name: "Upwork", url: "https://upwork.com" },
-        { name: "Toptal", url: "https://toptal.com" },
-        { name: "Fiverr", url: "https://fiverr.com" },
-      ],
-      tips: [
-        "Build strong portfolio",
-        "Start with small projects",
-        "Maintain high ratings",
-        "Communicate professionally",
-      ],
-    },
+  const fetchCompanyData = async (companyName) => {
+    if (!companyName?.trim()) {
+      setError('Company name is required');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    
+    try {
+      console.log(`Fetching data for: ${companyName}`);
+      const response = await getCompanyWaysToGetIn(companyName);
+      
+      console.log('Response received:', response);
+      
+      // Validate the data structure
+      if (validateData(response)) {
+        setWaysData(response);
+        console.log('Data successfully set to state');
+      }
+    } catch (error) {
+      console.error('Error in fetchCompanyData:', error);
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Invalid JSON')) {
+        setError('Unable to process the response from the server. Please try again.');
+      } else if (error.message.includes('Missing required fields')) {
+        setError('Incomplete data received. Please try again.');
+      } else {
+        setError(`Failed to fetch company data: ${error.message}`);
+      }
+      
+      setWaysData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearData = () => {
+    setWaysData(null);
+    setError(null);
   };
 
   return (
-    <WaysToGetInContext.Provider value={waysData}>
+    <WaysToGetInContext.Provider 
+      value={{
+        waysData,
+        loading,
+        error,
+        fetchCompanyData,
+        clearData
+      }}
+    >
       {children}
     </WaysToGetInContext.Provider>
   );

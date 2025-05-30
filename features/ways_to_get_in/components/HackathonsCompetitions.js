@@ -4,18 +4,22 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
 
 export default function HackathonsCompetitions() {
-  const waysData = useWaysToGetIn();
-  const { hackathons } = waysData;
+  const { waysData } = useWaysToGetIn();
+  const hackathons = waysData?.hackathons;
 
   const handlePlatformPress = (url) => {
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
+
+  if (!hackathons) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sectionIcon}>{hackathons.icon}</Text>
-        <Text style={styles.title}>{hackathons.title}</Text>
+        <Text style={styles.sectionIcon}>{hackathons.icon || '🧩'}</Text>
+        <Text style={styles.title}>{hackathons.title || 'Hackathons & Competitions'}</Text>
       </View>
 
       <LinearGradient
@@ -30,7 +34,7 @@ export default function HackathonsCompetitions() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Popular Platforms</Text>
         <View style={styles.platformsList}>
-          {hackathons.platforms.map((platform, index) => (
+          {hackathons.platforms?.map((platform, index) => (
             <TouchableOpacity
               key={index}
               style={styles.platformItem}
@@ -54,7 +58,7 @@ export default function HackathonsCompetitions() {
         </View>
       </View>
 
-      {hackathons.activeContests.length > 0 && (
+      {hackathons.activeContests?.length > 0 && (
         <View style={styles.section}>
           <View style={styles.activeHeader}>
             <Text style={styles.sectionTitle}>Active Contests</Text>
