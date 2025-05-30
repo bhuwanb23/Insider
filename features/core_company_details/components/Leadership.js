@@ -7,13 +7,13 @@ export default function Leadership({ data }) {
   const { companyData } = useCoreCompanyDetails();
   
   // Log raw API response for debugging
-  console.log('Raw API Response in Leadership:', JSON.stringify(companyData, null, 2));
+  // console.log('Raw API Response in Leadership:', JSON.stringify(companyData, null, 2));
 
   // Use passed data prop if available, otherwise use context data
   const leadershipData = data || companyData?.basicIdentity?.keyPeople;
 
   if (!leadershipData || leadershipData.length === 0) {
-    console.log('No leadership data available');
+    // console.log('No leadership data available');
     return (
       <View style={styles.centerContainer}>
         <Text>No leadership information available</Text>

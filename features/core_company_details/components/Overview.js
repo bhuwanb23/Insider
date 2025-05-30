@@ -7,13 +7,13 @@ export default function Overview({ data }) {
   const { companyData } = useCoreCompanyDetails();
   
   // Log raw API response for debugging
-  console.log('Raw API Response in Overview:', JSON.stringify(companyData, null, 2));
+  // console.log('Raw API Response in Overview:', JSON.stringify(companyData, null, 2));
 
   // Use passed data prop if available, otherwise use context data
   const overviewData = data || companyData?.overview;
 
   if (!overviewData) {
-    console.log('No overview data available');
+    // console.log('No overview data available');
     return (
       <View style={styles.centerContainer}>
         <Text>No overview information available</Text>

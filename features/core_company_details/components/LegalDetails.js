@@ -7,13 +7,13 @@ export default function LegalDetails({ data }) {
   const { companyData } = useCoreCompanyDetails();
   
   // Log raw API response for debugging
-  console.log('Raw API Response in LegalDetails:', JSON.stringify(companyData, null, 2));
+  // console.log('Raw API Response in LegalDetails:', JSON.stringify(companyData, null, 2));
 
   // Use passed data prop if available, otherwise use context data
   const legalData = data || companyData?.legalDetails;
 
   if (!legalData) {
-    console.log('No legal details available');
+    // console.log('No legal details available');
     return (
       <View style={styles.centerContainer}>
         <Text>No legal information available</Text>

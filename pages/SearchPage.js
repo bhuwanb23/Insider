@@ -11,6 +11,7 @@ import { getCompanyWaysToGetIn, getCoreCompanyDetails } from '../api/api';
 
 export default function SearchPage({ navigation, onBack }) {
   const [searchedCompany, setSearchedCompany] = useState(null);
+  const [localLoading, setLocalLoading] = useState(false);
   const { 
     loading: waysLoading, 
     error: waysError, 
@@ -40,7 +41,7 @@ export default function SearchPage({ navigation, onBack }) {
     
     console.log('Searching for company:', company);
     setSearchedCompany(company);
-    
+    setLocalLoading(true);
     try {
       console.log('Fetching company data...');
       
@@ -56,9 +57,24 @@ export default function SearchPage({ navigation, onBack }) {
       // Update context with fetched data
       fetchWaysData(company, waysResponse);
       fetchCoreData(company, coreResponse);
-
+      
+      // Add a delay to ensure context updates are processed
+      // and components have time to render with the new data
+      setTimeout(() => {
+        // Check if data is available in context before hiding loader
+        if (waysData && coreData) {
+          setLocalLoading(false);
+        } else {
+          // Add an additional check after a short delay
+          setTimeout(() => {
+            setLocalLoading(false);
+          }, 500);
+        }
+      }, 800);
+      
     } catch (error) {
       console.error('Error fetching data:', error);
+      setLocalLoading(false);
       // Handle error appropriately
     }
   };
@@ -129,8 +145,19 @@ export default function SearchPage({ navigation, onBack }) {
     setSearchedCompany(null);
   };
 
-  const isLoading = waysLoading || coreLoading;
+  const isLoading = localLoading;
   const error = waysError || coreError;
+
+  // Monitor context data changes
+  useEffect(() => {
+    // If we're loading and have both data sets, we can stop loading
+    if (localLoading && waysData && coreData) {
+      // Add a small delay to ensure UI is ready
+      setTimeout(() => {
+        setLocalLoading(false);
+      }, 300);
+    }
+  }, [waysData, coreData, localLoading]);
 
   // Show company topics list if we have data
   if (searchedCompany && waysData && coreData && !isLoading && !error) {

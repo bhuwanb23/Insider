@@ -32,10 +32,10 @@ const makeApiCall = async (prompt, label) => {
         });
 
         const responseContent = completion.choices[0].message.content;
-        console.log(`Raw ${label} API Response:`, responseContent);
+        console.log(`Raw ${label} API Response:`);
 
         const cleanedResponse = cleanJsonResponse(responseContent);
-        console.log(`Cleaned ${label} Response:`, cleanedResponse);
+        console.log(`Cleaned ${label} Response:`);
 
         try {
             const parsedResponse = JSON.parse(cleanedResponse);

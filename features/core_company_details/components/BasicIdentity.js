@@ -7,13 +7,13 @@ export default function BasicIdentity({ data }) {
   const { companyData } = useCoreCompanyDetails();
   
   // Log raw API response for debugging
-  console.log('Raw API Response in BasicIdentity:', JSON.stringify(companyData, null, 2));
+  // console.log('Raw API Response in BasicIdentity:', JSON.stringify(companyData, null, 2));
 
   // Use passed data prop if available, otherwise use context data
   const identityData = data || companyData?.basicIdentity;
 
   if (!identityData) {
-    console.log('No identity data available');
+    // console.log('No identity data available');
     return (
       <View style={styles.centerContainer}>
         <Text>No basic identity information available</Text>

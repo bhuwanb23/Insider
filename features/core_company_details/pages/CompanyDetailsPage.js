@@ -28,20 +28,20 @@ export default function CompanyDetailsPage() {
   const { loading, error, companyData, fetchCompanyData } = useCoreCompanyDetails();
 
   useEffect(() => {
-    console.log('CompanyDetailsPage mounted with company:', company);
+    // console.log('CompanyDetailsPage mounted with company:', company);
     if (company && !companyData) {
-      console.log('Fetching company data for:', company);
+      // console.log('Fetching company data for:', company);
       fetchCompanyData(company);
     }
   }, [company]);
 
   useEffect(() => {
-    console.log('CompanyData updated:', companyData);
+    // console.log('CompanyData updated:', companyData);
   }, [companyData]);
 
   const renderContent = () => {
-    console.log('Rendering content with activeSection:', activeSection.title);
-    console.log('Current companyData:', companyData);
+    // console.log('Rendering content with activeSection:', activeSection.title);
+    // console.log('Current companyData:', companyData);
 
     if (loading) {
       return (

@@ -7,13 +7,13 @@ export default function Timeline({ data }) {
   const { companyData } = useCoreCompanyDetails();
   
   // Log raw API response for debugging
-  console.log('Raw API Response in Timeline:', JSON.stringify(companyData, null, 2));
+  // console.log('Raw API Response in Timeline:', JSON.stringify(companyData, null, 2));
 
   // Use passed data prop if available, otherwise use context data
   const timelineData = data || companyData?.timeline;
 
   if (!timelineData || timelineData.length === 0) {
-    console.log('No timeline data available');
+    // console.log('No timeline data available');
     return (
       <View style={styles.centerContainer}>
         <Text>No timeline information available</Text>

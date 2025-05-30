@@ -23,13 +23,13 @@ export default function Awards({ data }) {
   const { companyData } = useCoreCompanyDetails();
   
   // Log raw API response for debugging
-  console.log('Raw API Response in Awards:', JSON.stringify(companyData, null, 2));
+  // console.log('Raw API Response in Awards:', JSON.stringify(companyData, null, 2));
 
   // Use passed data prop if available, otherwise use context data
   const awardsData = data || companyData?.recognition;
 
   if (!awardsData) {
-    console.log('No awards data available');
+    // console.log('No awards data available');
     return (
       <View style={styles.centerContainer}>
         <Text>No awards information available</Text>
