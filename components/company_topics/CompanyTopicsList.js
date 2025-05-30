@@ -87,6 +87,10 @@ export default function CompanyTopicsList({ company, onSelectTopic }) {
       navigation.navigate('NewsHighlights');
     } else if (topicKey === 'waysin') {
       navigation.navigate('WaysToGetIn');
+    } else if (topicKey === 'techstack') {
+      navigation.navigate('TechStack');
+    } else if (topicKey === 'culture') {
+      navigation.navigate('WorkCulture');
     } else {
       onSelectTopic(topicKey);
     }
