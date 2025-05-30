@@ -1,0 +1,235 @@
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useWaysToGetIn } from '../context/WaysToGetInContext';
+
+export default function ColdOutreach() {
+  const waysData = useWaysToGetIn();
+  const { coldOutreach } = waysData;
+
+  const handleShareTemplate = async () => {
+    try {
+      await Share.share({
+        title: coldOutreach.emailTemplate.subject,
+        message: coldOutreach.emailTemplate.body,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.sectionIcon}>{coldOutreach.icon}</Text>
+        <Text style={styles.title}>{coldOutreach.title}</Text>
+      </View>
+
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        style={styles.mainCard}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <Text style={styles.description}>{coldOutreach.description}</Text>
+      </LinearGradient>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Email Template</Text>
+        <View style={styles.templateCard}>
+          <View style={styles.templateHeader}>
+            <Text style={styles.templateSubject}>
+              Subject: {coldOutreach.emailTemplate.subject}
+            </Text>
+            <TouchableOpacity
+              style={styles.shareButton}
+              onPress={handleShareTemplate}
+            >
+              <Text style={styles.shareIcon}>📋</Text>
+              <Text style={styles.shareText}>Copy</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.templateBody}>
+            <Text style={styles.templateText}>
+              {coldOutreach.emailTemplate.body}
+            </Text>
+          </View>
+          <View style={styles.templateNote}>
+            <Text style={styles.noteIcon}>💡</Text>
+            <Text style={styles.noteText}>
+              Remember to customize the placeholders marked with [brackets]
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Best Practices</Text>
+        <View style={styles.tipsList}>
+          {coldOutreach.tips.map((tip, index) => (
+            <View key={index} style={styles.tipItem}>
+              <LinearGradient
+                colors={['rgba(65, 88, 208, 0.1)', 'rgba(200, 80, 192, 0.1)']}
+                style={styles.tipGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.tipIcon}>✨</Text>
+                <Text style={styles.tipText}>{tip}</Text>
+              </LinearGradient>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.warningCard}>
+        <Text style={styles.warningIcon}>⚠️</Text>
+        <Text style={styles.warningText}>
+          Always maintain professionalism and respect the recipient's time. Follow up only once if you don't receive a response.
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  sectionIcon: {
+    fontSize: 24,
+    marginRight: 8,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+  },
+  mainCard: {
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 24,
+  },
+  description: {
+    color: '#fff',
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 16,
+  },
+  templateCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  templateHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  templateSubject: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(65, 88, 208, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  shareIcon: {
+    fontSize: 16,
+    marginRight: 4,
+  },
+  shareText: {
+    fontSize: 12,
+    color: '#4158D0',
+    fontWeight: '600',
+  },
+  templateBody: {
+    padding: 16,
+    backgroundColor: 'rgba(65, 88, 208, 0.05)',
+  },
+  templateText: {
+    fontSize: 14,
+    color: '#1a1a1a',
+    lineHeight: 20,
+  },
+  templateNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+  },
+  noteIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  noteText: {
+    fontSize: 12,
+    color: '#1a1a1a',
+    flex: 1,
+  },
+  tipsList: {
+    gap: 12,
+  },
+  tipItem: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  tipGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  tipIcon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1a1a1a',
+  },
+  warningCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  warningIcon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1a1a1a',
+    lineHeight: 20,
+  },
+}); 
