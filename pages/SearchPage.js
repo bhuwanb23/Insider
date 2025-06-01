@@ -7,11 +7,14 @@ import CompanyTopicsList from '../components/company_topics/CompanyTopicsList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInContext';
 import { useCoreCompanyDetails } from '../features/core_company_details/context/CoreCompanyDetailsContext';
-import { getCompanyWaysToGetIn, getCoreCompanyDetails } from '../api/api';
+import { getCompanyWaysToGetIn, getCoreCompanyDetails, getCompanyCulture, getCompanyInterviewExperience, getCompanyJobHiringInsights, getCompanyNewsHighlights, getCompanyTechStack } from '../api/api';
 
 export default function SearchPage({ navigation, onBack }) {
   const [searchedCompany, setSearchedCompany] = useState(null);
-  const [localLoading, setLocalLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [allData, setAllData] = useState(null);
+
   const { 
     loading: waysLoading, 
     error: waysError, 
@@ -38,44 +41,53 @@ export default function SearchPage({ navigation, onBack }) {
 
   const handleSearch = async (company) => {
     if (!company?.trim()) return;
-    
-    console.log('Searching for company:', company);
     setSearchedCompany(company);
-    setLocalLoading(true);
+    setLoading(true);
+    setError(null);
+    setAllData(null);
+    // Optionally clear context data if needed
+    // clearWaysData();
+    // clearCoreData();
     try {
-      console.log('Fetching company data...');
-      
-      // Fetch both ways to get in and core company details
-      const [waysResponse, coreResponse] = await Promise.all([
-        getCompanyWaysToGetIn(company),
-        getCoreCompanyDetails(company)
-      ]);
-
-      console.log('Ways to Get In Response:', waysResponse);
-      console.log('Core Company Details Response:', coreResponse);
-
-      // Update context with fetched data
-      fetchWaysData(company, waysResponse);
-      fetchCoreData(company, coreResponse);
-      
-      // Add a delay to ensure context updates are processed
-      // and components have time to render with the new data
-      setTimeout(() => {
-        // Check if data is available in context before hiding loader
-        if (waysData && coreData) {
-          setLocalLoading(false);
-        } else {
-          // Add an additional check after a short delay
-          setTimeout(() => {
-            setLocalLoading(false);
-          }, 500);
+      console.log('Starting sequential API calls for company:', company);
+      const results = {};
+      let anySuccess = false;
+      // Helper to try API call and store both parsed and raw
+      const tryApi = async (fn, label) => {
+        try {
+          const res = await fn(company);
+          results[label] = { parsed: res, raw: res };
+          anySuccess = true;
+          console.log(`${label} data received.`);
+        } catch (err) {
+          // If error has a cleaned response, store it as raw
+          if (err.cleanedResponse) {
+            results[label] = { parsed: null, raw: err.cleanedResponse };
+          } else {
+            results[label] = { parsed: null, raw: null, error: err.message };
+          }
+          console.error(`${label} failed:`, err.message);
         }
-      }, 800);
-      
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setLocalLoading(false);
-      // Handle error appropriately
+      };
+      await tryApi(getCompanyWaysToGetIn, 'waysData');
+      await tryApi(getCoreCompanyDetails, 'coreData');
+      await tryApi(getCompanyCulture, 'cultureData');
+      await tryApi(getCompanyInterviewExperience, 'interviewData');
+      await tryApi(getCompanyJobHiringInsights, 'jobHiringData');
+      await tryApi(getCompanyNewsHighlights, 'newsData');
+      await tryApi(getCompanyTechStack, 'techStackData');
+      setAllData(results);
+      setLoading(false);
+      if (!anySuccess) {
+        setError('Failed to fetch any company data. Please try again.');
+      } else {
+        setError(null);
+        console.log('All API calls attempted, some data may be unparsed.');
+      }
+    } catch (err) {
+      setLoading(false);
+      setError('Failed to fetch company data. Please try again.');
+      console.error('Error during company data fetch:', err);
     }
   };
 
@@ -131,40 +143,23 @@ export default function SearchPage({ navigation, onBack }) {
   };
 
   const handleBackToLanding = () => {
-    clearWaysData();
-    clearCoreData();
     setSearchedCompany(null);
-    if (onBack) {
-      onBack();
-    }
+    setAllData(null);
+    setError(null);
+    if (onBack) onBack();
   };
 
   const handleBackToSearch = () => {
-    clearWaysData();
-    clearCoreData();
     setSearchedCompany(null);
   };
 
-  const isLoading = localLoading;
-  const error = waysError || coreError;
-
-  // Monitor context data changes
-  useEffect(() => {
-    // If we're loading and have both data sets, we can stop loading
-    if (localLoading && waysData && coreData) {
-      // Add a small delay to ensure UI is ready
-      setTimeout(() => {
-        setLocalLoading(false);
-      }, 300);
-    }
-  }, [waysData, coreData, localLoading]);
-
-  // Show company topics list if we have data
-  if (searchedCompany && waysData && coreData && !isLoading && !error) {
+  // Show company topics list if we have all data
+  if (searchedCompany && allData && !loading && !error) {
     return (
       <CompanyTopicsList 
         company={searchedCompany}
-        companyData={coreData} // Pass core data to topics list
+        companyData={allData.coreData}
+        allData={allData}
       />
     );
   }
@@ -185,18 +180,14 @@ export default function SearchPage({ navigation, onBack }) {
 
       <View style={styles.content}>
         <SearchCompany onSearch={handleSearch} />
-        
-        {isLoading && (
+        {loading && (
           <View style={styles.loadingContainer}>
             <LoadingSpinner message={`Fetching information about ${searchedCompany}...`} />
           </View>
         )}
-
         {error && (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
-              {error}
-            </Text>
+            <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity 
               style={styles.retryButton}
               onPress={() => searchedCompany && handleSearch(searchedCompany)}

@@ -99,75 +99,122 @@ Ensure all information is specific to ${companyName} and follows this exact stru
 };
 
 export const getCompanyCulturePrompt = (companyName) => {
-    return `Analyze the work culture at ${companyName} and provide information in the following structured format:
+    return `Analyze the work culture at ${companyName} and provide information in the following EXACT JSON structure:
 
 {
-    "workEnvironment": {
-        "title": "Work Environment",
-        "description": "Overview of ${companyName}'s work environment",
-        "icon": "🏢",
-        "aspects": {
-            "workLifeBalance": {
-                "rating": "Score out of 5",
-                "description": "Details about work-life balance",
-                "highlights": [
-                    "3-4 key points about work-life balance"
-                ]
-            },
-            "remoteWork": {
-                "policy": "Current remote work policy",
-                "details": [
-                    "3-4 specific points about remote work setup"
-                ]
-            },
-            "officeStructure": {
-                "description": "Office setup and atmosphere",
-                "features": [
-                    "3-4 notable office features or policies"
-                ]
-            }
-        }
+  "cultureOverview": {
+    "coreValues": [
+      { "value": "Core value name", "icon": "Emoji", "description": "Description of the value" }
+    ],
+    "culturalVibe": {
+      "type": "Type of culture (e.g., Flexible & Collaborative)",
+      "icon": "Emoji",
+      "attributes": ["List of attributes (e.g., Fast-paced, Modern)"],
+      "description": "Brief description of the cultural vibe"
     },
-    "growthOpportunities": {
-        "title": "Career Growth",
-        "description": "Career development at ${companyName}",
-        "icon": "📈",
-        "programs": [
-            {
-                "name": "Program name",
-                "description": "Program details",
-                "eligibility": "Eligibility criteria"
-            }
-        ],
-        "promotionCycle": {
-            "frequency": "Typical promotion timeline",
-            "process": [
-                "3-4 steps in promotion process"
-            ]
-        }
+    "employeeEmpowerment": {
+      "rating": "Score out of 5",
+      "initiatives": ["List of empowerment initiatives"]
     },
-    "benefits": {
-        "title": "Benefits & Perks",
-        "description": "Overview of benefits package",
-        "icon": "🎁",
-        "categories": {
-            "health": [
-                "List of health benefits"
-            ],
-            "financial": [
-                "List of financial benefits"
-            ],
-            "lifestyle": [
-                "List of lifestyle perks"
-            ],
-            "professional": [
-                "List of professional development benefits"
-            ]
-        }
+    "leadershipStyle": {
+      "type": "Type of leadership hierarchy",
+      "icon": "Emoji",
+      "features": ["List of leadership features"]
     }
+  },
+  "workLifeBalance": {
+    "rating": "Score out of 5",
+    "totalReviews": "Number of reviews",
+    "positivePercentage": "Percentage of positive reviews",
+    "workHours": {
+      "type": "Type of work hours (e.g., Flexible)",
+      "standard": "Standard work hours",
+      "flexibility": "Level of flexibility",
+      "timeZones": "Time zone coverage"
+    },
+    "metrics": [
+      { "category": "Metric name", "score": "Score out of 5", "status": "Status (e.g., great, good)" }
+    ]
+  },
+  "remoteWork": {
+    "policy": "Remote work policy",
+    "details": {
+      "remoteAllowed": "true/false",
+      "hybridStructure": "Description of hybrid structure",
+      "globalPolicy": "Global remote policy",
+      "equipmentProvided": "true/false"
+    },
+    "benefits": ["List of remote work benefits"],
+    "leaves": {
+      "annual": "Number of annual leaves",
+      "sick": "Number of sick leaves",
+      "parental": "Parental leave duration",
+      "sabbatical": "Sabbatical policy"
+    }
+  },
+  "teamCollaboration": {
+    "overallScore": "Score out of 5",
+    "activities": [
+      {
+        "type": "Activity type",
+        "frequency": "Frequency",
+        "participation": "Participation percentage",
+        "icon": "Emoji"
+      }
+    ],
+    "managerSupport": {
+      "rating": "Score out of 5",
+      "feedbackFrequency": "Frequency of feedback",
+      "oneOnOneMeetings": "Frequency of 1:1 meetings",
+      "testimonial": "Manager support testimonial"
+    }
+  },
+  "mentalHealth": {
+    "overallScore": "Score out of 5",
+    "programs": [
+      {
+        "name": "Program name",
+        "coverage": "Coverage details",
+        "sessions": "Number of sessions or 'Unlimited'",
+        "icon": "Emoji",
+        "apps": ["List of wellness apps (if applicable)"]
+      }
+    ],
+    "eapServices": {
+      "available": "true/false",
+      "coverage": "Coverage details",
+      "includes": ["List of EAP services"]
+    }
+  },
+  "diversity": {
+    "stats": {
+      "genderRatio": "Gender ratio",
+      "ethnicDiversity": "Ethnic diversity percentage",
+      "leadership": "Diversity in leadership"
+    },
+    "initiatives": [
+      {
+        "name": "Initiative name",
+        "members": "Number of members",
+        "activities": ["List of activities"],
+        "icon": "Emoji"
+      }
+    ],
+    "recognition": ["List of diversity recognitions"]
+  },
+  "employeeStories": [
+    {
+      "name": "Employee name",
+      "role": "Role",
+      "tenure": "Tenure at company",
+      "image": "Emoji or image URL",
+      "quote": "Employee quote",
+      "highlights": ["List of highlights"]
+    }
+  ]
 }
 
-Provide accurate, up-to-date information specific to ${companyName} while maintaining this exact structure.`;
+Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Include real examples and maintain consistent formatting.`;
 };
 
 export const getCoreCompanyDetailsPrompt = (companyName) => {
@@ -282,3 +329,314 @@ export const getCoreCompanyDetailsPrompt = (companyName) => {
 
 Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Include real URLs where applicable and maintain consistent formatting.`;
 }; 
+
+export const getCompanyInterviewExperiencePrompt = (companyName) => {
+    return `Analyze the interview experience at ${companyName} and provide information in the following EXACT JSON structure:
+
+{
+  "journey": {
+    "steps": [
+      {
+        "title": "Stage title",
+        "duration": "Typical duration",
+        "description": "Stage description",
+        "icon": "Emoji",
+        "status": "Stage status (e.g., Technical, Final)"
+      }
+    ]
+  },
+  "candidateExperiences": [
+    {
+      "role": "Role name",
+      "source": "Source (e.g., Glassdoor)",
+      "date": "Date",
+      "status": "Outcome status",
+      "sentiment": "Sentiment (e.g., Positive, Challenging)",
+      "summary": "Summary of experience",
+      "tags": ["List of tags"]
+    }
+  ],
+  "technicalQuestions": [
+    {
+      "category": "Question category",
+      "difficulty": "Difficulty level",
+      "frequency": "Frequency percentage",
+      "question": "Sample question",
+      "tags": ["List of tags"]
+    }
+  ],
+  "roleSpecificQuestions": [
+    {
+      "role": "Role name",
+      "questions": [
+        {
+          "question": "Sample question",
+          "frequency": "Frequency percentage",
+          "difficulty": "Difficulty level"
+        }
+      ]
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": "Sample behavioral question",
+      "frequency": "Frequency percentage",
+      "category": "Category",
+      "tip": "Answering tip"
+    }
+  ],
+  "questionStats": {
+    "topCategories": [
+      {
+        "name": "Category name",
+        "percentage": "Percentage",
+        "trend": "Trend (e.g., increasing, stable)"
+      }
+    ],
+    "difficultyDistribution": {
+      "easy": "Percentage",
+      "medium": "Percentage",
+      "hard": "Percentage"
+    }
+  },
+  "mockInterviewTips": [
+    {
+      "title": "Tip category",
+      "tips": ["List of tips"],
+      "items": ["List of common pitfalls (if applicable)"]
+    }
+  ]
+}
+
+Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+};
+
+export const getCompanyJobHiringInsightsPrompt = (companyName) => {
+    return `Analyze the job hiring insights for ${companyName} and provide information in the following EXACT JSON structure:
+
+{
+  "commonRoles": [
+    {
+      "title": "Role title",
+      "department": "Department",
+      "experienceLevel": "Experience level",
+      "location": "Location type",
+      "icon": "Emoji"
+    }
+  ],
+  "internshipConversion": {
+    "rate": "Conversion rate percentage",
+    "totalInterns": "Total number of interns",
+    "convertedCount": "Number converted",
+    "yearOverYearGrowth": "YoY growth percentage"
+  },
+  "hiringChannels": [
+    {
+      "name": "Channel name",
+      "logo": "Logo URL",
+      "successRate": "Success rate percentage",
+      "activeListings": "Number of active listings (if applicable)",
+      "partnerInstitutes": "Number of partner institutes (if applicable)",
+      "bonusAmount": "Referral bonus (if applicable)",
+      "directApplications": "Number of direct applications (if applicable)"
+    }
+  ],
+  "jobTrends": {
+    "quarterlyGrowth": {
+      "tech": "Tech growth percentage",
+      "design": "Design growth percentage",
+      "marketing": "Marketing growth percentage"
+    },
+    "topLocations": [
+      {
+        "city": "City name",
+        "country": "Country name",
+        "openings": "Number of openings"
+      }
+    ],
+    "topDepartments": [
+      {
+        "name": "Department name",
+        "openings": "Number of openings",
+        "growth": "Growth percentage"
+      }
+    ]
+  },
+  "hiringTimeline": {
+    "campus": {
+      "period": "Period",
+      "frequency": "Frequency",
+      "nextDrive": "Next drive date"
+    },
+    "offCampus": {
+      "period": "Period",
+      "frequency": "Frequency",
+      "averageOpenings": "Average number of openings"
+    },
+    "hackathons": {
+      "period": "Period",
+      "frequency": "Frequency",
+      "lastEvent": "Last event date"
+    }
+  },
+  "hiringProcess": [
+    {
+      "stage": "Stage name",
+      "duration": "Stage duration",
+      "successRate": "Success rate percentage (if applicable)",
+      "tips": "Tips (if applicable)",
+      "topics": ["List of topics (if applicable)"],
+      "rounds": "Number of rounds (if applicable)",
+      "focusAreas": ["List of focus areas (if applicable)"],
+      "includes": ["List of included items (if applicable)"]
+    }
+  ],
+  "resumeTips": {
+    "preferences": ["List of resume preferences"],
+    "tools": [
+      {
+        "name": "Tool name",
+        "purpose": "Purpose of tool",
+        "keywords": ["List of keywords (if applicable)"],
+        "platform": "Platform name (if applicable)",
+        "focusAreas": ["List of focus areas (if applicable)"]
+      }
+    ],
+    "optimization": ["List of optimization tips"]
+  }
+}
+
+Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+};
+
+export const getCompanyNewsHighlightsPrompt = (companyName) => {
+    return `Analyze the latest news and highlights for ${companyName} and provide information in the following EXACT JSON structure:
+
+{
+  "headlines": [
+    {
+      "title": "Headline title",
+      "source": "Source name",
+      "date": "Date",
+      "summary": "Summary of the news",
+      "url": "URL to the news article",
+      "image": "Image URL or filename"
+    }
+  ],
+  "socialSentiment": {
+    "overall": {
+      "positive": "Percentage",
+      "neutral": "Percentage",
+      "negative": "Percentage"
+    },
+    "trends": [
+      { "date": "Date", "sentiment": "Sentiment score" }
+    ],
+    "sources": {
+      "twitter": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
+      "linkedin": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
+      "reddit": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" }
+    }
+  },
+  "highlights": [
+    {
+      "title": "Highlight title",
+      "description": "Highlight description",
+      "date": "Date",
+      "category": "Category"
+    }
+  ],
+  "studentImpact": [
+    {
+      "title": "Impact title",
+      "description": "Impact description",
+      "impact": "Impact details"
+    }
+  ]
+}
+
+Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+};
+
+export const getCompanyTechStackPrompt = (companyName) => {
+    return `Analyze the technology stack at ${companyName} and provide information in the following EXACT JSON structure:
+
+{
+  "frontend": {
+    "title": "Frontend section title",
+    "icon": "Icon name or emoji",
+    "categories": [
+      {
+        "title": "Category title",
+        "tags": ["List of technologies"],
+        "description": "Category description",
+        "badges": ["List of badges (if applicable)"]
+      }
+    ],
+    "badges": ["List of badges (if applicable)"]
+  },
+  "backend": {
+    "title": "Backend section title",
+    "icon": "Icon name or emoji",
+    "categories": [
+      {
+        "title": "Category title",
+        "tags": ["List of technologies"],
+        "description": "Category description",
+        "badges": ["List of badges (if applicable)"]
+      }
+    ]
+  },
+  "cloud": {
+    "title": "Cloud & DevOps section title",
+    "icon": "Icon name or emoji",
+    "categories": [
+      {
+        "title": "Category title",
+        "tags": ["List of technologies"],
+        "description": "Category description",
+        "badges": ["List of badges (if applicable)"]
+      }
+    ]
+  },
+  "database": {
+    "title": "Database section title",
+    "icon": "Icon name or emoji",
+    "categories": [
+      {
+        "title": "Category title",
+        "tags": ["List of technologies"],
+        "description": "Category description",
+        "badges": ["List of badges (if applicable)"]
+      }
+    ]
+  },
+  "analytics": {
+    "title": "Analytics section title",
+    "icon": "Icon name or emoji",
+    "categories": [
+      {
+        "title": "Category title",
+        "tags": ["List of technologies"],
+        "description": "Category description",
+        "badges": ["List of badges (if applicable)"]
+      }
+    ],
+    "badges": ["List of badges (if applicable)"]
+  },
+  "team": {
+    "title": "Team tools section title",
+    "icon": "Icon name or emoji",
+    "categories": [
+      {
+        "title": "Category title",
+        "tags": ["List of technologies"],
+        "description": "Category description",
+        "badges": ["List of badges (if applicable)"]
+      }
+    ]
+  }
+}
+
+Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+};
