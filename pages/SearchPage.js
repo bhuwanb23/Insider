@@ -20,7 +20,8 @@ export default function SearchPage({ navigation, onBack }) {
     error: waysError, 
     fetchCompanyData: fetchWaysData, 
     waysData, 
-    clearData: clearWaysData 
+    clearData: clearWaysData,
+    setParsedWaysData
   } = useWaysToGetIn();
 
   const {
@@ -28,8 +29,17 @@ export default function SearchPage({ navigation, onBack }) {
     error: coreError,
     fetchCompanyData: fetchCoreData,
     companyData: coreData,
-    clearData: clearCoreData
+    clearData: clearCoreData,
+    setParsedCompanyData
   } = useCoreCompanyDetails();
+
+  const clearAllApiData = () => {
+    setParsedWaysData(null);
+    setParsedCompanyData(null);
+    setAllData(null);
+    setError(null);
+    // Add similar clears for other features if needed
+  };
 
   useEffect(() => {
     // Clear data when component unmounts
@@ -41,13 +51,9 @@ export default function SearchPage({ navigation, onBack }) {
 
   const handleSearch = async (company) => {
     if (!company?.trim()) return;
+    clearAllApiData();
     setSearchedCompany(company);
     setLoading(true);
-    setError(null);
-    setAllData(null);
-    // Optionally clear context data if needed
-    // clearWaysData();
-    // clearCoreData();
     try {
       console.log('Starting sequential API calls for company:', company);
       const results = {};
@@ -56,11 +62,16 @@ export default function SearchPage({ navigation, onBack }) {
       const tryApi = async (fn, label) => {
         try {
           const res = await fn(company);
-          results[label] = { parsed: res, raw: res };
+          if (label === 'coreData' && res && res.parsed) {
+            setParsedCompanyData(res.parsed);
+          }
+          if (label === 'waysData' && res && res.parsed) {
+            setParsedWaysData(res.parsed);
+          }
+          results[label] = { parsed: res.parsed, raw: res.raw };
           anySuccess = true;
           console.log(`${label} data received.`);
         } catch (err) {
-          // If error has a cleaned response, store it as raw
           if (err.cleanedResponse) {
             results[label] = { parsed: null, raw: err.cleanedResponse };
           } else {

@@ -11,6 +11,20 @@ export const useWaysToGetIn = () => {
   return context;
 };
 
+// Utility to clean non-JSON artifacts from OpenRouter response
+function cleanForJsonParse(str) {
+  // Remove parenthetical notes after URLs or values (e.g., "url": "..." (Note: ...))
+  let cleaned = str.replace(/"\s*\([^)]*\)\s*"/g, '"');
+  cleaned = cleaned.replace(/\s*\([^)]*\)\s*(,|\n|$)/g, '$1');
+  // Remove any trailing commas before closing brackets/braces
+  cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
+  // Remove // comments
+  cleaned = cleaned.replace(/\/\/.*$/gm, '');
+  // Remove /* */ comments
+  cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
+  return cleaned;
+}
+
 export const WaysToGetInProvider = ({ children }) => {
   const [waysData, setWaysData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -47,18 +61,26 @@ export const WaysToGetInProvider = ({ children }) => {
     
     try {
       console.log(`Fetching data for: ${companyName}`);
-      const response = await getCompanyWaysToGetIn(companyName);
-      
-      console.log('Response received:', response);
-      
+      const { parsed, raw } = await getCompanyWaysToGetIn(companyName);
+      let data = parsed;
+      if (!data && raw) {
+        // Try to parse raw if not already parsed
+        try {
+          data = JSON.parse(cleanForJsonParse(raw));
+        } catch (e) {
+          setError('Unable to process the response from the server. Please try again.');
+          setWaysData(null);
+          setLoading(false);
+          return;
+        }
+      }
       // Validate the data structure
-      if (validateData(response)) {
-        setWaysData(response);
+      if (validateData(data)) {
+        setWaysData(data);
         console.log('Data successfully set to state');
       }
     } catch (error) {
       console.error('Error in fetchCompanyData:', error);
-      
       // Provide user-friendly error messages
       if (error.message.includes('Invalid JSON')) {
         setError('Unable to process the response from the server. Please try again.');
@@ -67,15 +89,25 @@ export const WaysToGetInProvider = ({ children }) => {
       } else {
         setError(`Failed to fetch company data: ${error.message}`);
       }
-      
       setWaysData(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const clearData = () => {
-    setWaysData(null);
+  // Allow direct setting of parsed data
+  const setParsedWaysData = (dataOrRaw) => {
+    let data = dataOrRaw;
+    if (typeof dataOrRaw === 'string') {
+      try {
+        data = JSON.parse(cleanForJsonParse(dataOrRaw));
+      } catch (e) {
+        setWaysData(null);
+        setError('Unable to process the response from the server. Please try again.');
+        return;
+      }
+    }
+    setWaysData(data);
     setError(null);
   };
 
@@ -85,8 +117,7 @@ export const WaysToGetInProvider = ({ children }) => {
         waysData,
         loading,
         error,
-        fetchCompanyData,
-        clearData
+        setParsedWaysData
       }}
     >
       {children}

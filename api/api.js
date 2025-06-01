@@ -63,11 +63,12 @@ const makeOpenRouterApiCall = async (prompt, label) => {
         try {
             const parsedResponse = JSON.parse(cleanedResponse);
             console.log(`Successfully parsed ${label} response as JSON`);
-            return parsedResponse;
+            return { parsed: parsedResponse, raw: cleanedResponse };
         } catch (parseError) {
             console.error(`Failed to parse ${label} API response as JSON:`, parseError);
-            console.error('Cleaned response content error:', parseError);
-            throw new Error(`Invalid JSON response from API: ${parseError.message}`);
+            console.error('Cleaned response content error:');
+            // Return raw cleaned response even if parsing fails
+            return { parsed: null, raw: cleanedResponse };
         }
     } catch (error) {
         console.error(`Error getting ${label}:`, error);
