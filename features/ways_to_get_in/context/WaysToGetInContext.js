@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { getCompanyWaysToGetIn } from '../../../api/api';
+import { cleanForJsonParse, parseJsonResponse, validators } from '../../../utils/jsonParser';
 
 const WaysToGetInContext = createContext();
 
@@ -11,26 +12,16 @@ export const useWaysToGetIn = () => {
   return context;
 };
 
-// Utility to clean non-JSON artifacts from OpenRouter response
-function cleanForJsonParse(str) {
-  // Remove parenthetical notes after URLs or values (e.g., "url": "..." (Note: ...))
-  let cleaned = str.replace(/"\s*\([^)]*\)\s*"/g, '"');
-  cleaned = cleaned.replace(/\s*\([^)]*\)\s*(,|\n|$)/g, '$1');
-  // Remove any trailing commas before closing brackets/braces
-  cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
-  // Remove // comments
-  cleaned = cleaned.replace(/\/\/.*$/gm, '');
-  // Remove /* */ comments
-  cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
-  return cleaned;
-}
-
 export const WaysToGetInProvider = ({ children }) => {
   const [waysData, setWaysData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const validateData = (data) => {
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid data: Object is null or not an object');
+    }
+
     const requiredFields = [
       'campusRecruitment',
       'jobPortals',
@@ -44,6 +35,7 @@ export const WaysToGetInProvider = ({ children }) => {
     const missingFields = requiredFields.filter(field => !data[field]);
     
     if (missingFields.length > 0) {
+      console.error('[WaysToGetIn] Missing required fields:', missingFields);
       throw new Error(`Invalid data structure: Missing required fields: ${missingFields.join(', ')}`);
     }
 
@@ -60,35 +52,39 @@ export const WaysToGetInProvider = ({ children }) => {
     setError(null);
     
     try {
-      console.log(`Fetching data for: ${companyName}`);
+      console.log(`[WaysToGetIn] Fetching data for: ${companyName}`);
       const { parsed, raw } = await getCompanyWaysToGetIn(companyName);
+      
       let data = parsed;
       if (!data && raw) {
-        // Try to parse raw if not already parsed
         try {
-          data = JSON.parse(cleanForJsonParse(raw));
-        } catch (e) {
-          setError('Unable to process the response from the server. Please try again.');
-          setWaysData(null);
-          setLoading(false);
-          return;
+          const cleaned = cleanForJsonParse(raw);
+          if (__DEV__) {
+            console.log('[WaysToGetIn] Cleaned response:', cleaned);
+          }
+          data = JSON.parse(cleaned);
+        } catch (parseError) {
+          console.error('[WaysToGetIn] Parse error:', parseError);
+          throw new Error(`Failed to parse response: ${parseError.message}`);
         }
       }
+
+      if (!data) {
+        throw new Error('No data received from server');
+      }
+
       // Validate the data structure
       if (validateData(data)) {
         setWaysData(data);
-        console.log('Data successfully set to state');
+        console.log('[WaysToGetIn] Data successfully set to state');
       }
     } catch (error) {
-      console.error('Error in fetchCompanyData:', error);
-      // Provide user-friendly error messages
-      if (error.message.includes('Invalid JSON')) {
-        setError('Unable to process the response from the server. Please try again.');
-      } else if (error.message.includes('Missing required fields')) {
-        setError('Incomplete data received. Please try again.');
-      } else {
-        setError(`Failed to fetch company data: ${error.message}`);
-      }
+      console.error('[WaysToGetIn] Error in fetchCompanyData:', error);
+      setError(
+        'Unable to process the response from the server. ' +
+        (error.message ? `Error: ${error.message}` : '') +
+        ' Please try again.'
+      );
       setWaysData(null);
     } finally {
       setLoading(false);
@@ -97,18 +93,57 @@ export const WaysToGetInProvider = ({ children }) => {
 
   // Allow direct setting of parsed data
   const setParsedWaysData = (dataOrRaw) => {
-    let data = dataOrRaw;
-    if (typeof dataOrRaw === 'string') {
-      try {
-        data = JSON.parse(cleanForJsonParse(dataOrRaw));
-      } catch (e) {
-        setWaysData(null);
-        setError('Unable to process the response from the server. Please try again.');
-        return;
+    setLoading(true);
+    try {
+      let data = dataOrRaw;
+      
+      if (typeof dataOrRaw === 'string') {
+        if (!dataOrRaw.trim()) {
+          throw new Error('Empty response received from server');
+        }
+
+        if (__DEV__) {
+          console.log('[WaysToGetIn] Raw API response:', dataOrRaw);
+        }
+
+        const cleaned = cleanForJsonParse(dataOrRaw);
+        
+        if (__DEV__) {
+          console.log('[WaysToGetIn] Cleaned for JSON parse:', cleaned);
+        }
+
+        try {
+          data = JSON.parse(cleaned);
+        } catch (parseError) {
+          throw new Error(`JSON parse error: ${parseError.message}`);
+        }
+
+        if (__DEV__) {
+          console.log('[WaysToGetIn] Parsed object:', data);
+        }
       }
+
+      if (!data) {
+        throw new Error('No data received from server');
+      }
+
+      if (validateData(data)) {
+        setWaysData(data);
+        setError(null);
+      }
+    } catch (e) {
+      setWaysData(null);
+      setError(
+        'Unable to process the response from the server. ' +
+        (e.message ? `Error: ${e.message}` : '') +
+        ' Please try again.'
+      );
+      if (__DEV__) {
+        console.error('[WaysToGetIn] Error processing data:', e);
+      }
+    } finally {
+      setLoading(false);
     }
-    setWaysData(data);
-    setError(null);
   };
 
   return (
@@ -117,7 +152,8 @@ export const WaysToGetInProvider = ({ children }) => {
         waysData,
         loading,
         error,
-        setParsedWaysData
+        setParsedWaysData,
+        fetchCompanyData
       }}
     >
       {children}

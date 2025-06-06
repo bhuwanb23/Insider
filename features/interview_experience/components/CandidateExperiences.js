@@ -3,9 +3,15 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useInterview } from '../context/InterviewContext';
 
-export default function CandidateExperiences() {
+const CandidateExperiences = () => {
   const { interviewData } = useInterview();
   const [expandedId, setExpandedId] = useState(null);
+
+  if (!interviewData || !interviewData.candidateExperiences) {
+    return <Text>No candidate experiences data available.</Text>;
+  }
+
+  const { candidateExperiences } = interviewData;
 
   const toggleExpand = (index) => {
     setExpandedId(expandedId === index ? null : index);
@@ -18,7 +24,7 @@ export default function CandidateExperiences() {
         <Text style={styles.title}>Real Candidate Experiences</Text>
       </View>
 
-      {interviewData.candidateExperiences.map((experience, index) => (
+      {candidateExperiences.map((experience, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => toggleExpand(index)}
@@ -66,7 +72,7 @@ export default function CandidateExperiences() {
       ))}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -165,4 +171,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-}); 
+});
+
+export default CandidateExperiences; 

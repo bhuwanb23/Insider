@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { newsData as initialNewsData } from '../constants/sampleData';
+import { cleanForJsonParse, parseJsonResponse, validators } from '../../../utils/jsonParser';
 
 const NewsContext = createContext(null);
 

@@ -59,7 +59,7 @@ const makeOpenRouterApiCall = async (prompt, label) => {
 
         console.log(`Raw ${label} API Response received`);
         const cleanedResponse = cleanJsonResponse(responseContent);
-        console.log(`Cleaned ${label} Response received`);
+        console.log(`Cleaned ${label} Response received: ${cleanedResponse}`);
         try {
             const parsedResponse = JSON.parse(cleanedResponse);
             console.log(`Successfully parsed ${label} response as JSON`);

@@ -10,6 +10,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/metro-runtime": "^5.0.4",
     "@react-navigation/native": "^7.1.9",
     "@react-navigation/stack": "^7.3.2",
     "dotenv": "^16.5.0",
@@ -17,13 +18,15 @@
     "expo-linear-gradient": "^14.1.4",
     "expo-status-bar": "~2.2.3",
     "openai": "^4.103.0",
-    "react": "19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-native": "0.79.2",
     "react-native-animatable": "^1.4.0",
     "react-native-dotenv": "^3.4.11",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "^3.17.5",
-    "react-native-svg": "^15.12.0"
+    "react-native-svg": "^15.12.0",
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

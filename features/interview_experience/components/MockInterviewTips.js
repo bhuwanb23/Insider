@@ -3,8 +3,14 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useInterview } from '../context/InterviewContext';
 
-export default function MockInterviewTips() {
+const MockInterviewTips = () => {
   const { interviewData } = useInterview();
+
+  if (!interviewData || !interviewData.mockInterviewTips) {
+    return <Text>No mock interview tips data available.</Text>;
+  }
+
+  const { mockInterviewTips } = interviewData;
 
   return (
     <View style={styles.container}>
@@ -14,7 +20,7 @@ export default function MockInterviewTips() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {interviewData.mockInterviewTips.map((section, index) => (
+        {mockInterviewTips.map((tip, index) => (
           <LinearGradient
             key={index}
             colors={['#4158D0', '#C850C0']}
@@ -22,11 +28,11 @@ export default function MockInterviewTips() {
             end={{ x: 1, y: 1 }}
             style={styles.card}
           >
-            <Text style={styles.sectionTitle}>{section.title}</Text>
+            <Text style={styles.sectionTitle}>{tip.title}</Text>
             
-            {section.tips ? (
+            {tip.tips ? (
               <View style={styles.tipsContainer}>
-                {section.tips.map((tip, tipIndex) => (
+                {tip.tips.map((tip, tipIndex) => (
                   <View key={tipIndex} style={styles.tipItem}>
                     <Text style={styles.bulletPoint}>•</Text>
                     <Text style={styles.tipText}>{tip}</Text>
@@ -35,7 +41,7 @@ export default function MockInterviewTips() {
               </View>
             ) : (
               <View style={styles.tipsContainer}>
-                {section.items.map((item, itemIndex) => (
+                {tip.items.map((item, itemIndex) => (
                   <View key={itemIndex} style={styles.tipItem}>
                     <Text style={styles.bulletPoint}>•</Text>
                     <Text style={styles.tipText}>{item}</Text>
@@ -48,7 +54,7 @@ export default function MockInterviewTips() {
       </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -106,4 +112,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-}); 
+});
+
+export default MockInterviewTips; 

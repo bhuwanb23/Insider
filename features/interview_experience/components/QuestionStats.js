@@ -3,8 +3,13 @@ import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useInterview } from '../context/InterviewContext';
 
-export default function QuestionStats() {
+const QuestionStats = () => {
   const { interviewData } = useInterview();
+
+  if (!interviewData || !interviewData.questionStats) {
+    return <Text>No question statistics data available.</Text>;
+  }
+
   const { questionStats } = interviewData;
 
   const getTrendIcon = (trend) => {
@@ -90,7 +95,7 @@ export default function QuestionStats() {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -211,4 +216,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#fff',
   },
-}); 
+});
+
+export default QuestionStats; 

@@ -122,8 +122,8 @@ export const getCompanyCulturePrompt = (companyName) => {
       "features": ["List of leadership features"]
     }
   },
-  "workLifeBalance": {
-    "rating": "Score out of 5",
+            "workLifeBalance": {
+                "rating": "Score out of 5",
     "totalReviews": "Number of reviews",
     "positivePercentage": "Percentage of positive reviews",
     "workHours": {
@@ -134,9 +134,9 @@ export const getCompanyCulturePrompt = (companyName) => {
     },
     "metrics": [
       { "category": "Metric name", "score": "Score out of 5", "status": "Status (e.g., great, good)" }
-    ]
-  },
-  "remoteWork": {
+                ]
+            },
+            "remoteWork": {
     "policy": "Remote work policy",
     "details": {
       "remoteAllowed": "true/false",
@@ -171,9 +171,9 @@ export const getCompanyCulturePrompt = (companyName) => {
   },
   "mentalHealth": {
     "overallScore": "Score out of 5",
-    "programs": [
-      {
-        "name": "Program name",
+        "programs": [
+            {
+                "name": "Program name",
         "coverage": "Coverage details",
         "sessions": "Number of sessions or 'Unlimited'",
         "icon": "Emoji",
@@ -639,4 +639,4 @@ export const getCompanyTechStackPrompt = (companyName) => {
 }
 
 Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
-};
+}; 

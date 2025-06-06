@@ -3,8 +3,14 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useInterview } from '../context/InterviewContext';
 
-export default function BehavioralQuestions() {
+const BehavioralQuestions = () => {
   const { interviewData } = useInterview();
+
+  if (!interviewData || !interviewData.behavioralQuestions) {
+    return <Text>No behavioral questions data available.</Text>;
+  }
+
+  const { behavioralQuestions } = interviewData;
 
   return (
     <View style={styles.container}>
@@ -14,7 +20,7 @@ export default function BehavioralQuestions() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {interviewData.behavioralQuestions.map((question, index) => (
+        {behavioralQuestions.map((question, index) => (
           <LinearGradient
             key={index}
             colors={['#4158D0', '#C850C0']}
@@ -43,7 +49,7 @@ export default function BehavioralQuestions() {
       </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -127,4 +133,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     lineHeight: 16,
   },
-}); 
+});
+
+export default BehavioralQuestions; 

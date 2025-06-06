@@ -1,164 +1,71 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useInterview } from '../context/InterviewContext';
 
-export default function RoleSpecificQuestions() {
+const RoleSpecificQuestions = () => {
   const { interviewData } = useInterview();
-  const [selectedRole, setSelectedRole] = useState(interviewData.roleSpecificQuestions[0]?.role);
+
+  if (!interviewData || !interviewData.roleSpecificQuestions) {
+    return <Text>No role-specific questions data available.</Text>;
+  }
+
+  const { roleSpecificQuestions } = interviewData;
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.sectionIcon}>🎯</Text>
-        <Text style={styles.title}>Role-Specific Questions</Text>
-      </View>
-
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.roleTabsContainer}
-      >
-        {interviewData.roleSpecificQuestions.map((roleData, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => setSelectedRole(roleData.role)}
-            style={styles.roleTab}
-          >
-            <LinearGradient
-              colors={selectedRole === roleData.role ? ['#4158D0', '#C850C0'] : ['#f1f2f6', '#f1f2f6']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.roleTabGradient}
-            >
-              <Text 
-                style={[
-                  styles.roleTabText,
-                  selectedRole === roleData.role && styles.selectedRoleTabText
-                ]}
-              >
-                {roleData.role}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <ScrollView style={styles.questionsContainer} showsVerticalScrollIndicator={false}>
-        {interviewData.roleSpecificQuestions
-          .find(r => r.role === selectedRole)
-          ?.questions.map((question, index) => (
-            <LinearGradient
-              key={index}
-              colors={['#4158D0', '#C850C0']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.questionCard}
-            >
-              <Text style={styles.questionText}>{question.question}</Text>
-              
-              <View style={styles.metaContainer}>
-                <View style={styles.difficultyBadge}>
-                  <Text style={styles.difficultyText}>{question.difficulty}</Text>
-                </View>
-                <View style={styles.frequencyBadge}>
-                  <Text style={styles.frequencyText}>Asked in {question.frequency} interviews</Text>
-                </View>
-              </View>
-            </LinearGradient>
+      <Text style={styles.title}>Role-Specific Questions</Text>
+      {roleSpecificQuestions.map((role, index) => (
+        <View key={index} style={styles.roleContainer}>
+          <Text style={styles.roleTitle}>{role.role}</Text>
+          {role.questions.map((question, qIndex) => (
+            <View key={qIndex} style={styles.questionContainer}>
+              <Text style={styles.question}>{question.question}</Text>
+              <Text style={styles.frequency}>{question.frequency}</Text>
+              <Text style={styles.difficulty}>{question.difficulty}</Text>
+            </View>
           ))}
-      </ScrollView>
+        </View>
+      ))}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 16,
-  },
-  sectionIcon: {
-    fontSize: 24,
-    marginRight: 8,
+    padding: 16,
   },
   title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  roleContainer: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+  roleTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1a1a1a',
   },
-  roleTabsContainer: {
-    maxHeight: 44,
-    marginBottom: 16,
+  questionContainer: {
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 4,
   },
-  roleTab: {
-    marginHorizontal: 4,
-    borderRadius: 22,
-    overflow: 'hidden',
+  question: {
+    fontSize: 16,
   },
-  roleTabGradient: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 22,
-  },
-  roleTabText: {
-    fontSize: 14,
-    fontWeight: '600',
+  frequency: {
+    fontSize: 16,
     color: '#666',
   },
-  selectedRoleTabText: {
-    color: '#fff',
-  },
-  questionsContainer: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  questionCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-  },
-  questionText: {
+  difficulty: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 12,
-    lineHeight: 22,
+    color: '#666',
   },
-  metaContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  difficultyBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    marginRight: 8,
-  },
-  difficultyText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  frequencyBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  frequencyText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '500',
-  },
-}); 
+});
+
+export default RoleSpecificQuestions; 

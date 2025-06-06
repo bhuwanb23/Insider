@@ -3,9 +3,14 @@ import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useInterview } from '../context/InterviewContext';
 
-export default function InterviewJourney() {
+const InterviewJourney = () => {
   const { interviewData } = useInterview();
-  const { journey } = interviewData;
+
+  if (!interviewData || !interviewData.journey) {
+    return <Text>No interview journey data available.</Text>;
+  }
+
+  const { steps } = interviewData.journey;
 
   return (
     <View style={styles.container}>
@@ -15,7 +20,7 @@ export default function InterviewJourney() {
       </View>
 
       <View style={styles.timeline}>
-        {journey.steps.map((step, index) => (
+        {steps.map((step, index) => (
           <View key={index} style={styles.stepContainer}>
             <View style={styles.stepConnector}>
               <View style={styles.line} />
@@ -53,7 +58,7 @@ export default function InterviewJourney() {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -158,4 +163,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
-}); 
+});
+
+export default InterviewJourney; 

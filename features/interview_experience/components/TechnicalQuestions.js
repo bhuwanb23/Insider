@@ -3,8 +3,14 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useInterview } from '../context/InterviewContext';
 
-export default function TechnicalQuestions() {
+const TechnicalQuestions = () => {
   const { interviewData } = useInterview();
+
+  if (!interviewData || !interviewData.technicalQuestions) {
+    return <Text>No technical questions data available.</Text>;
+  }
+
+  const { technicalQuestions } = interviewData;
 
   return (
     <View style={styles.container}>
@@ -14,7 +20,7 @@ export default function TechnicalQuestions() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {interviewData.technicalQuestions.map((question, index) => (
+        {technicalQuestions.map((question, index) => (
           <LinearGradient
             key={index}
             colors={['#4158D0', '#C850C0']}
@@ -46,7 +52,7 @@ export default function TechnicalQuestions() {
       </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -130,4 +136,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500',
   },
-}); 
+});
+
+export default TechnicalQuestions; 

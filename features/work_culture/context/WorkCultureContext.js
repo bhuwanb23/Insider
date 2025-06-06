@@ -1,11 +1,53 @@
-import React, { createContext, useContext } from 'react';
-import { workCultureData } from '../data/workCultureData';
+import React, { createContext, useContext, useState } from 'react';
+import { cleanForJsonParse } from '../../../utils/jsonParser';
 
 const WorkCultureContext = createContext();
 
-export function WorkCultureProvider({ children }) {
+// Flatten nested API response to expected structure (customize as needed)
+function flattenWorkCultureData(apiData) {
+  if (!apiData) return {};
+  return {
+    coreValues: apiData.cultureOverview?.coreValues,
+    culturalVibe: apiData.cultureOverview?.culturalVibe,
+    employeeEmpowerment: apiData.cultureOverview?.employeeEmpowerment,
+    leadershipStyle: apiData.cultureOverview?.leadershipStyle,
+    workLifeBalance: apiData.workLifeBalance,
+    remoteWork: apiData.remoteWork,
+    teamCollaboration: apiData.teamCollaboration,
+    mentalHealth: apiData.mentalHealth,
+    diversity: apiData.diversity,
+    employeeStories: apiData.employeeStories
+  };
+}
+
+export function WorkCultureProvider({ children, apiResponse }) {
+  const [workCultureData, setWorkCultureData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // If apiResponse is provided, parse and flatten it
+  React.useEffect(() => {
+    if (!apiResponse) return;
+    setLoading(true);
+    setError(null);
+    try {
+      let data = apiResponse;
+      if (typeof apiResponse === 'string') {
+        const cleaned = cleanForJsonParse(apiResponse);
+        data = JSON.parse(cleaned);
+      }
+      const flatData = flattenWorkCultureData(data);
+      setWorkCultureData(flatData);
+    } catch (e) {
+      setWorkCultureData(null);
+      setError('Unable to process the response from the server. ' + (e.message ? `Error: ${e.message}` : '') + ' Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [apiResponse]);
+
   return (
-    <WorkCultureContext.Provider value={workCultureData}>
+    <WorkCultureContext.Provider value={{ workCultureData, loading, error }}>
       {children}
     </WorkCultureContext.Provider>
   );

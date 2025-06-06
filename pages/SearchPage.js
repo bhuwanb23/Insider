@@ -74,7 +74,7 @@ export default function SearchPage({ navigation, onBack }) {
         } catch (err) {
           if (err.cleanedResponse) {
             results[label] = { parsed: null, raw: err.cleanedResponse };
-          } else {
+        } else {
             results[label] = { parsed: null, raw: null, error: err.message };
           }
           console.error(`${label} failed:`, err.message);
