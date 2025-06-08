@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Badge from './Badge';
 
-export default function TechnologyCard({ title, tags, description, badges }) {
+export default function TechnologyCard({ title, tags = [], description, badges = [] }) {
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} activeOpacity={0.8}>
       <LinearGradient
         colors={['#4158D0', '#C850C0']}
         style={styles.cardGradient}
@@ -14,8 +14,12 @@ export default function TechnologyCard({ title, tags, description, badges }) {
       >
         <View style={styles.contentWrapper}>
           <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-            {badges && badges.length > 0 && (
+            {title ? (
+              <Text style={styles.title}>{title}</Text>
+            ) : (
+              <Text style={styles.titlePlaceholder}>No Title</Text>
+            )}
+            {badges.length > 0 && (
               <View style={styles.headerBadges}>
                 {badges.map((badge, index) => (
                   <Badge key={index} label={badge} variant="light" />
@@ -24,17 +28,21 @@ export default function TechnologyCard({ title, tags, description, badges }) {
             )}
           </View>
 
-          {description && (
+          {description ? (
             <Text style={styles.description}>{description}</Text>
+          ) : (
+            <Text style={styles.descriptionPlaceholder}>No description available.</Text>
           )}
 
-          <View style={styles.tagContainer}>
-            {tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
-          </View>
+          {tags.length > 0 && (
+            <View style={styles.tagContainer}>
+              {tags.map((tag, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       </LinearGradient>
     </TouchableOpacity>
@@ -76,6 +84,14 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
+  titlePlaceholder: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'rgba(255, 255, 255, 0.6)',
+    flex: 1,
+    letterSpacing: 0.5,
+    fontStyle: 'italic',
+  },
   headerBadges: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -92,6 +108,13 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+  },
+  descriptionPlaceholder: {
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 15,
+    lineHeight: 22,
+    fontStyle: 'italic',
+    marginBottom: 16,
   },
   tagContainer: {
     flexDirection: 'row',

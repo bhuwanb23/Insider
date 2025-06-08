@@ -27,7 +27,11 @@ export function WorkCultureProvider({ children, apiResponse }) {
 
   // If apiResponse is provided, parse and flatten it
   React.useEffect(() => {
-    if (!apiResponse) return;
+    if (!apiResponse) {
+      setWorkCultureData(null);
+      setError('No data available.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -37,7 +41,13 @@ export function WorkCultureProvider({ children, apiResponse }) {
         data = JSON.parse(cleaned);
       }
       const flatData = flattenWorkCultureData(data);
-      setWorkCultureData(flatData);
+      if (!flatData || (typeof flatData === 'object' && Object.keys(flatData).length === 0)) {
+        setWorkCultureData(null);
+        setError('No data available.');
+      } else {
+        setWorkCultureData(flatData);
+        setError(null);
+      }
     } catch (e) {
       setWorkCultureData(null);
       setError('Unable to process the response from the server. ' + (e.message ? `Error: ${e.message}` : '') + ' Please try again.');

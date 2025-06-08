@@ -26,7 +26,7 @@ const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight ||
 export default function App() {
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
+      <View style={[styles.container, { pointerEvents: 'box-none' }]}>
         <StatusBar
           barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'}
           backgroundColor="transparent"

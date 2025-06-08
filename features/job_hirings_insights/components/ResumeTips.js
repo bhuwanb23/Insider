@@ -1,11 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useJobHiring } from '../context/JobHiringContext';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+// import { useJobHiring } from '../context/JobHiringContext'; // Removed as data is passed via props
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function ResumeTips() {
-  const { jobHiringData } = useJobHiring();
-  const { resumeTips } = jobHiringData;
+export default function ResumeTips({ data }) {
+  // const { jobHiringData } = useJobHiring(); // Removed
+  const resumeTips = data?.resumeTips || {};
+
+  if (!resumeTips || Object.keys(resumeTips).length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No resume tips data available.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -15,66 +23,84 @@ export default function ResumeTips() {
       </View>
 
       {/* Preferences Section */}
-      <LinearGradient
-        colors={['#4158D0', '#C850C0']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.section}
-      >
-        <Text style={styles.sectionTitle}>What We Look For</Text>
-        <View style={styles.preferencesList}>
-          {resumeTips.preferences.map((pref, index) => (
-            <View key={index} style={styles.preferenceItem}>
-              <Text style={styles.bulletPoint}>•</Text>
-              <Text style={styles.preferenceText}>{pref}</Text>
-            </View>
-          ))}
+      {resumeTips.preferences && resumeTips.preferences.length > 0 ? (
+        <LinearGradient
+          colors={['#4158D0', '#C850C0']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.section}
+        >
+          <Text style={styles.sectionTitle}>What We Look For</Text>
+          <View style={styles.preferencesList}>
+            {resumeTips.preferences.map((pref, index) => (
+              <View key={index} style={styles.preferenceItem}>
+                <Text style={styles.bulletPoint}>•</Text>
+                <Text style={styles.preferenceText}>{pref}</Text>
+              </View>
+            ))}
+          </View>
+        </LinearGradient>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No preferences available.</Text>
         </View>
-      </LinearGradient>
+      )}
 
       {/* Tools Section */}
-      <View style={styles.toolsSection}>
-        <Text style={styles.subSectionTitle}>Screening Tools</Text>
-        {resumeTips.tools.map((tool, index) => (
-          <View key={index} style={styles.toolCard}>
-            <View style={styles.toolHeader}>
-              <Text style={styles.toolName}>{tool.name}</Text>
-              <Text style={styles.toolPurpose}>{tool.purpose}</Text>
-            </View>
-            {tool.keywords && (
-              <View style={styles.keywordsContainer}>
-                {tool.keywords.map((keyword, idx) => (
-                  <View key={idx} style={styles.keywordTag}>
-                    <Text style={styles.keywordText}>{keyword}</Text>
-                  </View>
-                ))}
+      {resumeTips.tools && resumeTips.tools.length > 0 ? (
+        <View style={styles.toolsSection}>
+          <Text style={styles.subSectionTitle}>Screening Tools</Text>
+          {resumeTips.tools.map((tool, index) => (
+            <View key={index} style={styles.toolCard}>
+              <View style={styles.toolHeader}>
+                <Text style={styles.toolName}>{tool.name}</Text>
+                <Text style={styles.toolPurpose}>{tool.purpose}</Text>
               </View>
-            )}
-            {tool.focusAreas && (
-              <View style={styles.keywordsContainer}>
-                {tool.focusAreas.map((area, idx) => (
-                  <View key={idx} style={styles.keywordTag}>
-                    <Text style={styles.keywordText}>{area}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-        ))}
-      </View>
-
-      {/* Optimization Tips */}
-      <View style={styles.optimizationSection}>
-        <Text style={styles.subSectionTitle}>Quick Optimization Tips</Text>
-        <View style={styles.tipsGrid}>
-          {resumeTips.optimization.map((tip, index) => (
-            <View key={index} style={styles.tipCard}>
-              <Text style={styles.tipNumber}>{index + 1}</Text>
-              <Text style={styles.tipText}>{tip}</Text>
+              {tool.keywords && ( 
+                <View style={styles.keywordsContainer}>
+                  {tool.keywords.map((keyword, idx) => (
+                    <View key={idx} style={styles.keywordTag}>
+                      <Text style={styles.keywordText}>{keyword}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+              {tool.focusAreas && ( 
+                <View style={styles.keywordsContainer}>
+                  {tool.focusAreas.map((area, idx) => (
+                    <View key={idx} style={styles.keywordTag}>
+                      <Text style={styles.keywordText}>{area}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           ))}
         </View>
-      </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No screening tools data available.</Text>
+        </View>
+      )}
+
+      {/* Optimization Tips */}
+      {resumeTips.optimization && resumeTips.optimization.length > 0 ? (
+        <View style={styles.optimizationSection}>
+          <Text style={styles.subSectionTitle}>Quick Optimization Tips</Text>
+          <View style={styles.tipsGrid}>
+            {resumeTips.optimization.map((tip, index) => (
+              <View key={index} style={styles.tipCard}>
+                <Text style={styles.tipNumber}>{index + 1}</Text>
+                <Text style={styles.tipText}>{tip}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No optimization tips available.</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -85,6 +111,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200, // Added for better visibility of loading/error
+  },
+  centeredNoCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    minHeight: 100,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   header: {
     flexDirection: 'row',

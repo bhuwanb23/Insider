@@ -61,33 +61,43 @@ export default function JobHiringsPage() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tabsContent}
           >
-            {Object.entries(SECTIONS).map(([key, section]) => (
-              <TouchableOpacity
-                key={key}
-                style={[
-                  styles.tab,
-                  activeSection === SECTIONS[key] && styles.activeTab,
-                ]}
-                onPress={() => setActiveSection(SECTIONS[key])}
-              >
-                <LinearGradient
-                  colors={activeSection === SECTIONS[key] ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                  style={styles.tabGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+            {Object.entries(SECTIONS).map(([key, section]) => {
+              const isActive = activeSection === SECTIONS[key];
+              return (
+                <TouchableOpacity
+                  key={key}
+                  style={[
+                    styles.tab,
+                    isActive && styles.activeTab,
+                  ]}
+                  onPress={(event) => {
+                    if (event && event.currentTarget) {
+                      event.currentTarget.blur();
+                    }
+                    setActiveSection(SECTIONS[key]);
+                  }}
+                  tabIndex={isActive ? 0 : -1}
+                  importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
                 >
-                  <Text style={styles.tabIcon}>{section.icon}</Text>
-                  <Text
-                    style={[
-                      styles.tabText,
-                      activeSection === SECTIONS[key] && styles.activeTabText,
-                    ]}
+                  <LinearGradient
+                    colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                    style={styles.tabGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
                   >
-                    {section.title}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
+                    <Text style={styles.tabIcon}>{section.icon}</Text>
+                    <Text
+                      style={[
+                        styles.tabText,
+                        isActive && styles.activeTabText,
+                      ]}
+                    >
+                      {section.title}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 

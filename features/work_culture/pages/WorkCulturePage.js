@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useWorkCulture } from '../context/WorkCultureContext';
 import CultureOverviewSection from '../components/CultureOverviewSection';
@@ -12,60 +12,70 @@ import EmployeeStoriesSection from '../components/EmployeeStoriesSection';
 
 const { width } = Dimensions.get('window');
 
-const SECTIONS = {
-  CULTURE: {
-    title: 'Company Culture',
-    icon: '🏢',
-  },
-  BALANCE: {
-    title: 'Work-Life Balance',
-    icon: '⚖️',
-  },
-  REMOTE: {
-    title: 'Remote Work',
-    icon: '🏠',
-  },
-  COLLABORATION: {
-    title: 'Team Collaboration',
-    icon: '🤝',
-  },
-  WELLNESS: {
-    title: 'Mental Health',
-    icon: '🧠',
-  },
-  DIVERSITY: {
-    title: 'Diversity & Inclusion',
-    icon: '🌈',
-  },
-  STORIES: {
-    title: 'Employee Stories',
-    icon: '👥',
-  },
+// Define a mapping from workCultureData keys to section components and display info
+const SECTION_COMPONENTS = {
+  cultureOverview: { title: 'Company Culture', icon: '🏢', component: CultureOverviewSection },
+  workLifeBalance: { title: 'Work-Life Balance', icon: '⚖️', component: WorkLifeBalanceSection },
+  remoteWork: { title: 'Remote Work', icon: '🏠', component: RemoteWorkSection },
+  teamCollaboration: { title: 'Team Collaboration', icon: '🤝', component: TeamCollaborationSection },
+  mentalHealth: { title: 'Mental Health', icon: '🧠', component: MentalHealthSection },
+  diversity: { title: 'Diversity & Inclusion', icon: '🌈', component: DiversitySection },
+  employeeStories: { title: 'Employee Stories', icon: '👥', component: EmployeeStoriesSection },
 };
 
 export default function WorkCulturePage() {
-  const [activeSection, setActiveSection] = useState(SECTIONS.CULTURE);
-  const workCultureData = useWorkCulture();
+  const { workCultureData, loading, error } = useWorkCulture();
+  const [activeSectionKey, setActiveSectionKey] = useState(null);
+
+  // Set the first available section as active when workCultureData loads
+  useEffect(() => {
+    if (workCultureData && Object.keys(workCultureData).length > 0) {
+      const availableSectionKeys = Object.keys(SECTION_COMPONENTS).filter(key => workCultureData[key]);
+      if (availableSectionKeys.length > 0) {
+        setActiveSectionKey(availableSectionKeys[0]);
+      } else {
+        setActiveSectionKey(null);
+      }
+    } else {
+      setActiveSectionKey(null);
+    }
+  }, [workCultureData]);
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#4158D0" />
+        <Text style={styles.centeredText}>Loading work culture data...</Text>
+      </View>
+    );
+  }
+
+  if (error || !workCultureData || Object.keys(workCultureData).length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>{error || 'No work culture data available.'}</Text>
+      </View>
+    );
+  }
+  
+  // Ensure activeSectionKey is set before rendering content
+  if (!activeSectionKey || !SECTION_COMPONENTS[activeSectionKey]) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No work culture sections found or selected.</Text>
+      </View>
+    );
+  }
+
+  const ActiveComponent = SECTION_COMPONENTS[activeSectionKey].component;
+  const currentSectionData = workCultureData[activeSectionKey];
+  const availableSectionKeys = Object.keys(SECTION_COMPONENTS).filter(key => workCultureData[key]);
 
   const renderContent = () => {
-    switch (activeSection) {
-      case SECTIONS.CULTURE:
-        return <CultureOverviewSection data={workCultureData.cultureOverview} />;
-      case SECTIONS.BALANCE:
-        return <WorkLifeBalanceSection data={workCultureData.workLifeBalance} />;
-      case SECTIONS.REMOTE:
-        return <RemoteWorkSection data={workCultureData.remoteWork} />;
-      case SECTIONS.COLLABORATION:
-        return <TeamCollaborationSection data={workCultureData.teamCollaboration} />;
-      case SECTIONS.WELLNESS:
-        return <MentalHealthSection data={workCultureData.mentalHealth} />;
-      case SECTIONS.DIVERSITY:
-        return <DiversitySection data={workCultureData.diversity} />;
-      case SECTIONS.STORIES:
-        return <EmployeeStoriesSection data={workCultureData.employeeStories} />;
-      default:
-        return null;
+    if (ActiveComponent && currentSectionData) {
+      return <ActiveComponent data={currentSectionData} />;
     }
+    return null;
   };
 
   return (
@@ -81,37 +91,43 @@ export default function WorkCulturePage() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}
         >
-          {Object.entries(SECTIONS).map(([key, section]) => (
-            <TouchableOpacity
-              key={key}
-              style={[
-                styles.tab,
-                activeSection === SECTIONS[key] && styles.activeTab,
-              ]}
-              onPress={() => setActiveSection(SECTIONS[key])}
-            >
-              <LinearGradient
-                colors={
-                  activeSection === SECTIONS[key]
-                    ? ['#4158D0', '#C850C0']
-                    : ['transparent', 'transparent']
-                }
-                style={styles.tabGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+          {availableSectionKeys.map((key) => {
+            const section = SECTION_COMPONENTS[key];
+            const isActive = activeSectionKey === key;
+            return (
+              <TouchableOpacity
+                key={key}
+                style={[
+                  styles.tab,
+                  isActive && styles.activeTab,
+                ]}
+                onPress={() => setActiveSectionKey(key)}
+                tabIndex={isActive ? 0 : -1}
+                importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
               >
-                <Text style={styles.tabIcon}>{section.icon}</Text>
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeSection === SECTIONS[key] && styles.activeTabText,
-                  ]}
+                <LinearGradient
+                  colors={
+                    isActive
+                      ? ['#4158D0', '#C850C0']
+                      : ['transparent', 'transparent']
+                  }
+                  style={styles.tabGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                 >
-                  {section.title}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
+                  <Text style={styles.tabIcon}>{section.icon}</Text>
+                  <Text
+                    style={[
+                      styles.tabText,
+                      isActive && styles.activeTabText,
+                    ]}
+                  >
+                    {section.title}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
 
@@ -176,5 +192,16 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 }); 

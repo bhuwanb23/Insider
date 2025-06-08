@@ -1,26 +1,48 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import RatingIndicator from './RatingIndicator';
 
 export default function MentalHealthSection({ data }) {
+  if (!data || Object.keys(data).length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No mental health support data available.</Text>
+      </View>
+    );
+  }
+
+  const { overallScore, programs } = data;
+
   return (
     <View style={styles.sectionContent}>
-      <View style={styles.wellnessScore}>
-        <Text style={styles.subheading}>Wellness Support Rating</Text>
-        <RatingIndicator score={data.overallScore} size="large" />
-      </View>
+      {overallScore !== undefined ? (
+        <View style={styles.wellnessScore}>
+          <Text style={styles.subheading}>Wellness Support Rating</Text>
+          <RatingIndicator score={overallScore} size="large" />
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No overall wellness score available.</Text>
+        </View>
+      )}
 
-      <View style={styles.programsContainer}>
-        {data.programs.map((program, index) => (
-          <View key={index} style={styles.programCard}>
-            <Text style={styles.programIcon}>{program.icon}</Text>
-            <View style={styles.programInfo}>
-              <Text style={styles.programName}>{program.name}</Text>
-              <Text style={styles.programDetails}>Coverage: {program.coverage}</Text>
+      {programs && programs.length > 0 ? (
+        <View style={styles.programsContainer}>
+          {programs.map((program, index) => (
+            <View key={index} style={styles.programCard}>
+              <Text style={styles.programIcon}>{program.icon || ''}</Text>
+              <View style={styles.programInfo}>
+                <Text style={styles.programName}>{program.name || 'N/A'}</Text>
+                <Text style={styles.programDetails}>Coverage: {program.coverage || 'N/A'}</Text>
+              </View>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No programs available.</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -28,6 +50,23 @@ export default function MentalHealthSection({ data }) {
 const styles = StyleSheet.create({
   sectionContent: {
     marginBottom: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 150,
+  },
+  centeredNoCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    minHeight: 100,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   wellnessScore: {
     alignItems: 'center',

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { cleanForJsonParse, parseJsonResponse, validators } from '../../../utils/jsonParser';
 
 const InterviewContext = createContext();
@@ -63,72 +63,51 @@ function isValidInterviewExperience(obj) {
   return true;
 }
 
-export function InterviewProvider({ children }) {
+// Optionally flatten or map the API data if needed (customize as required)
+function flattenInterviewData(apiData) {
+  if (!apiData) return {};
+  return apiData; // If you need to map/flatten, do it here
+}
+
+export function InterviewProvider({ children, apiResponse }) {
   const [interviewData, setInterviewData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const setParsedInterviewData = (dataOrRaw) => {
+  useEffect(() => {
+    if (!apiResponse) {
+      setInterviewData(null);
+      setError('No data available.');
+      return;
+    }
     setIsLoading(true);
+    setError(null);
     try {
-      let data = dataOrRaw;
-      
-      if (typeof dataOrRaw === 'string') {
-        if (!dataOrRaw.trim()) {
-          throw new Error('Empty response received from server');
-        }
-
-        if (__DEV__) {
-          console.log('[Interview] Raw API response:', dataOrRaw);
-        }
-
-        const cleaned = cleanForJsonParse(dataOrRaw);
-        
-        if (__DEV__) {
-          console.log('[Interview] Cleaned for JSON parse:', cleaned);
-        }
-
-        try {
-          data = JSON.parse(cleaned);
-        } catch (parseError) {
-          throw new Error(`JSON parse error: ${parseError.message}`);
-        }
-
-        if (__DEV__) {
-          console.log('[Interview] Parsed object:', data);
-        }
+      let data = apiResponse;
+      if (typeof apiResponse === 'string') {
+        const cleaned = cleanForJsonParse(apiResponse);
+        data = JSON.parse(cleaned);
       }
-
-      if (!data) {
-        throw new Error('No data received from server');
+      const flatData = flattenInterviewData(data);
+      if (!flatData || (typeof flatData === 'object' && Object.keys(flatData).length === 0)) {
+        setInterviewData(null);
+        setError('No data available.');
+      } else {
+        setInterviewData(flatData);
+        setError(null);
       }
-
-      if (!isValidInterviewExperience(data)) {
-        throw new Error('Data received is not in the expected format');
-      }
-
-      setInterviewData(data);
-      setError(null);
     } catch (e) {
       setInterviewData(null);
-      setError(
-        'Unable to process the response from the server. ' +
-        (e.message ? `Error: ${e.message}` : '') +
-        ' Please try again or contact support.'
-      );
-      if (__DEV__) {
-        console.error('[Interview] Error processing data:', e);
-      }
+      setError('Unable to process the response from the server. ' + (e.message ? `Error: ${e.message}` : '') + ' Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiResponse]);
 
   const value = {
     interviewData,
     error,
-    isLoading,
-    setParsedInterviewData
+    isLoading
   };
 
   return (

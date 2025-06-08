@@ -1,9 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Badge from '../../tech_stack/components/Badge';
 
 export default function EmployeeStoryCard({ story }) {
+  if (!story || Object.keys(story).length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No story details available.</Text>
+      </View>
+    );
+  }
+
   const { name, role, tenure, image, quote, highlights } = story;
 
   return (
@@ -14,28 +22,30 @@ export default function EmployeeStoryCard({ story }) {
       style={styles.container}
     >
       <View style={styles.header}>
-        <Text style={styles.image}>{image}</Text>
+        <Text style={styles.image}>{image || '👤'}</Text>
         <View style={styles.headerInfo}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.role}>{role}</Text>
-          <Text style={styles.tenure}>{tenure}</Text>
+          <Text style={styles.name}>{name || 'Unknown Employee'}</Text>
+          <Text style={styles.role}>{role || 'Unknown Role'}</Text>
+          <Text style={styles.tenure}>{tenure || 'N/A'}</Text>
         </View>
       </View>
 
       <View style={styles.quoteContainer}>
         <Text style={styles.quoteIcon}>"</Text>
-        <Text style={styles.quote}>{quote}</Text>
+        <Text style={styles.quote}>{quote || 'No quote available.'}</Text>
       </View>
 
-      <View style={styles.highlightsContainer}>
-        {highlights.map((highlight, index) => (
-          <Badge
-            key={index}
-            label={highlight}
-            variant="light"
-          />
-        ))}
-      </View>
+      {highlights && highlights.length > 0 && (
+        <View style={styles.highlightsContainer}>
+          {highlights.map((highlight, index) => (
+            <Badge
+              key={index}
+              label={highlight}
+              variant="light"
+            />
+          ))}
+        </View>
+      )}
     </LinearGradient>
   );
 }
@@ -51,6 +61,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 150,
+    marginHorizontal: 16,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   header: {
     flexDirection: 'row',

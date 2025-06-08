@@ -8,22 +8,42 @@ export function cleanForJsonParse(str) {
 
   let cleaned = str;
   try {
-    // Remove // comments
-    cleaned = cleaned.replace(/\/\/.*$/gm, '');
-    // Remove /* ... */ comments
-    cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
+    // Remove all types of comments (single-line // and multi-line /* */)
+    // This regex carefully avoids removing http(s)://
+    cleaned = cleaned.replace(/\/\*[^]*?\*\/|(?<!:)\/\/[^\n]*(\r?\n|$)/gm, '');
     // Remove parenthetical notes after URLs or values
     cleaned = cleaned.replace(/"\s*\([^)]*\)\s*"/g, '"');
     cleaned = cleaned.replace(/\s*\([^)]*\)\s*(,|\n|$)/g, '$1');
+    // Remove backticks and smart quotes
+    cleaned = cleaned.replace(/[`""'']/g, '"');
+    // Remove invalid triple quotes
+    cleaned = cleaned.replace(/"""/g, '');
     // Remove double commas (common LLM artifact)
     cleaned = cleaned.replace(/,\s*,+/g, ',');
+    // Replace non-JSON compliant 'None' with 'null'
+    cleaned = cleaned.replace(/None/g, 'null');
     // Remove trailing commas before closing brackets/braces
     cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
-    // Remove newlines
+    // Remove trailing commas before nested objects/arrays
+    cleaned = cleaned.replace(/,\s*([\[{])/g, '$1');
+    // Quote unquoted numeric ranges (e.g., 4-6) in key-value pairs or as array elements
+    cleaned = cleaned.replace(/([:\[,])\s*([0-9]+-[0-9]+)(\s*[,}\]])/g, '$1"$2"$3');
+    // Remove newlines and carriage returns, replace with single space if within property values to avoid breaking JSON structure, otherwise remove
+    cleaned = cleaned.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, function(match) {
+      return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+    });
     cleaned = cleaned.replace(/(\r\n|\n|\r)/gm, '');
     // Fix array syntax errors
     cleaned = cleaned.replace(/,\s*]/g, ']'); // Remove trailing commas in arrays
     cleaned = cleaned.replace(/\[\s*,/g, '['); // Remove leading commas in arrays
+    // Attempt to quote unquoted property names (simple cases). Ensure it doesn't double quote.
+    cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+    // Remove any invalid control characters (excluding valid JSON escape sequences)
+    cleaned = cleaned.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+    // Ensure no multiple spaces after commas or colons
+    cleaned = cleaned.replace(/([,:])\s+/g, '$1 ');
+    // Trim outer whitespace
+    cleaned = cleaned.trim();
     // Extract only the JSON part (from first { to last })
     const firstBrace = cleaned.indexOf('{');
     const lastBrace = cleaned.lastIndexOf('}');
@@ -160,8 +180,24 @@ export const validators = {
     }
 
     const requiredFields = [
-      'values', 'benefits', 'workLifeBalance', 'diversity',
-      'growth', 'environment', 'reviews'
+      'cultureOverview', 'workLifeBalance', 'remoteWork', 'teamCollaboration',
+      'mentalHealth', 'diversity', 'employeeStories'
+    ];
+
+    const missingFields = requiredFields.filter(field => !data[field]);
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+  },
+
+  jobHiring: (data) => {
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid data: Object is null or not an object');
+    }
+
+    const requiredFields = [
+      'commonRoles', 'internshipConversion', 'hiringChannels', 'jobTrends',
+      'hiringTimeline', 'hiringProcess', 'resumeTips'
     ];
 
     const missingFields = requiredFields.filter(field => !data[field]);
@@ -175,7 +211,7 @@ export const validators = {
       throw new Error('Invalid data: Object is null or not an object');
     }
 
-    const requiredFields = ['articles', 'highlights', 'trending'];
+    const requiredFields = ['headlines', 'socialSentiment', 'highlights', 'studentImpact'];
     const missingFields = requiredFields.filter(field => !data[field]);
     if (missingFields.length > 0) {
       throw new Error(`Missing required fields: ${missingFields.join(', ')}`);

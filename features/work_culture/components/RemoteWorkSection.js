@@ -1,11 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function RemoteWorkSection({ data }) {
+  if (!data || Object.keys(data).length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No remote work data available.</Text>
+      </View>
+    );
+  }
+
+  const { policy, details, benefits, leaves } = data;
+
   const renderDetail = (key, value) => {
-    const icon = key === 'remoteAllowed' ? 'home-outline' : 
+    const icon = key === 'remoteAllowed' ? 'home-outline' :
                 key === 'hybridStructure' ? 'calendar-clock' :
                 key === 'globalPolicy' ? 'earth' : 'laptop';
     
@@ -22,7 +32,7 @@ export default function RemoteWorkSection({ data }) {
             {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
           </Text>
           <Text style={styles.detailValue}>
-            {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value}
+            {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : (value || 'N/A')}
           </Text>
         </View>
       </View>
@@ -32,50 +42,72 @@ export default function RemoteWorkSection({ data }) {
   return (
     <View style={styles.sectionContent}>
       {/* Policy Header */}
-      <LinearGradient
-        colors={['#4158D0', '#C850C0']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.policyHeader}
-      >
-        <MaterialCommunityIcons name="laptop" size={28} color="#fff" />
-        <Text style={styles.policyTitle}>{data.policy}</Text>
-      </LinearGradient>
+      {policy ? (
+        <LinearGradient
+          colors={['#4158D0', '#C850C0']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.policyHeader}
+        >
+          <MaterialCommunityIcons name="laptop" size={28} color="#fff" />
+          <Text style={styles.policyTitle}>{policy}</Text>
+        </LinearGradient>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No remote work policy available.</Text>
+        </View>
+      )}
 
       {/* Details Grid */}
-      <View style={styles.detailsContainer}>
-        {Object.entries(data.details).map(([key, value]) => renderDetail(key, value))}
-      </View>
+      {details && Object.keys(details).length > 0 ? (
+        <View style={styles.detailsContainer}>
+          {Object.entries(details).map(([key, value]) => renderDetail(key, value))}
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No remote work details available.</Text>
+        </View>
+      )}
 
       {/* Benefits Section */}
-      <View style={styles.benefitsContainer}>
-        <Text style={styles.benefitsTitle}>Remote Work Benefits</Text>
-        <View style={styles.benefitsList}>
-          {data.benefits.map((benefit, index) => (
-            <View key={index} style={styles.benefitItem}>
-              <View style={styles.benefitIconContainer}>
-                <MaterialCommunityIcons name="check-circle" size={20} color="#4CAF50" />
+      {benefits && benefits.length > 0 ? (
+        <View style={styles.benefitsContainer}>
+          <Text style={styles.benefitsTitle}>Remote Work Benefits</Text>
+          <View style={styles.benefitsList}>
+            {benefits.map((benefit, index) => (
+              <View key={index} style={styles.benefitItem}>
+                <View style={styles.benefitIconContainer}>
+                  <MaterialCommunityIcons name="check-circle" size={20} color="#4CAF50" />
+                </View>
+                <Text style={styles.benefitText}>{benefit || 'N/A'}</Text>
               </View>
-              <Text style={styles.benefitText}>{benefit}</Text>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
-      </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No remote work benefits available.</Text>
+        </View>
+      )}
 
       {/* Leave Policy */}
-      {data.leaves && (
+      {leaves && Object.keys(leaves).length > 0 ? (
         <View style={styles.leavesContainer}>
           <Text style={styles.leavesTitle}>Leave Policy</Text>
           <View style={styles.leavesGrid}>
-            {Object.entries(data.leaves).map(([type, duration]) => (
+            {Object.entries(leaves).map(([type, duration]) => (
               <View key={type} style={styles.leaveItem}>
                 <Text style={styles.leaveType}>
                   {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Text>
-                <Text style={styles.leaveDuration}>{duration}</Text>
+                <Text style={styles.leaveDuration}>{duration || 'N/A'}</Text>
               </View>
             ))}
           </View>
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No leave policy details available.</Text>
         </View>
       )}
     </View>
@@ -85,6 +117,23 @@ export default function RemoteWorkSection({ data }) {
 const styles = StyleSheet.create({
   sectionContent: {
     marginBottom: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 150,
+  },
+  centeredNoCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    minHeight: 100,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   policyHeader: {
     flexDirection: 'row',

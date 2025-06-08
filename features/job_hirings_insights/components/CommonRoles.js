@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -7,7 +7,16 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32; // Full width minus padding
 
 export default function CommonRoles() {
-  const { jobHiringData } = useJobHiring();
+  const { jobHiringData, loading, error } = useJobHiring();
+
+  if (loading) {
+    return <View style={styles.centered}><ActivityIndicator size="large" color="#4158D0" /><Text style={styles.centeredText}>Loading common roles...</Text></View>;
+  }
+
+  if (error || !jobHiringData || !jobHiringData.commonRoles || jobHiringData.commonRoles.length === 0) {
+    return <View style={styles.centered}><Text style={styles.centeredText}>{error || 'No common roles data available.'}</Text></View>;
+  }
+
   const { commonRoles } = jobHiringData;
 
   return (
@@ -159,5 +168,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#fff',
     fontWeight: '600',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200, // Ensure it takes up some space
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 }); 

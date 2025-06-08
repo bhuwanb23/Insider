@@ -1,50 +1,62 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HiringTimeline() {
-  const { jobHiringData } = useJobHiring();
+  const { jobHiringData, loading, error } = useJobHiring();
+
+  if (loading) {
+    return <View style={styles.centered}><ActivityIndicator size="large" color="#4158D0" /><Text style={styles.centeredText}>Loading hiring timeline...</Text></View>;
+  }
+
+  if (error || !jobHiringData || !jobHiringData.hiringTimeline) {
+    return <View style={styles.centered}><Text style={styles.centeredText}>{error || 'No hiring timeline data available.'}</Text></View>;
+  }
+
   const { hiringTimeline } = jobHiringData;
 
-  const renderTimelineItem = (title, data) => (
-    <LinearGradient
-      colors={['#4158D0', '#C850C0']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.timelineCard}
-    >
-      <Text style={styles.timelineTitle}>{title}</Text>
-      <View style={styles.timelineDetails}>
-        <View style={styles.timelineItem}>
-          <Text style={styles.itemLabel}>Period</Text>
-          <Text style={styles.itemValue}>{data.period}</Text>
+  const renderTimelineItem = (title, data) => {
+    if (!data) return null; // Defensive check for individual timeline items
+    return (
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.timelineCard}
+      >
+        <Text style={styles.timelineTitle}>{title}</Text>
+        <View style={styles.timelineDetails}>
+          <View style={styles.timelineItem}>
+            <Text style={styles.itemLabel}>Period</Text>
+            <Text style={styles.itemValue}>{data.period}</Text>
+          </View>
+          <View style={styles.timelineItem}>
+            <Text style={styles.itemLabel}>Frequency</Text>
+            <Text style={styles.itemValue}>{data.frequency}</Text>
+          </View>
+          {data.nextDrive && (
+            <View style={styles.timelineItem}>
+              <Text style={styles.itemLabel}>Next Drive</Text>
+              <Text style={styles.itemValue}>{data.nextDrive}</Text>
+            </View>
+          )}
+          {data.averageOpenings && (
+            <View style={styles.timelineItem}>
+              <Text style={styles.itemLabel}>Avg. Openings</Text>
+              <Text style={styles.itemValue}>{data.averageOpenings}</Text>
+            </View>
+          )}
+          {data.lastEvent && (
+            <View style={styles.timelineItem}>
+              <Text style={styles.itemLabel}>Last Event</Text>
+              <Text style={styles.itemValue}>{data.lastEvent}</Text>
+            </View>
+          )}
         </View>
-        <View style={styles.timelineItem}>
-          <Text style={styles.itemLabel}>Frequency</Text>
-          <Text style={styles.itemValue}>{data.frequency}</Text>
-        </View>
-        {data.nextDrive && (
-          <View style={styles.timelineItem}>
-            <Text style={styles.itemLabel}>Next Drive</Text>
-            <Text style={styles.itemValue}>{data.nextDrive}</Text>
-          </View>
-        )}
-        {data.averageOpenings && (
-          <View style={styles.timelineItem}>
-            <Text style={styles.itemLabel}>Avg. Openings</Text>
-            <Text style={styles.itemValue}>{data.averageOpenings}</Text>
-          </View>
-        )}
-        {data.lastEvent && (
-          <View style={styles.timelineItem}>
-            <Text style={styles.itemLabel}>Last Event</Text>
-            <Text style={styles.itemValue}>{data.lastEvent}</Text>
-          </View>
-        )}
-      </View>
-    </LinearGradient>
-  );
+      </LinearGradient>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -112,5 +124,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#fff',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 }); 

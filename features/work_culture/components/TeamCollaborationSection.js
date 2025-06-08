@@ -1,28 +1,50 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import RatingIndicator from './RatingIndicator';
 
 export default function TeamCollaborationSection({ data }) {
+  if (!data || Object.keys(data).length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No team collaboration data available.</Text>
+      </View>
+    );
+  }
+
+  const { overallScore, activities } = data;
+
   return (
     <View style={styles.sectionContent}>
-      <View style={styles.scoreContainer}>
-        <Text style={styles.subheading}>Team Spirit Score</Text>
-        <RatingIndicator score={data.overallScore} size="large" />
-      </View>
+      {overallScore !== undefined ? (
+        <View style={styles.scoreContainer}>
+          <Text style={styles.subheading}>Team Spirit Score</Text>
+          <RatingIndicator score={overallScore} size="large" />
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No overall team spirit score available.</Text>
+        </View>
+      )}
 
-      <View style={styles.activitiesContainer}>
-        {data.activities.map((activity, index) => (
-          <View key={index} style={styles.activityCard}>
-            <Text style={styles.activityIcon}>{activity.icon}</Text>
-            <View style={styles.activityInfo}>
-              <Text style={styles.activityType}>{activity.type}</Text>
-              <Text style={styles.activityDetails}>
-                {activity.frequency} • {activity.participation} participation
-              </Text>
+      {activities && activities.length > 0 ? (
+        <View style={styles.activitiesContainer}>
+          {activities.map((activity, index) => (
+            <View key={index} style={styles.activityCard}>
+              <Text style={styles.activityIcon}>{activity.icon || ''}</Text>
+              <View style={styles.activityInfo}>
+                <Text style={styles.activityType}>{activity.type || 'N/A'}</Text>
+                <Text style={styles.activityDetails}>
+                  {activity.frequency || 'N/A'} • {activity.participation || 'N/A'} participation
+                </Text>
+              </View>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No activities available.</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -30,6 +52,23 @@ export default function TeamCollaborationSection({ data }) {
 const styles = StyleSheet.create({
   sectionContent: {
     marginBottom: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 150,
+  },
+  centeredNoCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    minHeight: 100,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   scoreContainer: {
     alignItems: 'center',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Platform } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -108,10 +108,22 @@ const styles = StyleSheet.create({
     color: '#2d3436',
     textAlign: 'center',
     marginBottom: 40,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 2 },
+    ...Platform.select({
+      ios: {
+        textShadowColor: 'rgba(0, 0, 0, 0.1)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 3,
+      },
+      android: {
+        textShadowColor: 'rgba(0, 0, 0, 0.1)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 3,
+      },
+      web: {
+        textShadow: '0px 2px 3px rgba(0, 0, 0, 0.1)',
+      },
+    }),
     backgroundColor: 'transparent',
-    textShadowRadius: 3,
   },
   cardsContainer: {
     flexDirection: 'row',
@@ -126,14 +138,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 25,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+      },
+      android: {
+        elevation: 8,
+      },
+      web: {
+        boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.2)',
+      },
+    }),
     position: 'relative',
     overflow: 'hidden',
   },
@@ -147,14 +165,20 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+      },
+      android: {
+        elevation: 8,
+      },
+      web: {
+        boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.2)',
+      },
+    }),
   },
   iconBackground: {
     width: 60,

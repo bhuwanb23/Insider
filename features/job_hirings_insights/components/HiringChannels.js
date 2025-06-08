@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HiringChannels() {
-  const { jobHiringData } = useJobHiring();
+  const { jobHiringData, loading, error } = useJobHiring();
+
+  if (loading) {
+    return <View style={styles.centered}><ActivityIndicator size="large" color="#4158D0" /><Text style={styles.centeredText}>Loading hiring channels...</Text></View>;
+  }
+
+  if (error || !jobHiringData || !jobHiringData.hiringChannels || jobHiringData.hiringChannels.length === 0) {
+    return <View style={styles.centered}><Text style={styles.centeredText}>{error || 'No hiring channels data available.'}</Text></View>;
+  }
+
   const { hiringChannels } = jobHiringData;
 
   return (
@@ -121,5 +130,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
     marginTop: 4,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 }); 

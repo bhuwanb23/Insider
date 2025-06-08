@@ -87,13 +87,13 @@ function flattenCoreCompanyDetails(apiData) {
     socialMedia: apiData.contact?.socialMedia,
     keyPeople: apiData.basicIdentity?.keyPeople,
     funding: apiData.legalDetails?.fundingHistory,
-    acquisitions: apiData.acquisitions,
-    products: apiData.products,
+    acquisitions: apiData.acquisitions || [],
+    products: apiData.products || [],
     awards: apiData.recognition?.workplace,
-    certifications: apiData.certifications,
-    partnerships: apiData.partnerships,
-    competitors: apiData.competitors,
-    recentNews: apiData.recentNews
+    certifications: apiData.certifications || [],
+    partnerships: apiData.partnerships || [],
+    competitors: apiData.competitors || [],
+    recentNews: apiData.recentNews || []
   };
 }
 
@@ -109,7 +109,10 @@ export function CoreCompanyDetailsProvider({ children }) {
       
       if (typeof dataOrRaw === 'string') {
         if (!dataOrRaw.trim()) {
-          throw new Error('Empty response received from server');
+          setCompanyData(null);
+          setError('No data received from server');
+          setIsLoading(false);
+          return;
         }
 
         if (__DEV__) {
@@ -133,8 +136,11 @@ export function CoreCompanyDetailsProvider({ children }) {
         }
       }
 
-      if (!data) {
-        throw new Error('No data received from server');
+      if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+        setCompanyData(null);
+        setError('No data available.');
+        setIsLoading(false);
+        return;
       }
 
       // Flatten the data to match expected structure

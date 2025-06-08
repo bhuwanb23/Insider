@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function InternshipConversion() {
-  const { jobHiringData } = useJobHiring();
+  const { jobHiringData, loading, error } = useJobHiring();
+
+  if (loading) {
+    return <View style={styles.centered}><ActivityIndicator size="large" color="#4158D0" /><Text style={styles.centeredText}>Loading internship conversion data...</Text></View>;
+  }
+
+  if (error || !jobHiringData || !jobHiringData.internshipConversion) {
+    return <View style={styles.centered}><Text style={styles.centeredText}>{error || 'No internship conversion data available.'}</Text></View>;
+  }
+
   const { internshipConversion } = jobHiringData;
 
   return (
@@ -38,7 +47,7 @@ export default function InternshipConversion() {
           </View>
         </View>
         <View style={styles.progressContainer}>
-          <View style={[styles.progressBar, { width: `${internshipConversion.rate}%` }]} />
+          <View style={[styles.progressBar, { width: `${parseFloat(internshipConversion.rate)}%` }]} />
         </View>
       </LinearGradient>
     </View>
@@ -112,5 +121,16 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#fff',
     borderRadius: 4,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 }); 

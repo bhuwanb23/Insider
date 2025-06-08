@@ -1,14 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNews } from '../context/NewsContext';
+// import { useNews } from '../context/NewsContext'; // Removed as data is passed via props
 
-export default function TopHeadlines() {
-  const { newsData } = useNews();
+export default function TopHeadlines({ data }) {
+  // const { newsData } = useNews(); // Removed
+  const headlines = data?.headlines || [];
 
   const handleReadMore = (url) => {
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
+
+  if (!headlines || headlines.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No headlines available.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -17,7 +28,7 @@ export default function TopHeadlines() {
         <Text style={styles.title}>Latest Headlines</Text>
       </View>
 
-      {newsData.headlines.map((article, index) => (
+      {headlines.map((article, index) => (
         <TouchableOpacity
           key={index}
           style={styles.card}
@@ -51,6 +62,17 @@ export default function TopHeadlines() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 150,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   header: {
     flexDirection: 'row',

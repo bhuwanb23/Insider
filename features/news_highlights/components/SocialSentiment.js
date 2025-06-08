@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNews } from '../context/NewsContext';
+// import { useNews } from '../context/NewsContext'; // Removed as data is passed via props
 
 const { width } = Dimensions.get('window');
 
@@ -11,42 +11,58 @@ const SENTIMENT_COLORS = {
   negative: ['#C62828', '#D32F2F'],
 };
 
-export default function SocialSentiment() {
-  const { newsData } = useNews();
-  const { overall, sources, trends } = newsData.socialSentiment;
+export default function SocialSentiment({ data }) {
+  // const { newsData } = useNews(); // Removed
+  const socialSentiment = data?.socialSentiment || {};
+  const { overall, sources, trends } = socialSentiment;
 
-  const renderSentimentBar = (data, showLabels = true) => {
+  if (!socialSentiment || Object.keys(socialSentiment).length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No social sentiment data available.</Text>
+      </View>
+    );
+  }
+
+  const renderSentimentBar = (sentimentData, showLabels = true) => {
+    if (!sentimentData || (sentimentData.positive === undefined && sentimentData.neutral === undefined && sentimentData.negative === undefined)) {
+      return <Text style={styles.noSentimentText}>No sentiment data for this section.</Text>;
+    }
+    const positive = sentimentData.positive || 0;
+    const neutral = sentimentData.neutral || 0;
+    const negative = sentimentData.negative || 0;
+
     return (
       <View style={styles.sentimentBarContainer}>
         <View style={styles.sentimentBar}>
           <LinearGradient
             colors={SENTIMENT_COLORS.positive}
-            style={[styles.sentimentFill, { width: `${data.positive}%` }]}
+            style={[styles.sentimentFill, { width: `${positive}%` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
             {showLabels && (
-              <Text style={styles.sentimentText}>{data.positive}%</Text>
+              <Text style={styles.sentimentText}>{positive}%</Text>
             )}
           </LinearGradient>
           <LinearGradient
             colors={SENTIMENT_COLORS.neutral}
-            style={[styles.sentimentFill, { width: `${data.neutral}%` }]}
+            style={[styles.sentimentFill, { width: `${neutral}%` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
             {showLabels && (
-              <Text style={styles.sentimentText}>{data.neutral}%</Text>
+              <Text style={styles.sentimentText}>{neutral}%</Text>
             )}
           </LinearGradient>
           <LinearGradient
             colors={SENTIMENT_COLORS.negative}
-            style={[styles.sentimentFill, { width: `${data.negative}%` }]}
+            style={[styles.sentimentFill, { width: `${negative}%` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
             {showLabels && (
-              <Text style={styles.sentimentText}>{data.negative}%</Text>
+              <Text style={styles.sentimentText}>{negative}%</Text>
             )}
           </LinearGradient>
         </View>
@@ -79,35 +95,47 @@ export default function SocialSentiment() {
         <Text style={styles.title}>Social Media Sentiment Analysis</Text>
       </View>
 
-      <View style={styles.mainCard}>
-        <Text style={styles.cardTitle}>Overall Sentiment Distribution</Text>
-        {renderSentimentBar(overall, true)}
-      </View>
+      {overall && Object.keys(overall).length > 0 ? (
+        <View style={styles.mainCard}>
+          <Text style={styles.cardTitle}>Overall Sentiment Distribution</Text>
+          {renderSentimentBar(overall, true)}
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No overall sentiment data available.</Text>
+        </View>
+      )}
 
-      <View style={styles.sourcesGrid}>
-        {Object.entries(sources).map(([platform, data], index) => (
-          <View key={platform} style={styles.sourceCard}>
-            <View style={styles.platformHeader}>
-              <Text style={styles.platformName}>
-                {platform === 'twitter' ? 'Twitter' : platform.charAt(0).toUpperCase() + platform.slice(1)}
-              </Text>
+      {sources && Object.keys(sources).length > 0 ? (
+        <View style={styles.sourcesGrid}>
+          {Object.entries(sources).map(([platform, sentimentData], index) => (
+            <View key={platform} style={styles.sourceCard}>
+              <View style={styles.platformHeader}>
+                <Text style={styles.platformName}>
+                  {platform === 'twitter' ? 'Twitter' : platform.charAt(0).toUpperCase() + platform.slice(1)}
+                </Text>
+              </View>
+              {renderSentimentBar(sentimentData, false)}
+              <View style={styles.platformStats}>
+                {[
+                  { label: 'Positive', value: sentimentData.positive },
+                  { label: 'Neutral', value: sentimentData.neutral },
+                  { label: 'Negative', value: sentimentData.negative },
+                ].map((item, idx) => (
+                  <View key={idx} style={styles.statRow}>
+                    <Text style={styles.statLabel}>{item.label}</Text>
+                    <Text style={styles.statValue}>{item.value}%</Text>
+                  </View>
+                ))}
+              </View>
             </View>
-            {renderSentimentBar(data, false)}
-            <View style={styles.platformStats}>
-              {[
-                { label: 'Positive', value: data.positive },
-                { label: 'Neutral', value: data.neutral },
-                { label: 'Negative', value: data.negative },
-              ].map((item, idx) => (
-                <View key={idx} style={styles.statRow}>
-                  <Text style={styles.statLabel}>{item.label}</Text>
-                  <Text style={styles.statValue}>{item.value}%</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      ) : (
+        <View style={styles.centeredNoCard}>
+          <Text style={styles.centeredText}>No sentiment source data available.</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -116,6 +144,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200, // Added for better visibility of loading/error
+  },
+  centeredNoCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    minHeight: 100,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
+  noSentimentText: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 10,
   },
   header: {
     paddingVertical: 16,

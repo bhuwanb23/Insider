@@ -15,7 +15,7 @@ const LoadingSpinner = ({ message = 'Loading...' }) => {
         toValue: 1,
         duration: 2000,
         easing: Easing.linear,
-        useNativeDriver: true,
+        useNativeDriver: false,
       })
     ).start();
 
@@ -26,13 +26,13 @@ const LoadingSpinner = ({ message = 'Loading...' }) => {
           toValue: 1.05,
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
+          useNativeDriver: false,
         }),
         Animated.timing(pulseAnim, {
           toValue: 1,
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
+          useNativeDriver: false,
         }),
       ])
     ).start();

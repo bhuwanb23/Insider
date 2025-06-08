@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNews } from '../context/NewsContext';
+// import { useNews } from '../context/NewsContext'; // Removed as data is passed via props
 
 const { width } = Dimensions.get('window');
 
@@ -23,8 +23,17 @@ const CATEGORY_ICONS = {
   Default: '✨',
 };
 
-export default function HighlightSnippets() {
-  const { newsData } = useNews();
+export default function HighlightSnippets({ data }) {
+  // const { newsData } = useNews(); // Removed
+  const highlights = data?.highlights || [];
+
+  if (!highlights || highlights.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No highlights available.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -34,7 +43,7 @@ export default function HighlightSnippets() {
       </View>
 
       <View style={styles.highlightsGrid}>
-        {newsData.highlights.map((highlight, index) => (
+        {highlights.map((highlight, index) => (
           <LinearGradient
             key={index}
             colors={CATEGORY_GRADIENTS[highlight.category] || CATEGORY_GRADIENTS.Default}
@@ -84,6 +93,17 @@ export default function HighlightSnippets() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 150,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   header: {
     flexDirection: 'row',
@@ -137,7 +157,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
   },
   categoryIcon: {
     fontSize: 18,

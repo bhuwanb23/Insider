@@ -4,6 +4,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function RatingIndicator({ score, label, size = 'medium', showText = true }) {
   const getStars = () => {
+    if (typeof score !== 'number' || isNaN(score)) {
+      return []; // Return empty array if score is not a valid number
+    }
     const stars = [];
     const fullStars = Math.floor(score);
     const hasHalfStar = score % 1 >= 0.5;
@@ -21,12 +24,23 @@ export default function RatingIndicator({ score, label, size = 'medium', showTex
   };
 
   const getStatusColor = () => {
+    if (typeof score !== 'number' || isNaN(score)) {
+      return '#999'; // Default color for invalid score
+    }
     if (score >= 4) return '#4CAF50';
     if (score >= 3) return '#FFC107';
     return '#F44336';
   };
 
   const iconSize = size === 'large' ? 24 : size === 'medium' ? 18 : 14;
+
+  if (typeof score !== 'number' || isNaN(score)) {
+    return (
+      <View style={[styles.container, styles.centeredNoRating]}>
+        <Text style={styles.noRatingText}>{label ? `No ${label.toLowerCase()} available.` : 'No rating available.'}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -77,5 +91,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     color: '#666',
+  },
+  centeredNoRating: {
+    paddingVertical: 10,
+    minHeight: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noRatingText: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
   },
 }); 

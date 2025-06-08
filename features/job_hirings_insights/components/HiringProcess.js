@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HiringProcess() {
-  const { jobHiringData } = useJobHiring();
+  const { jobHiringData, loading, error } = useJobHiring();
+
+  if (loading) {
+    return <View style={styles.centered}><ActivityIndicator size="large" color="#4158D0" /><Text style={styles.centeredText}>Loading hiring process...</Text></View>;
+  }
+
+  if (error || !jobHiringData || !jobHiringData.hiringProcess || jobHiringData.hiringProcess.length === 0) {
+    return <View style={styles.centered}><Text style={styles.centeredText}>{error || 'No hiring process data available.'}</Text></View>;
+  }
+
   const { hiringProcess } = jobHiringData;
 
   return (
@@ -177,5 +186,16 @@ const styles = StyleSheet.create({
   topicText: {
     fontSize: 12,
     color: '#fff',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 }); 

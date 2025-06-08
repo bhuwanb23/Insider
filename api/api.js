@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetailsPrompt, getCompanyInterviewExperiencePrompt, getCompanyJobHiringInsightsPrompt, getCompanyNewsHighlightsPrompt, getCompanyTechStackPrompt } from './prompts.js';
+import { parseJsonResponse, validators } from '../utils/jsonParser.js';
 
 
 // OpenRouter API config
@@ -61,7 +62,25 @@ const makeOpenRouterApiCall = async (prompt, label) => {
         const cleanedResponse = cleanJsonResponse(responseContent);
         console.log(`Cleaned ${label} Response received: ${cleanedResponse}`);
         try {
-            const parsedResponse = JSON.parse(cleanedResponse);
+            // Use the centralized parseJsonResponse from utils/jsonParser.js
+            let parsedResponse;
+            let validator = null;
+            if (label === 'Core Company Details') {
+                validator = validators.coreCompanyDetails;
+            } else if (label === 'Ways to Get In') {
+                validator = validators.waysToGetIn;
+            } else if (label === 'Tech Stack') {
+                validator = validators.techStack;
+            } else if (label === 'Job Hiring Insights') {
+                validator = validators.jobHiring;
+            } else if (label === 'Interview Experience') {
+                validator = validators.interviewExperience;
+            } else if (label === 'Culture') {
+                validator = validators.workCulture;
+            } else if (label === 'News Highlights') {
+                validator = validators.news;
+            }
+            parsedResponse = parseJsonResponse(cleanedResponse, label, validator);
             console.log(`Successfully parsed ${label} response as JSON`);
             return { parsed: parsedResponse, raw: cleanedResponse };
         } catch (parseError) {

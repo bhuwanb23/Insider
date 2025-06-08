@@ -42,12 +42,12 @@ export default function WaysToGetInPage({ route }) {
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 500,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 500,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start();
   }, [route?.params?.initialTopic]);
@@ -89,6 +89,8 @@ export default function WaysToGetInPage({ route }) {
         ]}
         onPress={() => setActiveSection(section)}
         activeOpacity={0.7}
+        tabIndex={isActive ? 0 : -1}
+        importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
       >
         <LinearGradient
           colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}

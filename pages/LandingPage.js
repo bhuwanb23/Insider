@@ -11,7 +11,7 @@ export default function LandingPage() {
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: true }
+    { useNativeDriver: false }
   );
 
   const handleBackToLanding = () => {

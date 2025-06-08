@@ -12,7 +12,7 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
   }, []);
 
@@ -24,7 +24,12 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
       <TouchableOpacity
         key={key}
         style={styles.card}
-        onPress={() => onSelectTopic(key)}
+        onPress={(event) => {
+          if (event && event.currentTarget) {
+            event.currentTarget.blur();
+          }
+          onSelectTopic(key);
+        }}
         activeOpacity={0.8}
       >
         <LinearGradient

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -134,9 +134,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 15,
     backgroundColor: 'transparent',
-    textShadowColor: 'rgba(255,255,255,0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    ...Platform.select({
+      ios: {
+        textShadowColor: 'rgba(255,255,255,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
+      },
+      android: {
+        textShadowColor: 'rgba(255,255,255,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
+      },
+      web: {
+        textShadow: '0px 1px 2px rgba(255,255,255,0.8)',
+      },
+    }),
   },
   subtitle: {
     fontSize: 18,
@@ -145,9 +157,21 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     width: '80%',
     backgroundColor: 'transparent',
-    textShadowColor: 'rgba(255,255,255,0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    ...Platform.select({
+      ios: {
+        textShadowColor: 'rgba(255,255,255,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
+      },
+      android: {
+        textShadowColor: 'rgba(255,255,255,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
+      },
+      web: {
+        textShadow: '0px 1px 2px rgba(255,255,255,0.8)',
+      },
+    }),
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -161,14 +185,20 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 25,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 3,
+      },
+      web: {
+        boxShadow: '0px 2px 3px rgba(0,0,0,0.2)',
+      },
+    }),
   },
   buttonText: {
     color: 'white',
@@ -189,14 +219,20 @@ const styles = StyleSheet.create({
     padding: width < 380 ? 10 : 15,
     borderRadius: 12,
     width: width < 380 ? width * 0.27 : width * 0.25,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+      web: {
+        boxShadow: '0px 2px 3.84px rgba(0,0,0,0.1)',
+      },
+    }),
   },
   statNumber: {
     fontSize: width < 380 ? 18 : 22,

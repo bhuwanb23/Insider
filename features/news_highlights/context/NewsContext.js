@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { newsData as initialNewsData } from '../constants/sampleData';
-import { cleanForJsonParse, parseJsonResponse, validators } from '../../../utils/jsonParser';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { cleanForJsonParse } from '../../../utils/jsonParser';
 
 const NewsContext = createContext(null);
 
@@ -12,31 +11,51 @@ export function useNews() {
   return context;
 }
 
-export function NewsProvider({ children }) {
-  const [newsData, setNewsData] = useState(initialNewsData);
+// Optionally flatten or map the API data if needed (customize as required)
+function flattenNewsData(apiData) {
+  if (!apiData) return {};
+  return apiData; // If you need to map/flatten, do it here
+}
+
+export function NewsProvider({ children, apiResponse }) {
+  const [newsData, setNewsData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const refreshNews = useCallback(async () => {
+  useEffect(() => {
+    if (!apiResponse) {
+      setNewsData(null);
+      setError('No data available.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      // In a real app, you would fetch from an API here
-      // For now, we'll just simulate a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setNewsData(initialNewsData);
-    } catch (err) {
-      setError(err.message);
+      let data = apiResponse;
+      if (typeof apiResponse === 'string') {
+        const cleaned = cleanForJsonParse(apiResponse);
+        data = JSON.parse(cleaned);
+      }
+      const flatData = flattenNewsData(data);
+      if (!flatData || (typeof flatData === 'object' && Object.keys(flatData).length === 0)) {
+        setNewsData(null);
+        setError('No data available.');
+      } else {
+        setNewsData(flatData);
+        setError(null);
+      }
+    } catch (e) {
+      setNewsData(null);
+      setError('Unable to process the response from the server. ' + (e.message ? `Error: ${e.message}` : '') + ' Please try again.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [apiResponse]);
 
   const value = {
     newsData,
     loading,
-    error,
-    refreshNews,
+    error
   };
 
   return (

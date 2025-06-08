@@ -1,36 +1,69 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, ActivityIndicator, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import TopHeadlines from '../components/TopHeadlines';
 import SocialSentiment from '../components/SocialSentiment';
 import HighlightSnippets from '../components/HighlightSnippets';
 import StudentImpact from '../components/StudentImpact';
-
-const SECTIONS = {
-  HEADLINES: { title: 'Top Headlines', icon: '📰' },
-  SENTIMENT: { title: 'Social Sentiment', icon: '💬' },
-  HIGHLIGHTS: { title: 'Key Highlights', icon: '🏆' },
-  IMPACT: { title: 'Student Impact', icon: '🧠' },
-};
+import { useNews } from '../context/NewsContext';
 
 const { width } = Dimensions.get('window');
 
 export default function NewsHighlightsPage() {
-  const [activeSection, setActiveSection] = useState(SECTIONS.HEADLINES);
+  const { newsData, loading, error } = useNews();
+  const [activeSectionKey, setActiveSectionKey] = useState(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (newsData && Object.keys(newsData).length > 0) {
+      const dynamicSections = {
+        headlines: { title: 'Latest Headlines', icon: '📰', component: TopHeadlines },
+        socialSentiment: { title: 'Social Sentiment', icon: '💬', component: SocialSentiment },
+        highlights: { title: 'Key Highlights', icon: '🏆', component: HighlightSnippets },
+        studentImpact: { title: 'Student Impact', icon: '🧠', component: StudentImpact },
+      };
+
+      const availableSectionKeys = Object.keys(dynamicSections).filter(key => newsData[key]);
+      
+      if (availableSectionKeys.length > 0) {
+        setActiveSectionKey(availableSectionKeys[0]);
+      } else {
+        setActiveSectionKey(null);
+      }
+    }
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  }, [newsData, fadeAnim]);
+
+  if (loading) {
+    return <View style={styles.centered}><ActivityIndicator size="large" color="#4158D0" /><Text style={styles.centeredText}>Loading news highlights...</Text></View>;
+  }
+  if (error || !newsData || Object.keys(newsData).length === 0) {
+    return <View style={styles.centered}><Text style={styles.centeredText}>{error || 'No news highlights data available.'}</Text></View>;
+  }
+  
+  if (!activeSectionKey || !newsData[activeSectionKey]) {
+     return <View style={styles.centered}><Text style={styles.centeredText}>No news highlights sections found or selected.</Text></View>;
+  }
+
+  const dynamicSections = {
+    headlines: { title: 'Latest Headlines', icon: '📰', component: TopHeadlines },
+    socialSentiment: { title: 'Social Sentiment', icon: '💬', component: SocialSentiment },
+    highlights: { title: 'Key Highlights', icon: '🏆', component: HighlightSnippets },
+    studentImpact: { title: 'Student Impact', icon: '🧠', component: StudentImpact },
+  };
+
+  const availableSectionKeys = Object.keys(dynamicSections).filter(key => newsData[key]);
+  const ActiveComponent = dynamicSections[activeSectionKey]?.component;
 
   const renderContent = () => {
-    switch (activeSection) {
-      case SECTIONS.HEADLINES:
-        return <TopHeadlines />;
-      case SECTIONS.SENTIMENT:
-        return <SocialSentiment />;
-      case SECTIONS.HIGHLIGHTS:
-        return <HighlightSnippets />;
-      case SECTIONS.IMPACT:
-        return <StudentImpact />;
-      default:
-        return <TopHeadlines />;
+    if (ActiveComponent) {
+      return <ActiveComponent data={newsData[activeSectionKey]} />;
     }
+    return null;
   };
 
   return (
@@ -47,41 +80,59 @@ export default function NewsHighlightsPage() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}
         >
-          {Object.entries(SECTIONS).map(([key, section]) => (
-            <TouchableOpacity
-              key={key}
-              style={[
-                styles.tab,
-                activeSection === SECTIONS[key] && styles.activeTab,
-              ]}
-              onPress={() => setActiveSection(SECTIONS[key])}
-            >
-              <LinearGradient
-                colors={activeSection === SECTIONS[key] ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                style={styles.tabGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+          {availableSectionKeys.map((key) => {
+            const section = dynamicSections[key];
+            const isActive = activeSectionKey === key;
+            return ( 
+              <TouchableOpacity
+                key={key}
+                style={[
+                  styles.tab,
+                  isActive && styles.activeTab,
+                ]}
+                onPress={(event) => {
+                  if (event && event.currentTarget) {
+                    event.currentTarget.blur();
+                  }
+                  setActiveSectionKey(key);
+                }}
+                tabIndex={isActive ? 0 : -1}
+                importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
               >
-                <Text style={styles.tabIcon}>{section.icon}</Text>
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeSection === SECTIONS[key] && styles.activeTabText,
-                  ]}
+                <LinearGradient
+                  colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                  style={styles.tabGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                 >
-                  {section.title}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
+                  <Text style={styles.tabIcon}>{section.icon}</Text>
+                  <Text
+                    style={[
+                      styles.tabText,
+                      isActive && styles.activeTabText,
+                    ]}
+                  >
+                    {section.title}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.contentContainer}>
-          {renderContent()}
-        </View>
-      </ScrollView>
+      <Animated.View
+        style={[
+          styles.content,
+          { opacity: fadeAnim }
+        ]}
+      >
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.contentContainer}>
+            {renderContent()}
+          </View>
+        </ScrollView>
+      </Animated.View>
     </LinearGradient>
   );
 }
@@ -143,5 +194,16 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 }); 

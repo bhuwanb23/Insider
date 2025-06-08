@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNews } from '../context/NewsContext';
+// import { useNews } from '../context/NewsContext'; // Removed as data is passed via props
 
-export default function StudentImpact() {
-  const { newsData } = useNews();
+export default function StudentImpact({ data }) {
+  // const { newsData } = useNews(); // Removed
+  const studentImpact = data?.studentImpact || [];
+
+  if (!studentImpact || studentImpact.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.centeredText}>No student impact data available.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -13,7 +22,7 @@ export default function StudentImpact() {
         <Text style={styles.title}>What This Means For You</Text>
       </View>
 
-      {newsData.studentImpact.map((item, index) => (
+      {studentImpact.map((item, index) => (
         <LinearGradient
           key={index}
           colors={['#4158D0', '#C850C0']}
@@ -55,6 +64,17 @@ export default function StudentImpact() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 150,
+  },
+  centeredText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   header: {
     flexDirection: 'row',

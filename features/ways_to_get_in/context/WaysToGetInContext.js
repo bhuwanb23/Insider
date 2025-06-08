@@ -4,6 +4,15 @@ import { cleanForJsonParse, parseJsonResponse, validators } from '../../../utils
 
 const WaysToGetInContext = createContext();
 
+// Custom cleaning function for Ways To Get In JSON
+const customCleanWaysToGetInJson = (jsonString) => {
+  let cleaned = jsonString;
+  // Replace }{ with },{ to fix missing commas between objects in arrays
+  cleaned = cleaned.replace(/}\{/g, '},{ ');
+  // Add any other specific cleaning rules here if more issues are found
+  return cleaned;
+};
+
 export const useWaysToGetIn = () => {
   const context = useContext(WaysToGetInContext);
   if (!context) {
@@ -58,7 +67,7 @@ export const WaysToGetInProvider = ({ children }) => {
       let data = parsed;
       if (!data && raw) {
         try {
-          const cleaned = cleanForJsonParse(raw);
+          const cleaned = customCleanWaysToGetInJson(raw);
           if (__DEV__) {
             console.log('[WaysToGetIn] Cleaned response:', cleaned);
           }
@@ -99,14 +108,17 @@ export const WaysToGetInProvider = ({ children }) => {
       
       if (typeof dataOrRaw === 'string') {
         if (!dataOrRaw.trim()) {
-          throw new Error('Empty response received from server');
+          setWaysData(null);
+          setError('No data received from server');
+          setLoading(false);
+          return;
         }
 
         if (__DEV__) {
           console.log('[WaysToGetIn] Raw API response:', dataOrRaw);
         }
 
-        const cleaned = cleanForJsonParse(dataOrRaw);
+        const cleaned = customCleanWaysToGetInJson(dataOrRaw);
         
         if (__DEV__) {
           console.log('[WaysToGetIn] Cleaned for JSON parse:', cleaned);
@@ -123,8 +135,11 @@ export const WaysToGetInProvider = ({ children }) => {
         }
       }
 
-      if (!data) {
-        throw new Error('No data received from server');
+      if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+        setWaysData(null);
+        setError('No data available.');
+        setLoading(false);
+        return;
       }
 
       if (validateData(data)) {
