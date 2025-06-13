@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { InterviewProvider } from '../context/InterviewContext';
+import { InterviewProvider, useInterview } from '../context/InterviewContext';
 import InterviewJourney from '../components/InterviewJourney';
 import CandidateExperiences from '../components/CandidateExperiences';
 import TechnicalQuestions from '../components/TechnicalQuestions';
@@ -9,6 +9,7 @@ import RoleSpecificQuestions from '../components/RoleSpecificQuestions';
 import BehavioralQuestions from '../components/BehavioralQuestions';
 import QuestionStats from '../components/QuestionStats';
 import MockInterviewTips from '../components/MockInterviewTips';
+import { useIsFocused, useRoute } from '@react-navigation/native';
 
 const SECTIONS = {
   JOURNEY: { title: 'Interview Journey', icon: '🛤️' },
@@ -22,92 +23,128 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function InterviewExperiencePage() {
+export default function InterviewExperiencePage({ route }) {
   const [activeSection, setActiveSection] = useState(SECTIONS.JOURNEY);
+  const isFocused = useIsFocused();
+  const { interviewData, fetchCompanyData, loading, error } = useInterview();
+
+  useEffect(() => {
+    const { company } = route.params || {};
+    if (isFocused && company) {
+      fetchCompanyData(company);
+    }
+  }, [isFocused, route?.params?.company, fetchCompanyData]);
 
   const renderContent = () => {
+    if (loading) {
+      return (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#4158D0" />
+          <Text style={styles.loadingText}>Loading interview experience data...</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      );
+    }
+
+    if (!interviewData) {
+      return (
+        <View style={styles.centerContainer}>
+          <Text style={styles.noDataText}>No interview experience data available.</Text>
+        </View>
+      );
+    }
+
     switch (activeSection) {
       case SECTIONS.JOURNEY:
-        return <InterviewJourney />;
+        return <InterviewJourney data={interviewData.interviewJourney} />;
       case SECTIONS.EXPERIENCES:
-        return <CandidateExperiences />;
+        return <CandidateExperiences data={interviewData.candidateExperiences} />;
       case SECTIONS.TECHNICAL:
-        return <TechnicalQuestions />;
+        return <TechnicalQuestions data={interviewData.technicalQuestions} />;
       case SECTIONS.ROLE_SPECIFIC:
-        return <RoleSpecificQuestions />;
+        return <RoleSpecificQuestions data={interviewData.roleSpecificQuestions} />;
       case SECTIONS.BEHAVIORAL:
-        return <BehavioralQuestions />;
+        return <BehavioralQuestions data={interviewData.behavioralQuestions} />;
       case SECTIONS.STATS:
-        return <QuestionStats />;
+        return <QuestionStats data={interviewData.questionStats} />;
       case SECTIONS.TIPS:
-        return <MockInterviewTips />;
+        return <MockInterviewTips data={interviewData.mockInterviewTips} />;
       default:
-        return <InterviewJourney />;
+        return <InterviewJourney data={interviewData.interviewJourney} />;
     }
   };
 
   return (
-    <InterviewProvider>
-      <LinearGradient
-        colors={['#ffffff', '#f8f9fa']}
-        style={styles.container}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.tabsWrapper}>
-          <ScrollView 
-            horizontal 
-            style={styles.tabsContainer}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.tabsContent}
-          >
-            {Object.entries(SECTIONS).map(([key, section]) => {
-              const isActive = activeSection === SECTIONS[key];
-              return (
-                <TouchableOpacity
-                  key={key}
-                  style={[
-                    styles.tab,
-                    isActive && styles.activeTab,
-                  ]}
-                  onPress={(event) => {
-                    if (event && event.currentTarget) {
-                      event.currentTarget.blur();
-                    }
-                    setActiveSection(SECTIONS[key]);
-                  }}
-                  tabIndex={isActive ? 0 : -1}
-                  importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
-                >
-                  <LinearGradient
-                    colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                    style={styles.tabGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+    isFocused ? (
+      <InterviewProvider>
+        <LinearGradient
+          colors={['#ffffff', '#f8f9fa']}
+          style={styles.container}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.tabsWrapper}>
+            <ScrollView 
+              horizontal 
+              style={styles.tabsContainer}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.tabsContent}
+            >
+              {Object.entries(SECTIONS).map(([key, section]) => {
+                const isActive = activeSection === SECTIONS[key];
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    style={[
+                      styles.tab,
+                      isActive && styles.activeTab,
+                    ]}
+                    onPress={(event) => {
+                      if (event && event.currentTarget) {
+                        event.currentTarget.blur();
+                      }
+                      setActiveSection(SECTIONS[key]);
+                    }}
+                    tabIndex={isActive ? 0 : -1}
+                    importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
                   >
-                    <Text style={styles.tabIcon}>{section.icon}</Text>
-                    <Text
-                      style={[
-                        styles.tabText,
-                        isActive && styles.activeTabText,
-                      ]}
+                    <LinearGradient
+                      colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                      style={styles.tabGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
                     >
-                      {section.title}
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>
-            {renderContent()}
+                      <Text style={styles.tabIcon}>{section.icon}</Text>
+                      <Text
+                        style={[
+                          styles.tabText,
+                          isActive && styles.activeTabText,
+                        ]}
+                      >
+                        {section.title}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
           </View>
-        </ScrollView>
-      </LinearGradient>
-    </InterviewProvider>
+
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <View style={styles.contentContainer}>
+              {renderContent()}
+            </View>
+          </ScrollView>
+        </LinearGradient>
+      </InterviewProvider>
+    ) : null
   );
 }
 
@@ -168,6 +205,27 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#555',
+    marginTop: 10,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d9534f',
+    textAlign: 'center',
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#777',
+    textAlign: 'center',
   },
   placeholderContainer: {
     padding: 20,

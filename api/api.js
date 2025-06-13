@@ -1,4 +1,3 @@
-import OpenAI from 'openai';
 import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetailsPrompt, getCompanyInterviewExperiencePrompt, getCompanyJobHiringInsightsPrompt, getCompanyNewsHighlightsPrompt, getCompanyTechStackPrompt } from './prompts.js';
 import { parseJsonResponse, validators } from '../utils/jsonParser.js';
 
@@ -60,32 +59,26 @@ const makeOpenRouterApiCall = async (prompt, label) => {
 
         console.log(`Raw ${label} API Response received`);
         const cleanedResponse = cleanJsonResponse(responseContent);
-        console.log(`Cleaned ${label} Response received: ${cleanedResponse}`);
+        console.log(`Cleaned ${label} Response received:`, cleanedResponse);
+        
+        // If the context file handles its own parsing, do not parse here.
+        // This is part of the "individual parsing" instruction.
+        if (label === 'Ways to Get In' || label === 'Core Company Details' || label === 'Culture' || label === 'Tech Stack' || label === 'Job Hiring Insights' || label === 'Interview Experience' || label === 'News Highlights') {
+            console.log(`[API] Skipping centralized parsing for ${label}. Context file will handle. Raw response:`, cleanedResponse);
+            return { parsed: null, raw: cleanedResponse }; // Return raw, parsed is null
+        }
+
+        // Existing parsing logic for other labels that still rely on centralized parsing
         try {
-            // Use the centralized parseJsonResponse from utils/jsonParser.js
             let parsedResponse;
             let validator = null;
-            if (label === 'Core Company Details') {
-                validator = validators.coreCompanyDetails;
-            } else if (label === 'Ways to Get In') {
-                validator = validators.waysToGetIn;
-            } else if (label === 'Tech Stack') {
-                validator = validators.techStack;
-            } else if (label === 'Job Hiring Insights') {
-                validator = validators.jobHiring;
-            } else if (label === 'Interview Experience') {
-                validator = validators.interviewExperience;
-            } else if (label === 'Culture') {
-                validator = validators.workCulture;
-            } else if (label === 'News Highlights') {
-                validator = validators.news;
-            }
+            // No more centralized validators for context files that handle their own parsing
             parsedResponse = parseJsonResponse(cleanedResponse, label, validator);
             console.log(`Successfully parsed ${label} response as JSON`);
             return { parsed: parsedResponse, raw: cleanedResponse };
         } catch (parseError) {
             console.error(`Failed to parse ${label} API response as JSON:`, parseError);
-            console.error('Cleaned response content error:');
+            // console.error('Cleaned response content error:', cleanedResponse);
             // Return raw cleaned response even if parsing fails
             return { parsed: null, raw: cleanedResponse };
         }

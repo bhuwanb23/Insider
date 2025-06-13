@@ -7,6 +7,11 @@ import CompanyTopicsList from '../components/company_topics/CompanyTopicsList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInContext';
 import { useCoreCompanyDetails } from '../features/core_company_details/context/CoreCompanyDetailsContext';
+import { useWorkCulture } from '../features/work_culture/context/WorkCultureContext';
+import { useInterview } from '../features/interview_experience/context/InterviewContext';
+import { useJobHiring } from '../features/job_hirings_insights/context/JobHiringContext';
+import { useNews } from '../features/news_highlights/context/NewsContext';
+import { useTechStack } from '../features/tech_stack/context/TechStackContext';
 import { getCompanyWaysToGetIn, getCoreCompanyDetails, getCompanyCulture, getCompanyInterviewExperience, getCompanyJobHiringInsights, getCompanyNewsHighlights, getCompanyTechStack } from '../api/api';
 
 export default function SearchPage({ navigation, onBack }) {
@@ -33,12 +38,22 @@ export default function SearchPage({ navigation, onBack }) {
     setParsedCompanyData
   } = useCoreCompanyDetails();
 
+  const { clearData: clearCultureData, setParsedCultureData } = useWorkCulture();
+  const { clearData: clearInterviewData, setParsedInterviewData } = useInterview();
+  const { clearData: clearJobHiringData, setParsedJobHiringData } = useJobHiring();
+  const { clearData: clearNewsData, setParsedNewsData } = useNews();
+  const { clearData: clearTechStackData, setParsedTechStackData } = useTechStack();
+
   const clearAllApiData = () => {
     setParsedWaysData(null);
     setParsedCompanyData(null);
+    clearCultureData();
+    clearInterviewData();
+    clearJobHiringData();
+    clearNewsData();
+    clearTechStackData();
     setAllData(null);
     setError(null);
-    // Add similar clears for other features if needed
   };
 
   useEffect(() => {
@@ -46,6 +61,11 @@ export default function SearchPage({ navigation, onBack }) {
     return () => {
       clearWaysData();
       clearCoreData();
+      clearCultureData();
+      clearInterviewData();
+      clearJobHiringData();
+      clearNewsData();
+      clearTechStackData();
     };
   }, []);
 
@@ -62,11 +82,26 @@ export default function SearchPage({ navigation, onBack }) {
       const tryApi = async (fn, label) => {
         try {
           const res = await fn(company);
-          if (label === 'coreData' && res && res.parsed) {
-            setParsedCompanyData(res.parsed);
+          if (label === 'coreData' && res && res.raw) {
+            setParsedCompanyData(res.raw);
           }
-          if (label === 'waysData' && res && res.parsed) {
-            setParsedWaysData(res.parsed);
+          if (label === 'waysData' && res && res.raw) {
+            setParsedWaysData(res.raw);
+          }
+          if (label === 'cultureData' && res && res.raw) {
+            setParsedCultureData(res.raw);
+          }
+          if (label === 'interviewData' && res && res.raw) {
+            setParsedInterviewData(res.raw);
+          }
+          if (label === 'jobHiringData' && res && res.raw) {
+            setParsedJobHiringData(res.raw);
+          }
+          if (label === 'newsData' && res && res.raw) {
+            setParsedNewsData(res.raw);
+          }
+          if (label === 'techStackData' && res && res.raw) {
+            setParsedTechStackData(res.raw);
           }
           results[label] = { parsed: res.parsed, raw: res.raw };
           anySuccess = true;
@@ -74,7 +109,7 @@ export default function SearchPage({ navigation, onBack }) {
         } catch (err) {
           if (err.cleanedResponse) {
             results[label] = { parsed: null, raw: err.cleanedResponse };
-        } else {
+          } else {
             results[label] = { parsed: null, raw: null, error: err.message };
           }
           console.error(`${label} failed:`, err.message);

@@ -8,43 +8,77 @@ export function cleanForJsonParse(str) {
 
   let cleaned = str;
   try {
-    // Remove all types of comments (single-line // and multi-line /* */)
-    // This regex carefully avoids removing http(s)://
-    cleaned = cleaned.replace(/\/\*[^]*?\*\/|(?<!:)\/\/[^\n]*(\r?\n|$)/gm, '');
-    // Remove parenthetical notes after URLs or values
-    cleaned = cleaned.replace(/"\s*\([^)]*\)\s*"/g, '"');
-    cleaned = cleaned.replace(/\s*\([^)]*\)\s*(,|\n|$)/g, '$1');
-    // Remove backticks and smart quotes
-    cleaned = cleaned.replace(/[`""'']/g, '"');
-    // Remove invalid triple quotes
-    cleaned = cleaned.replace(/"""/g, '');
-    // Remove double commas (common LLM artifact)
-    cleaned = cleaned.replace(/,\s*,+/g, ',');
-    // Replace non-JSON compliant 'None' with 'null'
-    cleaned = cleaned.replace(/None/g, 'null');
-    // Remove trailing commas before closing brackets/braces
-    cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
-    // Remove trailing commas before nested objects/arrays
-    cleaned = cleaned.replace(/,\s*([\[{])/g, '$1');
-    // Quote unquoted numeric ranges (e.g., 4-6) in key-value pairs or as array elements
-    cleaned = cleaned.replace(/([:\[,])\s*([0-9]+-[0-9]+)(\s*[,}\]])/g, '$1"$2"$3');
-    // Remove newlines and carriage returns, replace with single space if within property values to avoid breaking JSON structure, otherwise remove
-    cleaned = cleaned.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, function(match) {
-      return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+    // Step 1: Pre-processing cleanup
+    // Remove markdown code block indicators
+    cleaned = cleaned.replace(/```json\n?|```\n?/g, '');
+    // Remove BOM and other invisible characters
+    cleaned = cleaned.replace(/^\uFEFF/, '');
+    // Normalize all quote-like characters to standard double quotes
+    cleaned = cleaned.replace(/[`'""]/g, '"');
+
+    // Step 2: Robustly handle content within double-quoted strings:
+    // Escape newlines and aggressively escape all internal double quotes.
+    cleaned = cleaned.replace(/"(.*?)"/g, function(match, content) {
+      // Escape all special characters within string content
+      content = content
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t')
+        .replace(/\f/g, '\\f')
+        .replace(/\\b/g, '') // Remove escaped word boundaries
+        .replace(/\b/g, '') // Remove word boundaries
+        .replace(/`/g, '') // Remove backticks
+        .replace(/\\(?=[^"\\])/g, '\\\\') // Escape backslashes not followed by quotes
+        .replace(/"/g, '\\"');
+      return '"' + content + '"';
     });
-    cleaned = cleaned.replace(/(\r\n|\n|\r)/gm, '');
-    // Fix array syntax errors
-    cleaned = cleaned.replace(/,\s*]/g, ']'); // Remove trailing commas in arrays
-    cleaned = cleaned.replace(/\[\s*,/g, '['); // Remove leading commas in arrays
-    // Attempt to quote unquoted property names (simple cases). Ensure it doesn't double quote.
-    cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-    // Remove any invalid control characters (excluding valid JSON escape sequences)
+
+    // Step 3: Remove template literals and their backticks
+    cleaned = cleaned.replace(/`[^`]*`/g, function(match) {
+      return '"' + match.slice(1, -1).replace(/"/g, '\\"') + '"';
+    });
+
+    // Step 3: Remove all other newlines and carriage returns (should only be outside strings now).
+    cleaned = cleaned.replace(/([^\\])(\r\n|\n|\r)/gm, '$1');
+
+    // Step 4: Remove various non-JSON compliant elements and artifacts.
+    // Remove all types of comments (single-line // and multi-line /* */).
+    cleaned = cleaned.replace(/\/\*[^]*?\*\/|(?<!:)\/\/[^\n]*(\r?\n|$)/gm, '');
+    // Remove parenthetical notes after URLs or values.
+    cleaned = cleaned.replace(/"\s*\([^)]*\)\s*"/g, '"');
+    cleaned = cleaned.replace(/\s*\([^)]*\)\s*(,|$)/g, '$1');
+    // Remove invalid triple quotes and handle special values.
+    cleaned = cleaned.replace(/"{3,}/g, '"');
+    cleaned = cleaned.replace(/,\s*,+/g, ',');
+    cleaned = cleaned.replace(/\bNone\b/g, 'null');
+    cleaned = cleaned.replace(/\bTrue\b/g, 'true');
+    cleaned = cleaned.replace(/\bFalse\b/g, 'false');
+    cleaned = cleaned.replace(/\bundefined\b/g, 'null');
+    cleaned = cleaned.replace(/\bNaN\b/g, 'null');
+    // Remove any invalid control characters.
     cleaned = cleaned.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-    // Ensure no multiple spaces after commas or colons
+
+    // Step 5: Apply structural JSON fixes.
+    // Remove trailing commas before closing brackets/braces.
+    cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
+    // Remove trailing commas before nested objects/arrays.
+    cleaned = cleaned.replace(/,\s*([\[{])/g, '$1');
+    // Quote unquoted numeric ranges.
+    cleaned = cleaned.replace(/([:\[,])\s*([0-9]+-[0-9]+)(\s*[,}\]])/g, '$1"$2"$3');
+    // Fix array syntax errors (remove leading/trailing commas directly within array brackets).
+    cleaned = cleaned.replace(/,\s*]/g, ']');
+    cleaned = cleaned.replace(/\[\s*,/g, '[');
+    // Insert missing commas between adjacent JSON objects or arrays.
+    cleaned = cleaned.replace(/}\s*{/g, '},{');
+    cleaned = cleaned.replace(/\]\s*\[/g, '],[');
+    // Attempt to quote unquoted property names.
+    cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+    // Ensure no multiple spaces after commas or colons.
     cleaned = cleaned.replace(/([,:])\s+/g, '$1 ');
-    // Trim outer whitespace
+    // Trim outer whitespace.
     cleaned = cleaned.trim();
-    // Extract only the JSON part (from first { to last })
+
+    // Step 6: Extract only the JSON part (from first { to last }).
     const firstBrace = cleaned.indexOf('{');
     const lastBrace = cleaned.lastIndexOf('}');
     if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
@@ -60,6 +94,7 @@ export function cleanForJsonParse(str) {
 }
 
 // Parse JSON response with context-specific validation
+// Enhanced parseJsonResponse function
 export function parseJsonResponse(dataOrRaw, contextName, validator) {
   try {
     let data = dataOrRaw;
@@ -76,13 +111,13 @@ export function parseJsonResponse(dataOrRaw, contextName, validator) {
       const cleaned = cleanForJsonParse(dataOrRaw);
       
       if (__DEV__) {
-        console.log(`[${contextName}] Cleaned for JSON parse:`, cleaned);
+        console.log(`[${contextName}] Cleaned for JSON parse:`);
       }
 
       try {
         data = JSON.parse(cleaned);
       } catch (parseError) {
-        throw new Error(`JSON parse error: ${parseError.message}`);
+        throw new Error(`JSON parse error: ${parseError.message}\nCleaned content: ${cleaned}`);
       }
 
       if (__DEV__) {
@@ -90,13 +125,17 @@ export function parseJsonResponse(dataOrRaw, contextName, validator) {
       }
     }
 
-    if (!data) {
-      throw new Error('No data received from server');
+    if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+      throw new Error('Empty or invalid data structure received from server');
     }
 
-    // Validate data if validator is provided
+    // Enhanced validation with detailed error reporting
     if (validator) {
-      validator(data);
+      try {
+        validator(data);
+      } catch (validationError) {
+        throw new Error(`Validation error for ${contextName}: ${validationError.message}\nReceived data: ${JSON.stringify(data, null, 2)}`);
+      }
     }
 
     return data;
@@ -106,115 +145,238 @@ export function parseJsonResponse(dataOrRaw, contextName, validator) {
   }
 }
 
-// Validation utilities for different contexts
+// Enhanced validation utilities with type checking and data structure validation
 export const validators = {
   coreCompanyDetails: (data) => {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data: Object is null or not an object');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data: Expected a non-null object');
     }
 
-    const requiredFields = [
-      'name', 'description', 'founded', 'headquarters', 'size',
-      'industry', 'website', 'socialMedia', 'keyPeople', 'funding',
-      'acquisitions', 'products', 'awards', 'certifications',
-      'partnerships', 'competitors', 'recentNews'
-    ];
+    const requiredFields = {
+      name: 'string',
+      description: 'string',
+      founded: ['string', 'number'],
+      headquarters: 'string',
+      size: ['string', 'number'],
+      industry: 'string',
+      website: 'string',
+      socialMedia: 'object',
+      keyPeople: 'array',
+      funding: ['object', 'array'],
+      acquisitions: 'array',
+      products: 'array',
+      awards: ['array', 'object'],
+      certifications: 'array',
+      partnerships: 'array',
+      competitors: 'array',
+      recentNews: 'array'
+    };
 
-    const missingFields = requiredFields.filter(field => !data[field]);
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
+    Object.entries(requiredFields).forEach(([field, expectedType]) => {
+      if (!(field in data)) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+
+      const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+      const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+      if (!types.includes(valueType)) {
+        throw new Error(`Invalid type for ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+      }
+    });
   },
 
   interviewExperience: (data) => {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data: Object is null or not an object');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data: Expected a non-null object');
     }
 
-    const requiredFields = [
-      'journey', 'candidateExperiences', 'technicalQuestions',
-      'roleSpecificQuestions', 'behavioralQuestions', 'questionStats',
-      'mockInterviewTips'
-    ];
+    const requiredFields = {
+      journey: 'object',
+      candidateExperiences: 'array',
+      technicalQuestions: 'array',
+      roleSpecificQuestions: 'array',
+      behavioralQuestions: 'array',
+      questionStats: 'object',
+      mockInterviewTips: ['array', 'object']
+    };
 
-    const missingFields = requiredFields.filter(field => !data[field]);
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
+    Object.entries(requiredFields).forEach(([field, expectedType]) => {
+      if (!(field in data)) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+
+      const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+      const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+      if (!types.includes(valueType)) {
+        throw new Error(`Invalid type for ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+      }
+    });
   },
 
   waysToGetIn: (data) => {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data: Object is null or not an object');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data: Expected a non-null object');
     }
 
-    const requiredFields = [
-      'campusRecruitment', 'jobPortals', 'referrals', 'hackathons',
-      'coldOutreach', 'internshipConversion', 'contractRoles'
-    ];
+    const requiredFields = {
+      campusRecruitment: 'object',
+      jobPortals: 'object'
+    };
 
-    const missingFields = requiredFields.filter(field => !data[field]);
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
+    const optionalFields = {
+      referrals: 'object',
+      hackathons: 'object',
+      coldOutreach: 'object',
+      internshipConversion: 'object',
+      contractRoles: 'object'
+    };
+
+    // Validate required fields
+    Object.entries(requiredFields).forEach(([field, expectedType]) => {
+      if (!(field in data)) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+
+      const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+      const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+      if (!types.includes(valueType)) {
+        throw new Error(`Invalid type for ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+      }
+    });
+
+    // Validate optional fields if present
+    Object.entries(optionalFields).forEach(([field, expectedType]) => {
+      if (field in data) {
+        const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+        const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+        if (!types.includes(valueType)) {
+          throw new Error(`Invalid type for optional field ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+        }
+      }
+    });
+
+    // Validate campusRecruitment structure
+    const campusFields = ['title', 'description', 'icon', 'badge', 'details', 'tips'];
+    campusFields.forEach(field => {
+      if (!(field in data.campusRecruitment)) {
+        throw new Error(`Missing required field in campusRecruitment: ${field}`);
+      }
+    });
+
+    // Validate jobPortals structure
+    const jobPortalFields = ['title', 'description', 'icon', 'platforms', 'tips'];
+    jobPortalFields.forEach(field => {
+      if (!(field in data.jobPortals)) {
+        throw new Error(`Missing required field in jobPortals: ${field}`);
+      }
+    });
   },
 
   techStack: (data) => {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data: Object is null or not an object');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data: Expected a non-null object');
     }
 
-    const requiredFields = [
-      'frontend', 'backend', 'cloud', 'database', 'analytics', 'team'
-    ];
+    const requiredFields = {
+      frontend: 'object',
+      backend: 'object',
+      cloud: 'object',
+      database: 'object',
+      analytics: 'object',
+      team: ['array', 'object']
+    };
 
-    const missingFields = requiredFields.filter(field => !data[field]);
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
+    Object.entries(requiredFields).forEach(([field, expectedType]) => {
+      if (!(field in data)) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+
+      const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+      const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+      if (!types.includes(valueType)) {
+        throw new Error(`Invalid type for ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+      }
+    });
   },
 
   workCulture: (data) => {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data: Object is null or not an object');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data: Expected a non-null object');
     }
 
-    const requiredFields = [
-      'cultureOverview', 'workLifeBalance', 'remoteWork', 'teamCollaboration',
-      'mentalHealth', 'diversity', 'employeeStories'
-    ];
+    const requiredFields = {
+      cultureOverview: 'object',
+      workLifeBalance: 'object',
+      remoteWork: 'object',
+      teamCollaboration: 'object',
+      mentalHealth: 'object',
+      diversity: 'object',
+      employeeStories: 'array'
+    };
 
-    const missingFields = requiredFields.filter(field => !data[field]);
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
+    Object.entries(requiredFields).forEach(([field, expectedType]) => {
+      if (!(field in data)) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+
+      const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+      const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+      if (!types.includes(valueType)) {
+        throw new Error(`Invalid type for ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+      }
+    });
   },
 
   jobHiring: (data) => {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data: Object is null or not an object');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data: Expected a non-null object');
     }
 
-    const requiredFields = [
-      'commonRoles', 'internshipConversion', 'hiringChannels', 'jobTrends',
-      'hiringTimeline', 'hiringProcess', 'resumeTips'
-    ];
+    const requiredFields = {
+      commonRoles: 'array',
+      internshipConversion: 'object',
+      hiringChannels: 'array',
+      jobTrends: 'object',
+      hiringTimeline: 'object',
+      hiringProcess: 'object',
+      resumeTips: 'array'
+    };
 
-    const missingFields = requiredFields.filter(field => !data[field]);
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
+    Object.entries(requiredFields).forEach(([field, expectedType]) => {
+      if (!(field in data)) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+
+      const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+      const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+      if (!types.includes(valueType)) {
+        throw new Error(`Invalid type for ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+      }
+    });
   },
 
   news: (data) => {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data: Object is null or not an object');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data: Expected a non-null object');
     }
 
-    const requiredFields = ['headlines', 'socialSentiment', 'highlights', 'studentImpact'];
-    const missingFields = requiredFields.filter(field => !data[field]);
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
+    const requiredFields = {
+      headlines: 'array',
+      socialSentiment: 'object',
+      highlights: 'array',
+      studentImpact: 'object'
+    };
+
+    Object.entries(requiredFields).forEach(([field, expectedType]) => {
+      if (!(field in data)) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+
+      const types = Array.isArray(expectedType) ? expectedType : [expectedType];
+      const valueType = Array.isArray(data[field]) ? 'array' : typeof data[field];
+      if (!types.includes(valueType)) {
+        throw new Error(`Invalid type for ${field}: expected ${types.join(' or ')}, got ${valueType}`);
+      }
+    });
   }
-}; 
+};

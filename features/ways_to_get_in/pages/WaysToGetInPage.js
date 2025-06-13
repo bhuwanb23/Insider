@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Animated, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import CampusRecruitment from '../components/CampusRecruitment';
 import JobPortals from '../components/JobPortals';
@@ -9,6 +9,7 @@ import ColdOutreach from '../components/ColdOutreach';
 import InternshipConversion from '../components/InternshipConversion';
 import ContractRoles from '../components/ContractRoles';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
+import { useRoute, useIsFocused } from '@react-navigation/native';
 
 const SECTIONS = {
   CAMPUS: { title: 'Campus Recruitment', icon: '🎓', key: 'campusRecruitment' },
@@ -23,13 +24,18 @@ const SECTIONS = {
 const { width } = Dimensions.get('window');
 
 export default function WaysToGetInPage({ route }) {
-  const { waysData } = useWaysToGetIn();
+  const { waysData, fetchCompanyData, error, loading } = useWaysToGetIn();
   const [activeSection, setActiveSection] = useState(SECTIONS.CAMPUS || Object.values(SECTIONS)[0]);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(50)).current;
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    // Set initial topic if provided in route params
+    const { company } = route.params || {};
+    if (isFocused && company) {
+      fetchCompanyData(company);
+    }
+
     if (route?.params?.initialTopic) {
       const section = SECTIONS[route.params.initialTopic];
       if (section) {
@@ -37,7 +43,6 @@ export default function WaysToGetInPage({ route }) {
       }
     }
 
-    // Animate component entry
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -50,28 +55,51 @@ export default function WaysToGetInPage({ route }) {
         useNativeDriver: false,
       }),
     ]).start();
-  }, [route?.params?.initialTopic]);
+  }, [route?.params?.initialTopic, isFocused, route?.params?.company, fetchCompanyData]);
 
   const renderContent = () => {
-    if (!waysData) return null;
+    if (loading) {
+      return (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#4158D0" />
+          <Text style={styles.loadingText}>Loading ways to get in data...</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      );
+    }
+
+    if (!waysData) {
+      return (
+        <View style={styles.centerContainer}>
+          <Text style={styles.noDataText}>No ways to get in data available.</Text>
+        </View>
+      );
+    }
 
     switch (activeSection?.key) {
       case 'campusRecruitment':
-        return <CampusRecruitment />;
+        return <CampusRecruitment data={waysData.campusRecruitment} />;
       case 'jobPortals':
-        return <JobPortals />;
+        return <JobPortals data={waysData.jobPortals} />;
       case 'referrals':
-        return <Referrals />;
+        return <Referrals data={waysData.referrals} />;
       case 'hackathons':
-        return <HackathonsCompetitions />;
+        return <HackathonsCompetitions data={waysData.hackathons} />;
       case 'coldOutreach':
-        return <ColdOutreach />;
+        return <ColdOutreach data={waysData.coldOutreach} />;
       case 'internshipConversion':
-        return <InternshipConversion />;
+        return <InternshipConversion data={waysData.internshipConversion} />;
       case 'contractRoles':
-        return <ContractRoles />;
+        return <ContractRoles data={waysData.contractRoles} />;
       default:
-        return <CampusRecruitment />;
+        return <CampusRecruitment data={waysData.campusRecruitment} />;
     }
   };
 
@@ -113,6 +141,7 @@ export default function WaysToGetInPage({ route }) {
   };
 
   return (
+    isFocused ? (
     <LinearGradient
       colors={['#ffffff', '#f8f9fa']}
       style={styles.container}
@@ -146,6 +175,7 @@ export default function WaysToGetInPage({ route }) {
         </ScrollView>
       </Animated.View>
     </LinearGradient>
+    ) : null
   );
 }
 
@@ -206,5 +236,26 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#555',
+    marginTop: 10,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d9534f',
+    textAlign: 'center',
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#777',
+    textAlign: 'center',
   },
 }); 

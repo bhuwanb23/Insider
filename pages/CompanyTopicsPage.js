@@ -3,10 +3,12 @@ import { StyleSheet, View, TouchableOpacity, ScrollView, Text, Animated } from '
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInContext';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
   const { waysData } = useWaysToGetIn();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -58,27 +60,29 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
   }
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <LinearGradient
-        colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
-        style={styles.header}
-      >
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{company}</Text>
-      </LinearGradient>
-      
-      <ScrollView 
-        style={styles.content} 
-        contentContainerStyle={styles.gridContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {Object.entries(waysData)
-          .filter(([_, data]) => data && data.title) // Filter out invalid data
-          .map(([key, data]) => renderTopicCard(key, data))}
-      </ScrollView>
-    </Animated.View>
+    isFocused ? (
+      <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+        <LinearGradient
+          colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
+          style={styles.header}
+        >
+          <TouchableOpacity onPress={onBack} style={styles.backButton}>
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{company}</Text>
+        </LinearGradient>
+        
+        <ScrollView 
+          style={styles.content} 
+          contentContainerStyle={styles.gridContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {Object.entries(waysData)
+            .filter(([_, data]) => data && data.title) // Filter out invalid data
+            .map(([key, data]) => renderTopicCard(key, data))}
+        </ScrollView>
+      </Animated.View>
+    ) : null
   );
 }
 

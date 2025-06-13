@@ -15,7 +15,7 @@ export default function RemoteWorkSection({ data }) {
   const { policy, details, benefits, leaves } = data;
 
   const renderDetail = (key, value) => {
-    const icon = key === 'remoteAllowed' ? 'home-outline' :
+    const icon = key === 'remoteAllowed' ? 'home-outline' : 
                 key === 'hybridStructure' ? 'calendar-clock' :
                 key === 'globalPolicy' ? 'earth' : 'laptop';
     
@@ -43,15 +43,15 @@ export default function RemoteWorkSection({ data }) {
     <View style={styles.sectionContent}>
       {/* Policy Header */}
       {policy ? (
-        <LinearGradient
-          colors={['#4158D0', '#C850C0']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.policyHeader}
-        >
-          <MaterialCommunityIcons name="laptop" size={28} color="#fff" />
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.policyHeader}
+      >
+        <MaterialCommunityIcons name="laptop" size={28} color="#fff" />
           <Text style={styles.policyTitle}>{policy}</Text>
-        </LinearGradient>
+      </LinearGradient>
       ) : (
         <View style={styles.centeredNoCard}>
           <Text style={styles.centeredText}>No remote work policy available.</Text>
@@ -60,30 +60,30 @@ export default function RemoteWorkSection({ data }) {
 
       {/* Details Grid */}
       {details && Object.keys(details).length > 0 ? (
-        <View style={styles.detailsContainer}>
+      <View style={styles.detailsContainer}>
           {Object.entries(details).map(([key, value]) => renderDetail(key, value))}
         </View>
       ) : (
         <View style={styles.centeredNoCard}>
           <Text style={styles.centeredText}>No remote work details available.</Text>
-        </View>
+      </View>
       )}
 
       {/* Benefits Section */}
       {benefits && benefits.length > 0 ? (
-        <View style={styles.benefitsContainer}>
-          <Text style={styles.benefitsTitle}>Remote Work Benefits</Text>
-          <View style={styles.benefitsList}>
+      <View style={styles.benefitsContainer}>
+        <Text style={styles.benefitsTitle}>Remote Work Benefits</Text>
+        <View style={styles.benefitsList}>
             {benefits.map((benefit, index) => (
-              <View key={index} style={styles.benefitItem}>
-                <View style={styles.benefitIconContainer}>
-                  <MaterialCommunityIcons name="check-circle" size={20} color="#4CAF50" />
-                </View>
-                <Text style={styles.benefitText}>{benefit || 'N/A'}</Text>
+            <View key={index} style={styles.benefitItem}>
+              <View style={styles.benefitIconContainer}>
+                <MaterialCommunityIcons name="check-circle" size={20} color="#4CAF50" />
               </View>
-            ))}
-          </View>
+                <Text style={styles.benefitText}>{benefit || 'N/A'}</Text>
+            </View>
+          ))}
         </View>
+      </View>
       ) : (
         <View style={styles.centeredNoCard}>
           <Text style={styles.centeredText}>No remote work benefits available.</Text>

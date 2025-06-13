@@ -9,6 +9,7 @@ import TeamCollaborationSection from '../components/TeamCollaborationSection';
 import MentalHealthSection from '../components/MentalHealthSection';
 import DiversitySection from '../components/DiversitySection';
 import EmployeeStoriesSection from '../components/EmployeeStoriesSection';
+import { useRoute, useIsFocused } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -23,9 +24,17 @@ const SECTION_COMPONENTS = {
   employeeStories: { title: 'Employee Stories', icon: '👥', component: EmployeeStoriesSection },
 };
 
-export default function WorkCulturePage() {
-  const { workCultureData, loading, error } = useWorkCulture();
+export default function WorkCulturePage({ route }) {
+  const { workCultureData, loading, error, fetchCompanyData } = useWorkCulture();
   const [activeSectionKey, setActiveSectionKey] = useState(null);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const { company } = route.params || {};
+    if (isFocused && company) {
+      fetchCompanyData(company);
+    }
+  }, [isFocused, route?.params?.company, fetchCompanyData]);
 
   // Set the first available section as active when workCultureData loads
   useEffect(() => {

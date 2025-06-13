@@ -4,12 +4,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
 import TechnologySection from '../components/TechnologySection';
 import { useTechStack } from '../context/TechStackContext';
+import { useRoute, useIsFocused } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-export default function TechStackPage() {
-  const { techStack, loading, error } = useTechStack();
+export default function TechStackPage({ route }) {
+  const { techStack, loading, error, fetchCompanyData } = useTechStack();
   const [activeSectionKey, setActiveSectionKey] = useState(null);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const { company } = route.params || {};
+    if (isFocused && company) {
+      fetchCompanyData(company);
+    }
+  }, [isFocused, route?.params?.company, fetchCompanyData]);
 
   // Set the first available section as active when techStack loads
   useEffect(() => {
@@ -41,6 +50,7 @@ export default function TechStackPage() {
   };
 
   return (
+    isFocused ? (
     <LinearGradient
       colors={['#ffffff', '#f8f9fa']}
       style={styles.container}
@@ -54,40 +64,40 @@ export default function TechStackPage() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}
         >
-          {sectionKeys.map((key) => {
-            const section = techStack[key];
-            const isActive = activeSectionKey === key;
-            if (!section) return null;
-            return (
-              <TouchableOpacity
-                key={key}
-                style={[
-                  styles.tab,
-                  isActive && styles.activeTab,
-                ]}
-                onPress={() => setActiveSectionKey(key)}
-                tabIndex={isActive ? 0 : -1}
-                importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
+            {sectionKeys.map((key) => {
+              const section = techStack[key];
+              const isActive = activeSectionKey === key;
+              if (!section) return null;
+              return (
+            <TouchableOpacity
+              key={key}
+              style={[
+                styles.tab,
+                    isActive && styles.activeTab,
+              ]}
+                  onPress={() => setActiveSectionKey(key)}
+                  tabIndex={isActive ? 0 : -1}
+                  importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
+            >
+              <LinearGradient
+                    colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                style={styles.tabGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
               >
-                <LinearGradient
-                  colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                  style={styles.tabGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                    <Text style={styles.tabIcon}>{section.icon || ''}</Text>
+                <Text
+                  style={[
+                    styles.tabText,
+                        isActive && styles.activeTabText,
+                  ]}
                 >
-                  <Text style={styles.tabIcon}>{section.icon || ''}</Text>
-                  <Text
-                    style={[
-                      styles.tabText,
-                      isActive && styles.activeTabText,
-                    ]}
-                  >
-                    {section.title}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            );
-          })}
+                  {section.title}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+              );
+            })}
         </ScrollView>
       </View>
 
@@ -97,6 +107,7 @@ export default function TechStackPage() {
         </View>
       </ScrollView>
     </LinearGradient>
+    ) : null
   );
 }
 

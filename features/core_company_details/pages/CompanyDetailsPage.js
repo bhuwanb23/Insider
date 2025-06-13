@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useIsFocused } from '@react-navigation/native';
 import BasicIdentity from '../components/BasicIdentity';
 import Overview from '../components/Overview';
 import LegalDetails from '../components/LegalDetails';
@@ -24,28 +24,21 @@ const { width } = Dimensions.get('window');
 export default function CompanyDetailsPage() {
   const [activeSection, setActiveSection] = useState(SECTIONS.BASIC);
   const route = useRoute();
-  const { company } = route.params;
+  const { company } = route.params || {};
   const { loading, error, companyData, fetchCompanyData } = useCoreCompanyDetails();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    // console.log('CompanyDetailsPage mounted with company:', company);
-    if (company && !companyData) {
-      // console.log('Fetching company data for:', company);
-      fetchCompanyData(company);
+    if (isFocused && company) {
+      // Data should be pre-loaded from SearchPage; no need to refetch here.
     }
-  }, [company]);
-
-  useEffect(() => {
-    // console.log('CompanyData updated:', companyData);
-  }, [companyData]);
+  }, [isFocused, company]);
 
   const renderContent = () => {
-    // console.log('Rendering content with activeSection:', activeSection.title);
-    // console.log('Current companyData:', companyData);
-
     if (loading) {
       return (
         <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#4158D0" />
           <Text style={styles.loadingText}>Loading company details...</Text>
         </View>
       );
@@ -86,67 +79,69 @@ export default function CompanyDetailsPage() {
   };
 
   return (
-    <LinearGradient
-      colors={['#ffffff', '#f8f9fa']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{company}</Text>
-      </View>
+    isFocused ? (
+      <LinearGradient
+        colors={['#ffffff', '#f8f9fa']}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>{company}</Text>
+        </View>
 
-      <View style={styles.tabsWrapper}>
-        <ScrollView 
-          horizontal 
-          style={styles.tabsContainer}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContent}
-        >
-          {Object.entries(SECTIONS).map(([key, section]) => {
-            const isActive = activeSection === SECTIONS[key];
-            return (
-              <TouchableOpacity
-                key={key}
-                style={[
-                  styles.tab,
-                  isActive && styles.activeTab,
-                ]}
-                onPress={(event) => {
-                  if (event && event.currentTarget) {
-                    event.currentTarget.blur();
-                  }
-                  setActiveSection(SECTIONS[key]);
-                }}
-                tabIndex={isActive ? 0 : -1}
-                importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
-              >
-                <LinearGradient
-                  colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                  style={styles.tabGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+        <View style={styles.tabsWrapper}>
+          <ScrollView 
+            horizontal 
+            style={styles.tabsContainer}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContent}
+          >
+            {Object.entries(SECTIONS).map(([key, section]) => {
+              const isActive = activeSection === SECTIONS[key];
+              return (
+                <TouchableOpacity
+                  key={key}
+                  style={[
+                    styles.tab,
+                    isActive && styles.activeTab,
+                  ]}
+                  onPress={(event) => {
+                    if (event && event.currentTarget) {
+                      event.currentTarget.blur();
+                    }
+                    setActiveSection(SECTIONS[key]);
+                  }}
+                  tabIndex={isActive ? 0 : -1}
+                  importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
                 >
-                  <Text style={styles.tabIcon}>{section.icon}</Text>
-                  <Text
-                    style={[
-                      styles.tabText,
-                      isActive && styles.activeTabText,
-                    ]}
+                  <LinearGradient
+                    colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                    style={styles.tabGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
                   >
-                    {section.title}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
+                    <Text style={styles.tabIcon}>{section.icon}</Text>
+                    <Text
+                      style={[
+                        styles.tabText,
+                        isActive && styles.activeTabText,
+                      ]}
+                    >
+                      {section.title}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
 
-      <ScrollView style={styles.content}>
-        {renderContent()}
-      </ScrollView>
-    </LinearGradient>
+        <ScrollView style={styles.content}>
+          {renderContent()}
+        </ScrollView>
+      </LinearGradient>
+    ) : null
   );
 }
 
@@ -217,22 +212,28 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  centerContainer: {
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+  contentContainer: {
+    padding: 16,
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: '#555',
+    marginTop: 10,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d9534f',
+    textAlign: 'center',
   },
   noDataText: {
     fontSize: 16,
-    color: '#666',
+    color: '#777',
     textAlign: 'center',
   },
 }); 

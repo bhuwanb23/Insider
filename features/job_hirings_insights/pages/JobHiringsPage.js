@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions } from 'react-native';
-import { JobHiringProvider } from '../context/JobHiringContext';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { JobHiringProvider, useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import CommonRoles from '../components/CommonRoles';
 import InternshipConversion from '../components/InternshipConversion';
@@ -9,6 +9,7 @@ import JobTrends from '../components/JobTrends';
 import HiringTimeline from '../components/HiringTimeline';
 import HiringProcess from '../components/HiringProcess';
 import ResumeTips from '../components/ResumeTips';
+import { useIsFocused, useRoute } from '@react-navigation/native';
 
 const SECTIONS = {
   ROLES: { title: 'Roles', icon: '💼' },
@@ -22,31 +23,66 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function JobHiringsPage() {
+export default function JobHiringsPage({ route }) {
   const [activeSection, setActiveSection] = useState(SECTIONS.ROLES);
+  const isFocused = useIsFocused();
+  const { jobHiringData, fetchCompanyData, loading, error } = useJobHiring();
+
+  useEffect(() => {
+    const { company } = route.params || {};
+    if (isFocused && company) {
+      fetchCompanyData(company);
+    }
+  }, [isFocused, route?.params?.company, fetchCompanyData]);
 
   const renderContent = () => {
+    if (loading) {
+      return (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#4158D0" />
+          <Text style={styles.loadingText}>Loading job hiring insights...</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      );
+    }
+
+    if (!jobHiringData) {
+      return (
+        <View style={styles.centerContainer}>
+          <Text style={styles.noDataText}>No job hiring insights data available.</Text>
+        </View>
+      );
+    }
+
     switch (activeSection) {
       case SECTIONS.ROLES:
-        return <CommonRoles />;
+        return <CommonRoles data={jobHiringData.commonRoles} />;
       case SECTIONS.INTERNSHIP:
-        return <InternshipConversion />;
+        return <InternshipConversion data={jobHiringData.internshipConversion} />;
       case SECTIONS.CHANNELS:
-        return <HiringChannels />;
+        return <HiringChannels data={jobHiringData.hiringChannels} />;
       case SECTIONS.TRENDS:
-        return <JobTrends />;
+        return <JobTrends data={jobHiringData.jobTrends} />;
       case SECTIONS.TIMELINE:
-        return <HiringTimeline />;
+        return <HiringTimeline data={jobHiringData.hiringTimeline} />;
       case SECTIONS.PROCESS:
-        return <HiringProcess />;
+        return <HiringProcess data={jobHiringData.hiringProcess} />;
       case SECTIONS.RESUME:
-        return <ResumeTips />;
+        return <ResumeTips data={jobHiringData.resumeTips} />;
       default:
-        return <CommonRoles />;
+        return <CommonRoles data={jobHiringData.commonRoles} />;
     }
   };
 
   return (
+    isFocused ? (
     <JobHiringProvider>
       <LinearGradient
         colors={['#ffffff', '#f8f9fa']}
@@ -61,43 +97,43 @@ export default function JobHiringsPage() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tabsContent}
           >
-            {Object.entries(SECTIONS).map(([key, section]) => {
-              const isActive = activeSection === SECTIONS[key];
-              return (
-                <TouchableOpacity
-                  key={key}
-                  style={[
-                    styles.tab,
-                    isActive && styles.activeTab,
-                  ]}
-                  onPress={(event) => {
-                    if (event && event.currentTarget) {
-                      event.currentTarget.blur();
-                    }
-                    setActiveSection(SECTIONS[key]);
-                  }}
-                  tabIndex={isActive ? 0 : -1}
-                  importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
+              {Object.entries(SECTIONS).map(([key, section]) => {
+                const isActive = activeSection === SECTIONS[key];
+                return (
+              <TouchableOpacity
+                key={key}
+                style={[
+                  styles.tab,
+                      isActive && styles.activeTab,
+                ]}
+                    onPress={(event) => {
+                      if (event && event.currentTarget) {
+                        event.currentTarget.blur();
+                      }
+                      setActiveSection(SECTIONS[key]);
+                    }}
+                    tabIndex={isActive ? 0 : -1}
+                    importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
+              >
+                <LinearGradient
+                      colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                  style={styles.tabGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                 >
-                  <LinearGradient
-                    colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                    style={styles.tabGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+                  <Text style={styles.tabIcon}>{section.icon}</Text>
+                  <Text
+                    style={[
+                      styles.tabText,
+                          isActive && styles.activeTabText,
+                    ]}
                   >
-                    <Text style={styles.tabIcon}>{section.icon}</Text>
-                    <Text
-                      style={[
-                        styles.tabText,
-                        isActive && styles.activeTabText,
-                      ]}
-                    >
-                      {section.title}
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              );
-            })}
+                    {section.title}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+                );
+              })}
           </ScrollView>
         </View>
 
@@ -108,6 +144,7 @@ export default function JobHiringsPage() {
         </ScrollView>
       </LinearGradient>
     </JobHiringProvider>
+    ) : null
   );
 }
 
@@ -168,5 +205,26 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#555',
+    marginTop: 10,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d9534f',
+    textAlign: 'center',
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#777',
+    textAlign: 'center',
   },
 }); 

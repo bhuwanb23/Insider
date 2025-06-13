@@ -6,13 +6,22 @@ import SocialSentiment from '../components/SocialSentiment';
 import HighlightSnippets from '../components/HighlightSnippets';
 import StudentImpact from '../components/StudentImpact';
 import { useNews } from '../context/NewsContext';
+import { useIsFocused, useRoute } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-export default function NewsHighlightsPage() {
-  const { newsData, loading, error } = useNews();
+export default function NewsHighlightsPage({ route }) {
+  const { newsData, loading, error, fetchCompanyData } = useNews();
   const [activeSectionKey, setActiveSectionKey] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const { company } = route.params || {};
+    if (isFocused && company) {
+      fetchCompanyData(company);
+    }
+  }, [isFocused, route?.params?.company, fetchCompanyData]);
 
   useEffect(() => {
     if (newsData && Object.keys(newsData).length > 0) {
@@ -67,73 +76,75 @@ export default function NewsHighlightsPage() {
   };
 
   return (
-    <LinearGradient
-      colors={['#ffffff', '#f8f9fa']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      <View style={styles.tabsWrapper}>
-        <ScrollView 
-          horizontal 
-          style={styles.tabsContainer}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContent}
-        >
-          {availableSectionKeys.map((key) => {
-            const section = dynamicSections[key];
-            const isActive = activeSectionKey === key;
-            return ( 
-              <TouchableOpacity
-                key={key}
-                style={[
-                  styles.tab,
-                  isActive && styles.activeTab,
-                ]}
-                onPress={(event) => {
-                  if (event && event.currentTarget) {
-                    event.currentTarget.blur();
-                  }
-                  setActiveSectionKey(key);
-                }}
-                tabIndex={isActive ? 0 : -1}
-                importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
-              >
-                <LinearGradient
-                  colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
-                  style={styles.tabGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                  <Text style={styles.tabIcon}>{section.icon}</Text>
-                  <Text
-                    style={[
-                      styles.tabText,
-                      isActive && styles.activeTabText,
-                    ]}
-                  >
-                    {section.title}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      <Animated.View
-        style={[
-          styles.content,
-          { opacity: fadeAnim }
-        ]}
+    isFocused ? (
+      <LinearGradient
+        colors={['#ffffff', '#f8f9fa']}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>
-            {renderContent()}
-          </View>
-        </ScrollView>
-      </Animated.View>
-    </LinearGradient>
+        <View style={styles.tabsWrapper}>
+          <ScrollView 
+            horizontal 
+            style={styles.tabsContainer}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContent}
+          >
+            {availableSectionKeys.map((key) => {
+              const section = dynamicSections[key];
+              const isActive = activeSectionKey === key;
+              return ( 
+                <TouchableOpacity
+                  key={key}
+                  style={[
+                    styles.tab,
+                    isActive && styles.activeTab,
+                  ]}
+                  onPress={(event) => {
+                    if (event && event.currentTarget) {
+                      event.currentTarget.blur();
+                    }
+                    setActiveSectionKey(key);
+                  }}
+                  tabIndex={isActive ? 0 : -1}
+                  importantForAccessibility={isActive ? 'yes' : 'no-hide-descendants'}
+                >
+                  <LinearGradient
+                    colors={isActive ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                    style={styles.tabGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Text style={styles.tabIcon}>{section.icon}</Text>
+                    <Text
+                      style={[
+                        styles.tabText,
+                        isActive && styles.activeTabText,
+                      ]}
+                    >
+                      {section.title}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        <Animated.View
+          style={[
+            styles.content,
+            { opacity: fadeAnim }
+          ]}
+        >
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.contentContainer}>
+              {renderContent()}
+            </View>
+          </ScrollView>
+        </Animated.View>
+      </LinearGradient>
+    ) : null
   );
 }
 
