@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInContext';
 
-export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
+export default function CompanyTopicsPage({ company, onSelectTopic, onBack, navigation }) {
   const { waysData } = useWaysToGetIn();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
@@ -58,7 +58,13 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
         colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
         style={styles.header}
       >
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+        <TouchableOpacity onPress={() => {
+          if (navigation) {
+            navigation.goBack();
+          } else if (onBack) {
+            onBack();
+          }
+        }} style={styles.backButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{company}</Text>
@@ -164,4 +170,4 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
   },
-}); 
+});
