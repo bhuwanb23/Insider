@@ -23,7 +23,7 @@ const SECTIONS = {
 const { width } = Dimensions.get('window');
 
 export default function WaysToGetInPage({ route }) {
-  const { waysData } = useWaysToGetIn();
+  const { waysData, loading, error } = useWaysToGetIn();
   const [activeSection, setActiveSection] = useState(SECTIONS.CAMPUS || Object.values(SECTIONS)[0]);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(50)).current;
@@ -110,12 +110,29 @@ export default function WaysToGetInPage({ route }) {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading ways to get in...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
-    <LinearGradient
-      colors={['#ffffff', '#f8f9fa']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+    <WaysToGetInProvider rawData={route.params?.rawData}>
+      <LinearGradient
+        colors={['#ffffff', '#f8f9fa']}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
     >
       <View style={styles.tabsWrapper}>
         <ScrollView 
@@ -144,10 +161,35 @@ export default function WaysToGetInPage({ route }) {
         </ScrollView>
       </Animated.View>
     </LinearGradient>
+    </WaysToGetInProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 12,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#dc3545',
+    textAlign: 'center',
+    marginTop: 12,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -205,4 +247,4 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
-}); 
+});

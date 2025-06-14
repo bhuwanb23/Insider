@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { InterviewProvider } from '../context/InterviewContext';
+import { InterviewProvider, useInterview } from '../context/InterviewContext';
 import InterviewJourney from '../components/InterviewJourney';
 import CandidateExperiences from '../components/CandidateExperiences';
 import TechnicalQuestions from '../components/TechnicalQuestions';
@@ -22,7 +22,9 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function InterviewExperiencePage() {
+export default function InterviewExperiencePage({ route }) {
+  // Extract rawData from route params
+  const { rawData } = route?.params || {};
   const [activeSection, setActiveSection] = useState(SECTIONS.JOURNEY);
 
   const renderContent = () => {
@@ -47,8 +49,69 @@ export default function InterviewExperiencePage() {
   };
 
   return (
+    <InterviewProvider rawData={rawData}>
+      <InterviewContent />
+    </InterviewProvider>
+  );
+}
+
+// Separate component to use the context
+function InterviewContent() {
+  const { loading, error, interviewData } = useInterview();
+  const [activeSection, setActiveSection] = useState(SECTIONS.JOURNEY);
+
+  // Show loading indicator while data is being processed
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4158D0" />
+        <Text style={styles.loadingText}>Loading interview data...</Text>
+      </View>
+    );
+  }
+
+  // Show error message if there was a problem
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  // Ensure we have interview data before rendering
+  if (!interviewData) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>No interview data available</Text>
+      </View>
+    );
+  }
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case SECTIONS.JOURNEY:
+        return <InterviewJourney />;
+      case SECTIONS.EXPERIENCES:
+        return <CandidateExperiences />;
+      case SECTIONS.TECHNICAL:
+        return <TechnicalQuestions />;
+      case SECTIONS.ROLE_SPECIFIC:
+        return <RoleSpecificQuestions />;
+      case SECTIONS.BEHAVIORAL:
+        return <BehavioralQuestions />;
+      case SECTIONS.STATS:
+        return <QuestionStats />;
+      case SECTIONS.TIPS:
+        return <MockInterviewTips />;
+      default:
+        return <InterviewJourney />;
+    }
+  };
+
+  return (
     <InterviewProvider>
-      <LinearGradient
+    <LinearGradient
         colors={['#ffffff', '#f8f9fa']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
@@ -102,6 +165,29 @@ export default function InterviewExperiencePage() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#4158D0',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -167,4 +253,4 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginVertical: 8,
   },
-}); 
+});

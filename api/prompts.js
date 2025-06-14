@@ -1,6 +1,7 @@
 export const getCompanyAnalysisPrompt = (companyName) => {
     return `Analyze ${companyName}'s hiring channels and provide information in the following EXACT JSON structure:
-
+Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
 {
     "campusRecruitment": {
         "title": "Campus Recruitment",
@@ -100,7 +101,8 @@ Ensure all information is specific to ${companyName} and follows this exact stru
 
 export const getCompanyCulturePrompt = (companyName) => {
     return `Analyze the work culture at ${companyName} and provide information in the following EXACT JSON structure:
-
+Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
 {
   "cultureOverview": {
     "coreValues": [
@@ -219,7 +221,8 @@ Ensure all information is specific to ${companyName}, accurate, and follows this
 
 export const getCoreCompanyDetailsPrompt = (companyName) => {
     return `Analyze ${companyName}'s core company details and provide information in the following EXACT JSON structure:
-
+Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
 {
     "basicIdentity": {
         "name": "${companyName}",
@@ -332,7 +335,8 @@ Ensure all information is specific to ${companyName}, accurate, and follows this
 
 export const getCompanyInterviewExperiencePrompt = (companyName) => {
     return `Analyze the interview experience at ${companyName} and provide information in the following EXACT JSON structure:
-
+Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
 {
   "journey": {
     "steps": [
@@ -413,7 +417,8 @@ Ensure all information is specific to ${companyName}, accurate, and follows this
 
 export const getCompanyJobHiringInsightsPrompt = (companyName) => {
     return `Analyze the job hiring insights for ${companyName} and provide information in the following EXACT JSON structure:
-
+Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
 {
   "commonRoles": [
     {
@@ -511,7 +516,8 @@ Ensure all information is specific to ${companyName}, accurate, and follows this
 
 export const getCompanyNewsHighlightsPrompt = (companyName) => {
     return `Analyze the latest news and highlights for ${companyName} and provide information in the following EXACT JSON structure:
-
+Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
 {
   "headlines": [
     {
@@ -560,7 +566,8 @@ Ensure all information is specific to ${companyName}, accurate, and follows this
 
 export const getCompanyTechStackPrompt = (companyName) => {
     return `Analyze the technology stack at ${companyName} and provide information in the following EXACT JSON structure:
-
+Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
 {
   "frontend": {
     "title": "Frontend section title",

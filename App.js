@@ -28,7 +28,7 @@ export default function App() {
     <SafeAreaProvider>
       <View style={styles.container}>
         <StatusBar
-          barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'}
+          barStyle={'dark-content'}
           backgroundColor="transparent"
           translucent={true}
         />
@@ -56,6 +56,7 @@ export default function App() {
                         headerTitleStyle: {
                           fontWeight: 'bold',
                           fontSize: 18,
+                          color: '#000000',
                         },
                         headerBackTitleVisible: false,
                         headerTitleAlign: 'center',

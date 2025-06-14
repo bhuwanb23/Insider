@@ -1,6 +1,36 @@
 import React, { createContext, useContext, useState } from 'react';
 import { getCoreCompanyDetailsPrompt } from '../../../api/prompts';
 
+// Function to parse core company details from raw response
+const parseCoreCompanyDetails = (rawResponse) => {
+  if (!rawResponse) return null;
+  
+  try {
+    // If response is already parsed
+    if (typeof rawResponse === 'object' && !Array.isArray(rawResponse)) {
+      return rawResponse;
+    }
+
+    // If response is a string, try to extract JSON
+    let jsonStr = rawResponse;
+    if (typeof rawResponse === 'string') {
+      // Try to extract JSON from triple backticks if present
+      const match = rawResponse.match(/```([\s\S]*?)```/);
+      if (match && match[1]) {
+        jsonStr = match[1];
+      }
+    }
+
+    // Parse the JSON string
+    const parsedData = JSON.parse(jsonStr);
+    console.log('Successfully parsed core company details');
+    return parsedData;
+  } catch (err) {
+    console.error('Error parsing core company details:', err);
+    return null;
+  }
+};
+
 const CoreCompanyDetailsContext = createContext();
 
 export function useCoreCompanyDetails() {
@@ -31,15 +61,23 @@ export function CoreCompanyDetailsProvider({ children }) {
 
     try {
       if (apiResponse) {
-        console.log('Using provided API response:', apiResponse);
-        setCompanyData(apiResponse);
+        console.log('Processing API response for:', companyName);
+        const rawData = apiResponse.raw || apiResponse;
+        const parsedData = parseCoreCompanyDetails(rawData);
+        
+        if (parsedData) {
+          console.log('Successfully parsed core company details');
+          setCompanyData(parsedData);
+        } else {
+          throw new Error('Failed to parse company details');
+        }
       } else {
         console.error('No API response provided');
         setError('Failed to fetch company details');
       }
     } catch (err) {
-      console.error('Error setting company details:', err);
-      setError(err.message || 'Failed to fetch company details');
+      console.error('Error processing company details:', err);
+      setError(err.message || 'Failed to process company details');
     } finally {
       setLoading(false);
     }
@@ -58,4 +96,4 @@ export function CoreCompanyDetailsProvider({ children }) {
       {children}
     </CoreCompanyDetailsContext.Provider>
   );
-} 
+}

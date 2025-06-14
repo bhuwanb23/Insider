@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FontAwesome5 } from '@expo/vector-icons';
 import TechnologyCard from '../components/TechnologyCard';
 import Badge from '../components/Badge';
+import { TechStackProvider, useTechStack } from '../context/TechStackContext';
 
 const { width } = Dimensions.get('window');
 
@@ -174,8 +174,29 @@ const SECTIONS = {
   }
 };
 
-export default function TechStackPage() {
-  const [activeSection, setActiveSection] = useState(SECTIONS.FRONTEND);
+export default function TechStackPage({ route }) {
+  return (
+    <TechStackProvider rawData={route.params.rawData}>
+      <TechStackPageContent />
+    </TechStackProvider>
+  );
+}
+
+function TechStackPageContent() {
+  const { techStack } = useTechStack();
+  const sections = Object.entries(techStack).reduce((acc, [key, value]) => {
+    acc[key.toUpperCase()] = {
+      title: value.title,
+      icon: value.icon,
+      data: {
+        categories: value.categories,
+        badges: value.badges
+      }
+    };
+    return acc;
+  }, {});
+  
+  const [activeSection, setActiveSection] = useState(sections.FRONTEND);
 
   const renderContent = (section) => {
     return (
@@ -317,4 +338,4 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
   },
-}); 
+});

@@ -69,8 +69,8 @@ export default function SearchPage({ navigation, onBack }) {
           console.error(`${label} failed:`, err.message);
         }
       };
-      await tryApi(getCompanyWaysToGetIn, 'waysData');
       await tryApi(getCoreCompanyDetails, 'coreData');
+      await tryApi(getCompanyWaysToGetIn, 'waysData');
       await tryApi(getCompanyCulture, 'cultureData');
       await tryApi(getCompanyInterviewExperience, 'interviewData');
       await tryApi(getCompanyJobHiringInsights, 'jobHiringData');
@@ -105,7 +105,8 @@ export default function SearchPage({ navigation, onBack }) {
           }
           navigation.navigate('WaysToGetIn', {
             company: searchedCompany,
-            initialTopic: 'CAMPUS'
+            initialTopic: 'CAMPUS',
+            rawData: allData
           });
           break;
         case 'core':
@@ -115,26 +116,43 @@ export default function SearchPage({ navigation, onBack }) {
           }
           console.log('Navigating to CompanyDetails with data:', {
             company: searchedCompany,
-            companyData: coreData
+            rawData: allData
           });
+
           navigation.navigate('CompanyDetails', { 
-            company: searchedCompany
+            company: searchedCompany,
+            rawData: allData
           });
           break;
         case 'jobs':
-          navigation.navigate('JobHirings', { company: searchedCompany });
+          navigation.navigate('JobHirings', { 
+            company: searchedCompany,
+            rawData: allData
+          });
           break;
         case 'interview':
-          navigation.navigate('InterviewExperience', { company: searchedCompany });
+          navigation.navigate('InterviewExperience', { 
+            company: searchedCompany,
+            rawData: allData
+          });
           break;
         case 'culture':
-          navigation.navigate('WorkCulture', { company: searchedCompany });
+          navigation.navigate('WorkCulture', { 
+            company: searchedCompany,
+            rawData: allData
+          });
           break;
         case 'techstack':
-          navigation.navigate('TechStack', { company: searchedCompany });
+          navigation.navigate('TechStack', { 
+            company: searchedCompany,
+            rawData: allData
+          });
           break;
         case 'insights':
-          navigation.navigate('NewsHighlights', { company: searchedCompany });
+          navigation.navigate('NewsHighlights', { 
+            company: searchedCompany,
+            rawData: allData
+          });
           break;
         default:
           console.warn('Unknown topic:', topicKey);
@@ -218,6 +236,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     position: 'relative',
+    paddingBottom: 80, // Add padding for bottom navigation
   },
   backButton: {
     width: 40,
@@ -239,10 +258,10 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 90, // Adjust based on new content padding and desired spacing
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    backgroundColor: '#ffffff',
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
@@ -250,20 +269,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    color: 'red',
+    color: '#000000',
     textAlign: 'center',
     marginBottom: 12,
     fontSize: 14,
   },
   retryButton: {
-    backgroundColor: '#4158D0',
+    backgroundColor: '#000000',
     paddingHorizontal: 24,
     paddingVertical: 8,
     borderRadius: 20,
   },
   retryText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
-}); 
+});

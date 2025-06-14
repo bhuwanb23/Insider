@@ -1,6 +1,23 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { newsData as initialNewsData } from '../constants/sampleData';
 
+function parseNewsResponse(content) {
+  try {
+    const match = content.match(/```([\s\S]*?)```/);
+    if (!match) {
+      console.error('Could not find JSON between triple backticks');
+      return null;
+    }
+    const jsonStr = match[1];
+    const parsedData = JSON.parse(jsonStr);
+    console.log('Successfully parsed news response');
+    return parsedData;
+  } catch (error) {
+    console.error('Error parsing news response:', error);
+    return null;
+  }
+}
+
 const NewsContext = createContext(null);
 
 export function useNews() {
@@ -11,10 +28,18 @@ export function useNews() {
   return context;
 }
 
-export function NewsProvider({ children }) {
-  const [newsData, setNewsData] = useState(initialNewsData);
+export function NewsProvider({ children, rawData }) {
+  const [newsData, setNewsData] = useState(rawData ? parseNewsResponse(rawData.newsData?.raw) || initialNewsData : initialNewsData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const updateNewsData = useCallback((rawContent) => {
+    if (!rawContent) return;
+    const parsedData = parseNewsResponse(rawContent);
+    if (parsedData) {
+      setNewsData(parsedData);
+    }
+  }, []);
 
   const refreshNews = useCallback(async () => {
     try {
@@ -43,4 +68,4 @@ export function NewsProvider({ children }) {
       {children}
     </NewsContext.Provider>
   );
-} 
+}

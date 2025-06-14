@@ -1,6 +1,29 @@
 import React, { createContext, useContext, useState } from 'react';
 import { getCompanyWaysToGetIn } from '../../../api/api';
 
+// Function to parse and extract JSON from API response
+const parseWaysToGetInData = (rawData) => {
+    try {
+      // If the data is already a parsed object, return it
+      if (typeof rawData === 'object' && rawData !== null) {
+        console.log('Successfully parsed ways to get in data (already parsed object)');
+        return rawData;
+      }
+
+      // Try to find JSON between triple backticks
+      const match = rawData.match(/```([\s\S]*?)```/);
+      const jsonStr = match ? match[1] : rawData;
+
+      // Parse the JSON string
+      const parsedData = JSON.parse(jsonStr);
+      console.log('Successfully parsed ways to get in data');
+      return parsedData;
+    } catch (error) {
+      console.error('Error parsing ways to get in data:', error);
+      throw new Error('Failed to parse response data');
+    }
+  };
+
 const WaysToGetInContext = createContext();
 
 export const useWaysToGetIn = () => {
@@ -11,7 +34,7 @@ export const useWaysToGetIn = () => {
   return context;
 };
 
-export const WaysToGetInProvider = ({ children }) => {
+export const WaysToGetInProvider = ({ children, rawData }) => {
   const [waysData, setWaysData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,38 +59,39 @@ export const WaysToGetInProvider = ({ children }) => {
     return true;
   };
 
-  const fetchCompanyData = async (companyName) => {
-    if (!companyName?.trim()) {
-      setError('Company name is required');
-      return;
+  // Effect to process raw data when it changes
+  React.useEffect(() => {
+    if (rawData?.waysData) {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const parsedData = parseWaysToGetInData(rawData.waysData.raw);
+        if (validateData(parsedData)) {
+          setWaysData(parsedData);
+        }
+      } catch (error) {
+        console.error('Error processing ways to get in data:', error);
+        setError('Failed to process ways to get in data');
+        setWaysData(null);
+      } finally {
+        setLoading(false);
+      }
     }
+  }, [rawData]);
 
+  const updateWaysData = (newRawContent) => {
     setLoading(true);
     setError(null);
     
     try {
-      console.log(`Fetching data for: ${companyName}`);
-      const response = await getCompanyWaysToGetIn(companyName);
-      
-      console.log('Response received:', response);
-      
-      // Validate the data structure
-      if (validateData(response)) {
-        setWaysData(response);
-        console.log('Data successfully set to state');
+      const parsedData = parseWaysToGetInData(newRawContent);
+      if (validateData(parsedData)) {
+        setWaysData(parsedData);
       }
     } catch (error) {
-      console.error('Error in fetchCompanyData:', error);
-      
-      // Provide user-friendly error messages
-      if (error.message.includes('Invalid JSON')) {
-        setError('Unable to process the response from the server. Please try again.');
-      } else if (error.message.includes('Missing required fields')) {
-        setError('Incomplete data received. Please try again.');
-      } else {
-        setError(`Failed to fetch company data: ${error.message}`);
-      }
-      
+      console.error('Error updating ways to get in data:', error);
+      setError('Failed to process ways to get in data');
       setWaysData(null);
     } finally {
       setLoading(false);
@@ -85,11 +109,11 @@ export const WaysToGetInProvider = ({ children }) => {
         waysData,
         loading,
         error,
-        fetchCompanyData,
+        updateWaysData,
         clearData
       }}
     >
       {children}
     </WaysToGetInContext.Provider>
   );
-}; 
+};

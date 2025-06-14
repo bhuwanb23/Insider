@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions } from 'react-native';
-import { JobHiringProvider } from '../context/JobHiringContext';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { JobHiringProvider, useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import CommonRoles from '../components/CommonRoles';
 import InternshipConversion from '../components/InternshipConversion';
@@ -47,7 +47,37 @@ export default function JobHiringsPage() {
   };
 
   return (
-    <JobHiringProvider>
+    <JobHiringProvider rawData={rawData}>
+      {() => {
+        const { loading, error, jobHiringData } = useJobHiring();
+
+        // Show loading indicator while data is being processed
+        if (loading) {
+          return (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#4158D0" />
+              <Text style={styles.loadingText}>Loading hiring data...</Text>
+            </View>
+          );
+        }
+
+        // Show error message if there was a problem
+        if (error) {
+          return (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          );
+        }
+
+        // Ensure we have job hiring data before rendering
+        if (!jobHiringData) {
+          return (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>No hiring data available</Text>
+            </View>
+          );
+        }
       <LinearGradient
         colors={['#ffffff', '#f8f9fa']}
         style={styles.container}
@@ -97,11 +127,35 @@ export default function JobHiringsPage() {
           </View>
         </ScrollView>
       </LinearGradient>
+    }}
     </JobHiringProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#4158D0',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -159,4 +213,4 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
-}); 
+});

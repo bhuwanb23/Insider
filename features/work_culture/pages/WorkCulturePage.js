@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import SimpleLoader from '../components/SimpleLoader';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useWorkCulture } from '../context/WorkCultureContext';
 import CultureOverviewSection from '../components/CultureOverviewSection';
@@ -43,9 +44,17 @@ const SECTIONS = {
   },
 };
 
-export default function WorkCulturePage() {
+export default function WorkCulturePage({ route }) {
   const [activeSection, setActiveSection] = useState(SECTIONS.CULTURE);
-  const workCultureData = useWorkCulture();
+  const { workCultureData } = useWorkCulture();
+
+  if (!workCultureData) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <SimpleLoader />
+      </View>
+    );
+  }
 
   const renderContent = () => {
     switch (activeSection) {
@@ -177,4 +186,4 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
-}); 
+});

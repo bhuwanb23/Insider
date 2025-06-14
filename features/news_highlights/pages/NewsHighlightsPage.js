@@ -15,7 +15,9 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function NewsHighlightsPage() {
+export default function NewsHighlightsPage({ route }) {
+  const rawData = route?.params?.rawData;
+
   const [activeSection, setActiveSection] = useState(SECTIONS.HEADLINES);
 
   const renderContent = () => {
@@ -34,7 +36,8 @@ export default function NewsHighlightsPage() {
   };
 
   return (
-    <LinearGradient
+    <NewsProvider rawData={rawData}>
+      <LinearGradient
       colors={['#ffffff', '#f8f9fa']}
       style={styles.container}
       start={{ x: 0, y: 0 }}
@@ -83,6 +86,7 @@ export default function NewsHighlightsPage() {
         </View>
       </ScrollView>
     </LinearGradient>
+    </NewsProvider>
   );
 }
 
@@ -144,4 +148,4 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
-}); 
+});

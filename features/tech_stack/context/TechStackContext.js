@@ -1,5 +1,22 @@
 import React, { createContext, useContext, useState } from 'react';
 
+// Function to parse tech stack data from API response
+const parseTechStackResponse = (content) => {
+  try {
+    // Extract JSON from between triple backticks if present
+    const jsonMatch = content.match(/```([\s\S]*?)```/);
+    const jsonStr = jsonMatch ? jsonMatch[1] : content;
+    
+    // Parse the JSON string
+    const parsedData = JSON.parse(jsonStr);
+    console.log('Successfully parsed tech stack data');
+    return parsedData;
+  } catch (error) {
+    console.error('Error parsing tech stack data:', error);
+    return null;
+  }
+};
+
 const TechStackContext = createContext();
 
 export const techStackData = {
@@ -155,11 +172,23 @@ export const techStackData = {
   }
 };
 
-export function TechStackProvider({ children }) {
+export function TechStackProvider({ children, rawData }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [techStack, setTechStack] = useState(techStackData);
+
+  // Parse and update tech stack data when rawData changes
+  React.useEffect(() => {
+    if (rawData?.techStackData?.raw) {
+      const content = rawData.techStackData.raw.choices[0].message.content;
+      const parsedData = parseTechStackResponse(content);
+      if (parsedData) {
+        setTechStack(parsedData);
+      }
+    }
+  }, [rawData]);
 
   const value = {
-    techStack: techStackData,
+    techStack,
     selectedCategory,
     setSelectedCategory,
   };
@@ -177,4 +206,4 @@ export function useTechStack() {
     throw new Error('useTechStack must be used within a TechStackProvider');
   }
   return context;
-} 
+}

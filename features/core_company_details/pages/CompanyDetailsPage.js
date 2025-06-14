@@ -24,14 +24,19 @@ const { width } = Dimensions.get('window');
 export default function CompanyDetailsPage() {
   const [activeSection, setActiveSection] = useState(SECTIONS.BASIC);
   const route = useRoute();
-  const { company } = route.params;
+  const { company, rawData } = route.params;
   const { loading, error, companyData, fetchCompanyData } = useCoreCompanyDetails();
 
   useEffect(() => {
     // console.log('CompanyDetailsPage mounted with company:', company);
     if (company && !companyData) {
-      // console.log('Fetching company data for:', company);
-      fetchCompanyData(company);
+      // console.log('Processing company data for:', company);
+      if (rawData?.coreData?.raw) {
+
+        fetchCompanyData(company, rawData.coreData.raw);
+      } else {
+        console.error('No core data available in navigation params');
+      }
     }
   }, [company]);
 
@@ -225,4 +230,4 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
-}); 
+});

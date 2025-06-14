@@ -1,21 +1,18 @@
-import OpenAI from 'openai';
 import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetailsPrompt, getCompanyInterviewExperiencePrompt, getCompanyJobHiringInsightsPrompt, getCompanyNewsHighlightsPrompt, getCompanyTechStackPrompt } from './prompts.js';
 
 
 // OpenRouter API config
-const OPENROUTER_API_KEY = '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';
+// const OPENROUTER_API_KEY = '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';
+const OPENROUTER_API_KEY = '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';
 const OPENROUTER_SITE_URL = process.env.OPENROUTER_SITE_URL || '';
 const OPENROUTER_SITE_NAME = process.env.OPENROUTER_SITE_NAME || '';
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const OPENROUTER_MODEL = 'deepseek/deepseek-r1-0528-qwen3-8b:free';
+const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
 
 // Helper function to clean markdown code blocks from response
 const cleanJsonResponse = (response) => {
-    // Remove markdown code block indicators and any language specification
-    let cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    // Trim any whitespace
-    cleaned = cleaned.trim();
-    return cleaned;
+    // Return raw response for context files to handle parsing
+    return response;
 };
 
 // OpenRouter API call helper
@@ -58,17 +55,8 @@ const makeOpenRouterApiCall = async (prompt, label) => {
         }
 
         console.log(`Raw ${label} API Response received`);
-        const cleanedResponse = cleanJsonResponse(responseContent);
-        console.log(`Cleaned ${label} Response received`);
-        try {
-            const parsedResponse = JSON.parse(cleanedResponse);
-            console.log(`Successfully parsed ${label} response as JSON`);
-            return parsedResponse;
-        } catch (parseError) {
-            console.error(`Failed to parse ${label} API response as JSON:`, parseError);
-            console.error('Cleaned response content error:', parseError);
-            throw new Error(`Invalid JSON response from API: ${parseError.message}`);
-        }
+        // Return raw response content for context files to handle parsing
+        return responseContent;
     } catch (error) {
         console.error(`Error getting ${label}:`, error);
         throw error;
