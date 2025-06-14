@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Insider",
-    "slug": "Insider",
+    "slug": "insider",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,8 +28,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "a2021521-8dbf-4a5d-9959-b84fa4e7f648"
+        "projectId": "3bb8388e-13b8-48e0-a07e-f127634d0f9f"
       }
-    }
+    },
+    "owner": "bhuwan23"
   }
 }
