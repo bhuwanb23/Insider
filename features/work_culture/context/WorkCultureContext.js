@@ -81,6 +81,14 @@ function flattenWorkCultureData(apiData) {
   };
 }
 
+export const useWorkCulture = () => {
+  const context = useContext(WorkCultureContext);
+  if (!context) {
+    throw new Error('useWorkCulture must be used within a WorkCultureProvider');
+  }
+  return context;
+};
+
 export function WorkCultureProvider({ children }) {
   const [workCultureData, setWorkCultureData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -218,26 +226,18 @@ export function WorkCultureProvider({ children }) {
     }
   };
 
+  const value = {
+    workCultureData,
+    loading,
+    error,
+    fetchCompanyData,
+    setParsedCultureData: setParsedWorkCultureData,
+    clearData
+  };
+
   return (
-    <WorkCultureContext.Provider 
-      value={{
-        workCultureData,
-        loading,
-        error,
-        fetchCompanyData,
-        setParsedWorkCultureData,
-        clearData
-      }}
-    >
+    <WorkCultureContext.Provider value={value}>
       {children}
     </WorkCultureContext.Provider>
   );
-}
-
-export function useWorkCulture() {
-  const context = useContext(WorkCultureContext);
-  if (!context) {
-    throw new Error('useWorkCulture must be used within a WorkCultureProvider');
-  }
-  return context;
-} 
+};

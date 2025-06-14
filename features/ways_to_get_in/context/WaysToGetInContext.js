@@ -13,40 +13,31 @@ const robustCleanAndParseJson = (jsonString, contextName) => {
     cleaned = cleaned.replace(/^﻿/, ''); // Remove BOM and other invisible characters
     cleaned = cleaned.trim(); // Trim whitespace
 
-    // Step 2: Replace non-JSON compliant values (from previous fix)
-    cleaned = cleaned.replace(/None/g, 'null');
-    cleaned = cleaned.replace(/True/g, 'true');
-    cleaned = cleaned.replace(/False/g, 'false');
-    cleaned = cleaned.replace(/undefined/g, 'null');
+    // Step 2: Fix missing quotes around property names and string values
+    cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*([:\[])/g, '$1"$2"$3');
+    cleaned = cleaned.replace(/:\s*([^\s\[{\d"'][^,}\]]*)/g, ': "$1"');
+
+    // Step 3: Replace non-JSON compliant values
+    cleaned = cleaned.replace(/None/g, 'null');
+    cleaned = cleaned.replace(/True/g, 'true');
+    cleaned = cleaned.replace(/False/g, 'false');
+    cleaned = cleaned.replace(/undefined/g, 'null');
     cleaned = cleaned.replace(/\bNaN\b/g, 'null');
 
-    // Step 3: Handle improperly escaped double quotes within string values.
-    // Temporarily replace already escaped double quotes so they are not affected by the next regex.
+    // Step 4: Handle improperly escaped quotes
     const tempEscapedQuote = '__ESCAPED_QUOTE__';
     cleaned = cleaned.replace(/\\"/g, tempEscapedQuote);
+    cleaned = cleaned.replace(/(?<!\\)"/g, '\"');
+    cleaned = cleaned.replace(new RegExp(tempEscapedQuote, 'g'), '\"');
 
-    // Now, escape any unescaped double quotes that are inside string values.
-    // This regex looks for a double quote not preceded by a backslash.
-    cleaned = cleaned.replace(/(?<!\\)\"/g, '\\"');
+    // Step 5: Fix array syntax
+    cleaned = cleaned.replace(/(["\]}\d])\s*([,{\[])\s*/g, '$1, $2');
+    cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
 
-    // Restore the temporarily replaced escaped double quotes.
-    cleaned = cleaned.replace(new RegExp(tempEscapedQuote, 'g'), '\\"');
-
-    // Step 4: Ensure numeric-like strings with special characters (like %) are treated as strings.
-    // This regex looks for unquoted numbers or percentages that are part of a JSON value.
-    cleaned = cleaned.replace(/([:,\[\{]\s*)([-+]?\d+\.?\d*%?)([,\]\}"\s])/g, (match, p1, p2, p3) => {
-      // Check if the matched value is a number with a percentage or a standalone hyphen/plus
-      // and is not already enclosed in quotes.
-      if ((p2.includes('%') || (p2.startsWith('-') && p2.length > 1 && isNaN(p2))) && !p2.startsWith('"')) {
-        return `${p1}"${p2}"${p3}`;
-      }
-      return match;
-    });
-
-    // Step 5: Remove extra commas, invalid characters.
-    cleaned = cleaned.replace(/,\s*([}\]])/g, '$1'); // Remove trailing commas
-    cleaned = cleaned.replace(/[`'"`]/g, '"'); // Normalize all quote-like characters to standard double quotes
-    cleaned = cleaned.replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, ''); // Remove control characters
+    // Step 6: Remove comments and normalize quotes
+    cleaned = cleaned.replace(/\/\/[^\n]*/g, '');
+    cleaned = cleaned.replace(/[`'"`]/g, '"');
+    cleaned = cleaned.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
 
     if (__DEV__) {
       console.log(`[${contextName}] Cleaned for JSON parse:`, cleaned);
@@ -254,4 +245,4 @@ export const WaysToGetInProvider = ({ children }) => {
       {children}
     </WaysToGetInContext.Provider>
   );
-}; 
+};

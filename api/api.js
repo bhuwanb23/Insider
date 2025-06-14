@@ -7,7 +7,8 @@ const OPENROUTER_API_KEY = 'sk-or-v1-326b523172339624fa71351e1239fa7f96e5786a0f6
 const OPENROUTER_SITE_URL = process.env.OPENROUTER_SITE_URL || '';
 const OPENROUTER_SITE_NAME = process.env.OPENROUTER_SITE_NAME || '';
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const OPENROUTER_MODEL = 'deepseek/deepseek-r1-0528-qwen3-8b:free';
+// const OPENROUTER_MODEL = 'deepseek/deepseek-r1-0528-qwen3-8b:free';
+const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
 
 // Helper function to clean markdown code blocks from response
 const cleanJsonResponse = (response) => {
