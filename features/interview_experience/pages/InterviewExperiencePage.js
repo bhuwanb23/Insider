@@ -23,33 +23,9 @@ const SECTIONS = {
 const { width } = Dimensions.get('window');
 
 export default function InterviewExperiencePage({ route }) {
-  // Extract rawData from route params
-  const { rawData } = route?.params || {};
-  const [activeSection, setActiveSection] = useState(SECTIONS.JOURNEY);
-
-  const renderContent = () => {
-    switch (activeSection) {
-      case SECTIONS.JOURNEY:
-        return <InterviewJourney />;
-      case SECTIONS.EXPERIENCES:
-        return <CandidateExperiences />;
-      case SECTIONS.TECHNICAL:
-        return <TechnicalQuestions />;
-      case SECTIONS.ROLE_SPECIFIC:
-        return <RoleSpecificQuestions />;
-      case SECTIONS.BEHAVIORAL:
-        return <BehavioralQuestions />;
-      case SECTIONS.STATS:
-        return <QuestionStats />;
-      case SECTIONS.TIPS:
-        return <MockInterviewTips />;
-      default:
-        return <InterviewJourney />;
-    }
-  };
-
+  console.log('[InterviewExperiencePage] route.params:', route.params);
   return (
-    <InterviewProvider rawData={rawData}>
+    <InterviewProvider rawData={route.params?.rawData}>
       <InterviewContent />
     </InterviewProvider>
   );
@@ -58,6 +34,7 @@ export default function InterviewExperiencePage({ route }) {
 // Separate component to use the context
 function InterviewContent() {
   const { loading, error, interviewData } = useInterview();
+  console.log('[InterviewContent] loading:', loading, 'error:', error, 'interviewData:', interviewData);
   const [activeSection, setActiveSection] = useState(SECTIONS.JOURNEY);
 
   // Show loading indicator while data is being processed
@@ -110,7 +87,6 @@ function InterviewContent() {
   };
 
   return (
-    <InterviewProvider>
     <LinearGradient
         colors={['#ffffff', '#f8f9fa']}
         style={styles.container}
@@ -160,7 +136,6 @@ function InterviewContent() {
           </View>
         </ScrollView>
       </LinearGradient>
-    </InterviewProvider>
   );
 }
 

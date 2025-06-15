@@ -3,12 +3,14 @@ import { newsData as initialNewsData } from '../constants/sampleData';
 
 function parseNewsResponse(content) {
   try {
-    const match = content.match(/```([\s\S]*?)```/);
-    if (!match) {
-      console.error('Could not find JSON between triple backticks');
-      return null;
+    // If content is already an object, return it
+    if (typeof content === 'object' && content !== null) {
+      return content;
     }
-    const jsonStr = match[1];
+
+    // Try to find JSON between triple backticks
+    const match = content.match(/```([\s\S]*?)```/);
+    const jsonStr = match ? match[1] : content;
     const parsedData = JSON.parse(jsonStr);
     console.log('Successfully parsed news response');
     return parsedData;
@@ -29,7 +31,17 @@ export function useNews() {
 }
 
 export function NewsProvider({ children, rawData }) {
-  const [newsData, setNewsData] = useState(rawData ? parseNewsResponse(rawData.newsData?.raw) || initialNewsData : initialNewsData);
+  console.log('[NewsProvider] received rawData:', rawData);
+  const [newsData, setNewsData] = useState(() => {
+    if (!rawData?.newsData?.raw) {
+      console.log('[NewsProvider] No raw news data available, using initial data');
+      return initialNewsData;
+    }
+    console.log('[NewsProvider] rawData to parse:', rawData.newsData.raw);
+    const parsed = parseNewsResponse(rawData.newsData.raw);
+    console.log('[NewsProvider] parsed newsData:', parsed);
+    return parsed || initialNewsData;
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 

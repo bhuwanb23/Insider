@@ -34,33 +34,28 @@ const parseInterviewData = (content) => {
 };
 
 export function InterviewProvider({ children, rawData }) {
-  const [interviewData, setInterviewData] = useState(sampleInterviewData);
-  const [loading, setLoading] = useState(false);
+  console.log('[InterviewProvider] received rawData:', rawData);
+  const [interviewData, setInterviewData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Parse and set interview data when rawData changes
   useEffect(() => {
-    if (rawData && rawData.interviewData) {
-      setLoading(true);
+    if (rawData?.interviewData?.raw) {
       try {
-        const rawContent = rawData.interviewData.raw;
-        if (rawContent) {
-          const parsedData = parseInterviewData(rawContent);
-          if (parsedData) {
-            setInterviewData(parsedData);
-            setError(null);
-          } else {
-            console.error('Failed to parse interview data');
-            setError('Failed to parse interview data');
-          }
-        }
+        console.log('[InterviewProvider] rawData to parse:', rawData.interviewData.raw);
+        const parsed = parseInterviewData(rawData.interviewData.raw);
+        console.log('[InterviewProvider] parsed interviewData:', parsed);
+        setInterviewData(parsed);
       } catch (err) {
-        console.error('Error processing interview data:', err);
-        setError('Error processing interview data');
-      } finally {
-        setLoading(false);
+        setError('Failed to parse interview data');
+        console.error('[InterviewProvider] Error parsing interview data:', err);
       }
+    } else {
+      setInterviewData(null);
+      setError('No interview data available');
+      console.warn('[InterviewProvider] No interview data available in rawData');
     }
+    setLoading(false);
   }, [rawData]);
 
   // Function to update interview data with new raw content

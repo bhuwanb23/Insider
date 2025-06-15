@@ -22,71 +22,71 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function JobHiringsPage() {
+export default function JobHiringsPage({ navigation, route }) {
+  console.log('[JobHiringsPage] route.params:', route.params);
   const [activeSection, setActiveSection] = useState(SECTIONS.ROLES);
+  const rawData = route.params?.rawData;
 
-  const renderContent = () => {
-    switch (activeSection) {
-      case SECTIONS.ROLES:
-        return <CommonRoles />;
-      case SECTIONS.INTERNSHIP:
-        return <InternshipConversion />;
-      case SECTIONS.CHANNELS:
-        return <HiringChannels />;
-      case SECTIONS.TRENDS:
-        return <JobTrends />;
-      case SECTIONS.TIMELINE:
-        return <HiringTimeline />;
-      case SECTIONS.PROCESS:
-        return <HiringProcess />;
-      case SECTIONS.RESUME:
-        return <ResumeTips />;
-      default:
-        return <CommonRoles />;
+  function JobHiringsContent() {
+    const { loading, error, jobHiringData } = useJobHiring();
+    console.log('[JobHiringsContent] loading:', loading, 'error:', error, 'jobHiringData:', jobHiringData);
+
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4158D0" />
+          <Text style={styles.loadingText}>Loading hiring data...</Text>
+        </View>
+      );
     }
-  };
 
-  return (
-    <JobHiringProvider rawData={rawData}>
-      {() => {
-        const { loading, error, jobHiringData } = useJobHiring();
+    if (error) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      );
+    }
 
-        // Show loading indicator while data is being processed
-        if (loading) {
-          return (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#4158D0" />
-              <Text style={styles.loadingText}>Loading hiring data...</Text>
-            </View>
-          );
-        }
+    if (!jobHiringData) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>No hiring data available</Text>
+        </View>
+      );
+    }
 
-        // Show error message if there was a problem
-        if (error) {
-          return (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          );
-        }
+    const renderContent = () => {
+      switch (activeSection) {
+        case SECTIONS.ROLES:
+          return <CommonRoles />;
+        case SECTIONS.INTERNSHIP:
+          return <InternshipConversion />;
+        case SECTIONS.CHANNELS:
+          return <HiringChannels />;
+        case SECTIONS.TRENDS:
+          return <JobTrends />;
+        case SECTIONS.TIMELINE:
+          return <HiringTimeline />;
+        case SECTIONS.PROCESS:
+          return <HiringProcess />;
+        case SECTIONS.RESUME:
+          return <ResumeTips />;
+        default:
+          return <CommonRoles />;
+      }
+    };
 
-        // Ensure we have job hiring data before rendering
-        if (!jobHiringData) {
-          return (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>No hiring data available</Text>
-            </View>
-          );
-        }
+    return (
       <LinearGradient
-        colors={['#ffffff', '#f8f9fa']}
+        colors={["#ffffff", "#f8f9fa"]}
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
         <View style={styles.tabsWrapper}>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             style={styles.tabsContainer}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tabsContent}
@@ -101,7 +101,7 @@ export default function JobHiringsPage() {
                 onPress={() => setActiveSection(SECTIONS[key])}
               >
                 <LinearGradient
-                  colors={activeSection === SECTIONS[key] ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                  colors={activeSection === SECTIONS[key] ? ["#4158D0", "#C850C0"] : ["transparent", "transparent"]}
                   style={styles.tabGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
@@ -122,12 +122,15 @@ export default function JobHiringsPage() {
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>
-            {renderContent()}
-          </View>
+          <View style={styles.contentContainer}>{renderContent()}</View>
         </ScrollView>
       </LinearGradient>
-    }}
+    );
+  }
+
+  return (
+    <JobHiringProvider rawData={rawData}>
+      <JobHiringsContent />
     </JobHiringProvider>
   );
 }

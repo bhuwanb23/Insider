@@ -9,6 +9,7 @@ import ColdOutreach from '../components/ColdOutreach';
 import InternshipConversion from '../components/InternshipConversion';
 import ContractRoles from '../components/ContractRoles';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
+import { WaysToGetInProvider } from '../context/WaysToGetInContext';
 
 const SECTIONS = {
   CAMPUS: { title: 'Campus Recruitment', icon: '🎓', key: 'campusRecruitment' },
@@ -23,7 +24,17 @@ const SECTIONS = {
 const { width } = Dimensions.get('window');
 
 export default function WaysToGetInPage({ route }) {
+  console.log('[WaysToGetInPage] route.params:', route.params);
+  return (
+    <WaysToGetInProvider rawData={route.params?.rawData}>
+      <WaysToGetInContent route={route} />
+    </WaysToGetInProvider>
+  );
+}
+
+function WaysToGetInContent({ route }) {
   const { waysData, loading, error } = useWaysToGetIn();
+  console.log('[WaysToGetInContent] loading:', loading, 'error:', error, 'waysData:', waysData);
   const [activeSection, setActiveSection] = useState(SECTIONS.CAMPUS || Object.values(SECTIONS)[0]);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(50)).current;
@@ -77,9 +88,7 @@ export default function WaysToGetInPage({ route }) {
 
   const renderTab = (key, section) => {
     if (!section) return null;
-    
     const isActive = activeSection?.key === section.key;
-    
     return (
       <TouchableOpacity
         key={key}
@@ -127,16 +136,15 @@ export default function WaysToGetInPage({ route }) {
   }
 
   return (
-    <WaysToGetInProvider rawData={route.params?.rawData}>
-      <LinearGradient
-        colors={['#ffffff', '#f8f9fa']}
-        style={styles.container}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+    <LinearGradient
+      colors={['#ffffff', '#f8f9fa']}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
     >
       <View style={styles.tabsWrapper}>
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           style={styles.tabsContainer}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}
@@ -145,7 +153,7 @@ export default function WaysToGetInPage({ route }) {
         </ScrollView>
       </View>
 
-      <Animated.View 
+      <Animated.View
         style={[
           styles.content,
           {
@@ -161,7 +169,6 @@ export default function WaysToGetInPage({ route }) {
         </ScrollView>
       </Animated.View>
     </LinearGradient>
-    </WaysToGetInProvider>
   );
 }
 

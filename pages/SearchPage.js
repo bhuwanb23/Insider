@@ -35,7 +35,6 @@ export default function SearchPage({ navigation, onBack }) {
     // Clear data when component unmounts
     return () => {
       clearWaysData();
-      clearCoreData();
     };
   }, []);
 
@@ -56,9 +55,10 @@ export default function SearchPage({ navigation, onBack }) {
       const tryApi = async (fn, label) => {
         try {
           const res = await fn(company);
-          results[label] = { parsed: res, raw: res };
+          // For all data types, ensure raw is a stringified JSON
+          results[label] = { parsed: res, raw: JSON.stringify(res) };
           anySuccess = true;
-          console.log(`${label} data received.`);
+          console.log(`[SearchPage] ${label} data received:`, res);
         } catch (err) {
           // If error has a cleaned response, store it as raw
           if (err.cleanedResponse) {
@@ -66,7 +66,7 @@ export default function SearchPage({ navigation, onBack }) {
           } else {
             results[label] = { parsed: null, raw: null, error: err.message };
           }
-          console.error(`${label} failed:`, err.message);
+          console.error(`[SearchPage] ${label} failed:`, err.message);
         }
       };
       await tryApi(getCoreCompanyDetails, 'coreData');
@@ -76,86 +76,120 @@ export default function SearchPage({ navigation, onBack }) {
       await tryApi(getCompanyJobHiringInsights, 'jobHiringData');
       await tryApi(getCompanyNewsHighlights, 'newsData');
       await tryApi(getCompanyTechStack, 'techStackData');
+      console.log('[SearchPage] allData before setAllData:', results);
       setAllData(results);
       setLoading(false);
       if (!anySuccess) {
         setError('Failed to fetch any company data. Please try again.');
       } else {
         setError(null);
-        console.log('All API calls attempted, some data may be unparsed.');
+        console.log('[SearchPage] All API calls attempted, some data may be unparsed.');
       }
     } catch (err) {
       setLoading(false);
       setError('Failed to fetch company data. Please try again.');
-      console.error('Error during company data fetch:', err);
+      console.error('[SearchPage] Error during company data fetch:', err);
     }
   };
 
   const handleSelectTopic = (topicKey) => {
     if (navigation) {
-      console.log('Selecting topic:', topicKey);
-      console.log('Current core data:', coreData);
-      
+      console.log('[SearchPage] Selecting topic:', topicKey);
+      console.log('[SearchPage] allData:', allData);
       // Navigate to the appropriate screen based on the topic
       switch (topicKey) {
         case 'waysin':
-          if (!waysData) {
-            console.error('Ways to get in data not available');
+          console.log('[SearchPage] allData.waysData:', allData?.waysData);
+          if (!allData?.waysData) {
+            console.warn('[SearchPage] No waysData found in allData, not navigating.');
             return;
           }
+          console.log('[SearchPage] Navigating to WaysToGetIn with rawData:', { waysData: allData.waysData });
           navigation.navigate('WaysToGetIn', {
             company: searchedCompany,
             initialTopic: 'CAMPUS',
-            rawData: allData
+            rawData: { waysData: allData.waysData }
           });
           break;
         case 'core':
-          if (!coreData) {
-            console.error('Core company data not available');
+          const coreRaw = allData?.coreData?.raw || allData?.coreData?.parsed;
+          console.log('[SearchPage] allData.coreData:', allData?.coreData);
+          if (!allData?.coreData) {
+            console.warn('[SearchPage] No coreData found in allData, not navigating.');
             return;
           }
-          console.log('Navigating to CompanyDetails with data:', {
-            company: searchedCompany,
-            rawData: allData
-          });
-
+          if (!coreRaw) {
+            console.error('[SearchPage] No core data available in navigation params');
+            return;
+          }
+          console.log('[SearchPage] Navigating to CompanyDetails with rawData:', { coreData: { raw: coreRaw } });
           navigation.navigate('CompanyDetails', { 
             company: searchedCompany,
-            rawData: allData
+            rawData: { coreData: { raw: coreRaw } }
           });
           break;
         case 'jobs':
+          console.log('[SearchPage] allData.jobHiringData:', allData?.jobHiringData);
+          if (!allData?.jobHiringData) {
+            console.warn('[SearchPage] No jobHiringData found in allData, not navigating.');
+            return;
+          }
+          console.log('[SearchPage] Navigating to JobHirings with rawData:', { jobHiringData: allData.jobHiringData });
           navigation.navigate('JobHirings', { 
             company: searchedCompany,
-            rawData: allData
+            rawData: { jobHiringData: allData.jobHiringData }
           });
           break;
         case 'interview':
+          console.log('[SearchPage] allData.interviewData:', allData?.interviewData);
+          if (!allData?.interviewData) {
+            console.warn('[SearchPage] No interviewData found in allData, not navigating.');
+            return;
+          }
+          console.log('[SearchPage] Navigating to InterviewExperience with rawData:', { interviewData: allData.interviewData });
           navigation.navigate('InterviewExperience', { 
             company: searchedCompany,
-            rawData: allData
+            rawData: { interviewData: allData.interviewData }
           });
           break;
         case 'culture':
+          console.log('[SearchPage] allData.cultureData:', allData?.cultureData);
+          if (!allData?.cultureData) {
+            console.warn('[SearchPage] No cultureData found in allData, not navigating.');
+            return;
+          }
+          console.log('[SearchPage] Navigating to WorkCulture with rawData:', { cultureData: allData.cultureData });
           navigation.navigate('WorkCulture', { 
             company: searchedCompany,
-            rawData: allData
+            rawData: { cultureData: allData.cultureData }
           });
           break;
         case 'techstack':
+          console.log('[SearchPage] allData.techStackData:', allData?.techStackData);
+          if (!allData?.techStackData) {
+            console.warn('[SearchPage] No techStackData found in allData, not navigating.');
+            return;
+          }
+          console.log('[SearchPage] Navigating to TechStack with rawData:', { techStackData: allData.techStackData });
           navigation.navigate('TechStack', { 
             company: searchedCompany,
-            rawData: allData
+            rawData: { techStackData: allData.techStackData }
           });
           break;
         case 'insights':
+          console.log('[SearchPage] allData.newsData:', allData?.newsData);
+          if (!allData?.newsData) {
+            console.warn('[SearchPage] No newsData found in allData, not navigating.');
+            return;
+          }
+          console.log('[SearchPage] Navigating to NewsHighlights with rawData:', { newsData: allData.newsData });
           navigation.navigate('NewsHighlights', { 
             company: searchedCompany,
-            rawData: allData
+            rawData: { newsData: allData.newsData }
           });
           break;
         default:
-          console.warn('Unknown topic:', topicKey);
+          console.warn('[SearchPage] Unknown topic:', topicKey);
       }
     }
   };

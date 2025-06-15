@@ -41,7 +41,8 @@ export function useCoreCompanyDetails() {
   return context;
 }
 
-export function CoreCompanyDetailsProvider({ children }) {
+export function CoreCompanyDetailsProvider({ children, rawData }) {
+  console.log('[CoreCompanyDetailsProvider] received rawData:', rawData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [companyData, setCompanyData] = useState(null);
@@ -55,28 +56,29 @@ export function CoreCompanyDetailsProvider({ children }) {
   const fetchCompanyData = async (companyName, apiResponse = null) => {
     if (!companyName) return;
 
-    console.log('Setting core company details for:', companyName);
+    console.log('[CoreCompanyDetailsProvider] Setting core company details for:', companyName);
     setLoading(true);
     setError(null);
 
     try {
       if (apiResponse) {
-        console.log('Processing API response for:', companyName);
+        console.log('[CoreCompanyDetailsProvider] Processing API response for:', companyName, apiResponse);
         const rawData = apiResponse.raw || apiResponse;
+        console.log('[CoreCompanyDetailsProvider] rawData to parse:', rawData);
         const parsedData = parseCoreCompanyDetails(rawData);
-        
+        console.log('[CoreCompanyDetailsProvider] parsedData:', parsedData);
         if (parsedData) {
-          console.log('Successfully parsed core company details');
           setCompanyData(parsedData);
+          console.log('[CoreCompanyDetailsProvider] set companyData:', parsedData);
         } else {
           throw new Error('Failed to parse company details');
         }
       } else {
-        console.error('No API response provided');
+        console.error('[CoreCompanyDetailsProvider] No API response provided');
         setError('Failed to fetch company details');
       }
     } catch (err) {
-      console.error('Error processing company details:', err);
+      console.error('[CoreCompanyDetailsProvider] Error processing company details:', err);
       setError(err.message || 'Failed to process company details');
     } finally {
       setLoading(false);

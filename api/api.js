@@ -3,7 +3,8 @@ import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetail
 
 // OpenRouter API config
 // const OPENROUTER_API_KEY = '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';
-const OPENROUTER_API_KEY = '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';
+// const OPENROUTER_API_KEY = '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';
+const OPENROUTER_API_KEY = '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';
 const OPENROUTER_SITE_URL = process.env.OPENROUTER_SITE_URL || '';
 const OPENROUTER_SITE_NAME = process.env.OPENROUTER_SITE_NAME || '';
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';

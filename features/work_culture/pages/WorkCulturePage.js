@@ -10,6 +10,7 @@ import TeamCollaborationSection from '../components/TeamCollaborationSection';
 import MentalHealthSection from '../components/MentalHealthSection';
 import DiversitySection from '../components/DiversitySection';
 import EmployeeStoriesSection from '../components/EmployeeStoriesSection';
+import { WorkCultureProvider } from '../context/WorkCultureContext';
 
 const { width } = Dimensions.get('window');
 
@@ -45,8 +46,18 @@ const SECTIONS = {
 };
 
 export default function WorkCulturePage({ route }) {
+  console.log('[WorkCulturePage] route.params:', route.params);
+  return (
+    <WorkCultureProvider rawData={route.params?.rawData}>
+      <WorkCultureContent />
+    </WorkCultureProvider>
+  );
+}
+
+function WorkCultureContent() {
   const [activeSection, setActiveSection] = useState(SECTIONS.CULTURE);
   const { workCultureData } = useWorkCulture();
+  console.log('[WorkCultureContent] workCultureData:', workCultureData);
 
   if (!workCultureData) {
     return (

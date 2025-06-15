@@ -3,7 +3,10 @@ import React, { createContext, useContext, useState } from 'react';
 const WorkCultureContext = createContext();
 
 export function WorkCultureProvider({ children, rawData }) {
+  console.log('[WorkCultureProvider] received rawData:', rawData);
   const [workCultureData, setWorkCultureData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Parse the raw API response data
   const parseWorkCultureData = (content) => {
@@ -28,9 +31,21 @@ export function WorkCultureProvider({ children, rawData }) {
   // Initialize data if rawData is provided
   React.useEffect(() => {
     if (rawData?.cultureData?.raw) {
-      const content = rawData.cultureData.raw;
-      parseWorkCultureData(content);
+      try {
+        console.log('[WorkCultureProvider] rawData to parse:', rawData.cultureData.raw);
+        const parsed = parseWorkCultureData(rawData.cultureData.raw);
+        console.log('[WorkCultureProvider] parsed workCultureData:', parsed);
+        setWorkCultureData(parsed);
+      } catch (err) {
+        setError('Failed to parse work culture data');
+        console.error('[WorkCultureProvider] Error parsing work culture data:', err);
+      }
+    } else {
+      setWorkCultureData(null);
+      setError('No work culture data available');
+      console.warn('[WorkCultureProvider] No work culture data available in rawData');
     }
+    setLoading(false);
   }, [rawData]);
 
   const contextValue = {

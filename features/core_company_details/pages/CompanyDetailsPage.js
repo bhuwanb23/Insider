@@ -9,6 +9,7 @@ import LegalDetails from '../components/LegalDetails';
 import Leadership from '../components/Leadership';
 import Timeline from '../components/Timeline';
 import Awards from '../components/Awards';
+import { CoreCompanyDetailsProvider } from '../context/CoreCompanyDetailsContext';
 
 const SECTIONS = {
   BASIC: { title: 'Basic', icon: '🏢' },
@@ -21,33 +22,32 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function CompanyDetailsPage() {
+export default function CompanyDetailsPage({ route }) {
+  console.log('[CompanyDetailsPage] route.params:', route.params);
+  return (
+    <CoreCompanyDetailsProvider rawData={route.params?.rawData}>
+      <CompanyDetailsContent route={route} />
+    </CoreCompanyDetailsProvider>
+  );
+}
+
+function CompanyDetailsContent({ route }) {
   const [activeSection, setActiveSection] = useState(SECTIONS.BASIC);
-  const route = useRoute();
-  const { company, rawData } = route.params;
+  const { company } = route.params;
   const { loading, error, companyData, fetchCompanyData } = useCoreCompanyDetails();
+  console.log('[CompanyDetailsContent] loading:', loading, 'error:', error, 'companyData:', companyData);
 
-  useEffect(() => {
-    // console.log('CompanyDetailsPage mounted with company:', company);
+  React.useEffect(() => {
     if (company && !companyData) {
-      // console.log('Processing company data for:', company);
-      if (rawData?.coreData?.raw) {
-
-        fetchCompanyData(company, rawData.coreData.raw);
+      if (route.params?.rawData?.coreData?.raw) {
+        fetchCompanyData(company, route.params.rawData.coreData.raw);
       } else {
         console.error('No core data available in navigation params');
       }
     }
   }, [company]);
 
-  useEffect(() => {
-    // console.log('CompanyData updated:', companyData);
-  }, [companyData]);
-
   const renderContent = () => {
-    // console.log('Rendering content with activeSection:', activeSection.title);
-    // console.log('Current companyData:', companyData);
-
     if (loading) {
       return (
         <View style={styles.centerContainer}>
@@ -102,8 +102,8 @@ export default function CompanyDetailsPage() {
       </View>
 
       <View style={styles.tabsWrapper}>
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           style={styles.tabsContainer}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}

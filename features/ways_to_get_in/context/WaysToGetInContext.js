@@ -34,9 +34,10 @@ export const useWaysToGetIn = () => {
   return context;
 };
 
-export const WaysToGetInProvider = ({ children, rawData }) => {
+export function WaysToGetInProvider({ children, rawData }) {
+  console.log('[WaysToGetInProvider] received rawData:', rawData);
   const [waysData, setWaysData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const validateData = (data) => {
@@ -59,25 +60,23 @@ export const WaysToGetInProvider = ({ children, rawData }) => {
     return true;
   };
 
-  // Effect to process raw data when it changes
   React.useEffect(() => {
-    if (rawData?.waysData) {
-      setLoading(true);
-      setError(null);
-      
+    if (rawData?.waysData?.raw) {
       try {
-        const parsedData = parseWaysToGetInData(rawData.waysData.raw);
-        if (validateData(parsedData)) {
-          setWaysData(parsedData);
-        }
-      } catch (error) {
-        console.error('Error processing ways to get in data:', error);
-        setError('Failed to process ways to get in data');
-        setWaysData(null);
-      } finally {
-        setLoading(false);
+        console.log('[WaysToGetInProvider] rawData to parse:', rawData.waysData.raw);
+        const parsed = parseWaysToGetInData(rawData.waysData.raw);
+        console.log('[WaysToGetInProvider] parsed waysData:', parsed);
+        setWaysData(parsed);
+      } catch (err) {
+        setError('Failed to parse ways to get in data');
+        console.error('[WaysToGetInProvider] Error parsing ways to get in data:', err);
       }
+    } else {
+      setWaysData(null);
+      setError('No ways to get in data available');
+      console.warn('[WaysToGetInProvider] No ways to get in data available in rawData');
     }
+    setLoading(false);
   }, [rawData]);
 
   const updateWaysData = (newRawContent) => {
@@ -116,4 +115,4 @@ export const WaysToGetInProvider = ({ children, rawData }) => {
       {children}
     </WaysToGetInContext.Provider>
   );
-};
+}

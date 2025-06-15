@@ -32,6 +32,7 @@ function parseJobHiringData(rawData) {
 }
 
 export function JobHiringProvider({ children, rawData }) {
+  console.log('[JobHiringProvider] received rawData:', rawData);
   const [jobHiringData, setJobHiringData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,11 +40,14 @@ export function JobHiringProvider({ children, rawData }) {
   React.useEffect(() => {
     if (rawData) {
       try {
+        console.log('[JobHiringProvider] rawData to parse:', rawData.jobHiringData?.raw);
         const parsedData = parseJobHiringData(rawData);
+        console.log('[JobHiringProvider] parsed jobHiringData:', parsedData);
         setJobHiringData(parsedData);
         setError(null);
       } catch (err) {
         setError(err.message);
+        console.error('[JobHiringProvider] Error parsing job hiring data:', err);
       } finally {
         setLoading(false);
       }

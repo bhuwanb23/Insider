@@ -175,8 +175,9 @@ const SECTIONS = {
 };
 
 export default function TechStackPage({ route }) {
+  console.log('[TechStackPage] route.params:', route.params);
   return (
-    <TechStackProvider rawData={route.params.rawData}>
+    <TechStackProvider rawData={route.params?.rawData}>
       <TechStackPageContent />
     </TechStackProvider>
   );
@@ -184,6 +185,7 @@ export default function TechStackPage({ route }) {
 
 function TechStackPageContent() {
   const { techStack } = useTechStack();
+  console.log('[TechStackPageContent] techStack:', techStack);
   const sections = Object.entries(techStack).reduce((acc, [key, value]) => {
     acc[key.toUpperCase()] = {
       title: value.title,
