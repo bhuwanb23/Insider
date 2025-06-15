@@ -24,6 +24,8 @@ const { width } = Dimensions.get('window');
 
 export default function JobHiringsPage({ navigation, route }) {
   console.log('[JobHiringsPage] route.params:', route.params);
+  console.log('[JobHiringsPage] rawData received:', route.params?.rawData);
+  console.log('[JobHiringsPage] jobHiringData:', route.params?.rawData?.jobHiringData);
   const [activeSection, setActiveSection] = useState(SECTIONS.ROLES);
   const rawData = route.params?.rawData;
 

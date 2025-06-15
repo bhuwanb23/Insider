@@ -25,6 +25,8 @@ const { width } = Dimensions.get('window');
 
 export default function WaysToGetInPage({ route }) {
   console.log('[WaysToGetInPage] route.params:', route.params);
+  console.log('[WaysToGetInPage] rawData received:', route.params?.rawData);
+  console.log('[WaysToGetInPage] waysData:', route.params?.rawData?.waysData);
   return (
     <WaysToGetInProvider rawData={route.params?.rawData}>
       <WaysToGetInContent route={route} />

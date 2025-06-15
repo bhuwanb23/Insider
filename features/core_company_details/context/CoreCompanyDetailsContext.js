@@ -43,6 +43,7 @@ export function useCoreCompanyDetails() {
 
 export function CoreCompanyDetailsProvider({ children, rawData }) {
   console.log('[CoreCompanyDetailsProvider] received rawData:', rawData);
+  console.log('[CoreCompanyDetailsProvider] coreData:', rawData?.coreData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [companyData, setCompanyData] = useState(null);

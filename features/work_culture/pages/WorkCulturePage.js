@@ -47,6 +47,8 @@ const SECTIONS = {
 
 export default function WorkCulturePage({ route }) {
   console.log('[WorkCulturePage] route.params:', route.params);
+  console.log('[WorkCulturePage] rawData received:', route.params?.rawData);
+  console.log('[WorkCulturePage] cultureData:', route.params?.rawData?.cultureData);
   return (
     <WorkCultureProvider rawData={route.params?.rawData}>
       <WorkCultureContent />

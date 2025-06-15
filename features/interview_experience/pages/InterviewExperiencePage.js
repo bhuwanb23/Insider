@@ -24,6 +24,8 @@ const { width } = Dimensions.get('window');
 
 export default function InterviewExperiencePage({ route }) {
   console.log('[InterviewExperiencePage] route.params:', route.params);
+  console.log('[InterviewExperiencePage] rawData received:', route.params?.rawData);
+  console.log('[InterviewExperiencePage] interviewData:', route.params?.rawData?.interviewData);
   return (
     <InterviewProvider rawData={route.params?.rawData}>
       <InterviewContent />

@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 16,
+    // paddingTop: 16,
     paddingBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
@@ -107,9 +107,10 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: '#333',
+    letterSpacing: 0.3,
   },
   content: {
     flex: 1,

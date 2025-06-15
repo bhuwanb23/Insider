@@ -1,212 +1,246 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import React from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Animatable from 'react-native-animatable';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
 export default function LandingHero({ onGetStarted }) {
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
-        style={[StyleSheet.absoluteFill, styles.gradient]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
-      <Animatable.View 
-        animation="fadeIn" 
-        duration={1500} 
-        style={styles.heroContainer}
-      >
-        <Animatable.View
-          animation="zoomIn"
-          duration={1000}
-          style={styles.logoContainer}
+    <ScrollView 
+      style={styles.scrollView}
+      showsVerticalScrollIndicator={false}
+      bounces={false}
+    >
+      <View style={styles.container}>
+        <LinearGradient
+          colors={['#4158D0', '#C850C0', '#FFCC70']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradient}
         >
-          <View style={styles.logo}>
-            <LinearGradient
-              colors={['#0984e3', '#00b894']}
-              style={StyleSheet.absoluteFill}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            />
-          </View>
-        </Animatable.View>
-        
-        <Animatable.Text 
-          animation="slideInDown" 
-          duration={1000} 
-          style={styles.title}
-        >
-          Company Analysis Hub
-        </Animatable.Text>
-        
-        <Animatable.Text 
-          animation="fadeIn" 
-          delay={500} 
-          style={styles.subtitle}
-        >
-          Your Gateway to Professional Success
-        </Animatable.Text>
-
-        <Animatable.View 
-          animation="fadeInUp" 
-          delay={1000} 
-          style={styles.buttonContainer}
-        >
-          <TouchableOpacity onPress={onGetStarted}>
-            <LinearGradient
-              colors={['#0984e3', '#00b894']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.button}
+          <Animatable.View 
+            animation="fadeIn" 
+            duration={1000} 
+            style={styles.content}
+          >
+            <Animatable.Text 
+              animation="fadeInDown" 
+              delay={300}
+              style={styles.title}
             >
-              <Text style={styles.buttonText}>Get Started</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </Animatable.View>
-
-        <Animatable.View
-          animation="fadeIn"
-          delay={1500}
-          style={styles.statsContainer}
-        >
-          {[
-            { number: '1000+', label: 'Companies' },
-            { number: '50K+', label: 'Users' },
-            { number: '95%', label: 'Success Rate' }
-          ].map((stat, index) => (
-            <Animatable.View
-              key={index}
-              animation="zoomIn"
-              delay={1500 + (index * 200)}
-              style={styles.statItem}
+              Insider
+            </Animatable.Text>
+            
+            <Animatable.Text 
+              animation="fadeInUp" 
+              delay={500}
+              style={styles.subtitle}
             >
-              <Text style={styles.statNumber}>{stat.number}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+              Your Gateway to Company Insights
+            </Animatable.Text>
+
+            <Animatable.View 
+              animation="fadeInUp" 
+              delay={700}
+              style={styles.featuresContainer}
+            >
+              <Animatable.View 
+                animation="pulse" 
+                easing="ease-out" 
+                iterationCount="infinite" 
+                style={styles.featureItem}
+              >
+                <MaterialCommunityIcons name="chart-line" size={24} color="#fff" />
+                <Text style={styles.featureText}>Real-time Insights</Text>
+              </Animatable.View>
+
+              <Animatable.View 
+                animation="pulse" 
+                easing="ease-out" 
+                iterationCount="infinite" 
+                delay={200}
+                style={styles.featureItem}
+              >
+                <MaterialCommunityIcons name="briefcase-search" size={24} color="#fff" />
+                <Text style={styles.featureText}>Job Opportunities</Text>
+              </Animatable.View>
+
+              <Animatable.View 
+                animation="pulse" 
+                easing="ease-out" 
+                iterationCount="infinite" 
+                delay={400}
+                style={styles.featureItem}
+              >
+                <MaterialCommunityIcons name="account-group" size={24} color="#fff" />
+                <Text style={styles.featureText}>Company Culture</Text>
+              </Animatable.View>
+
+              <Animatable.View 
+                animation="pulse" 
+                easing="ease-out" 
+                iterationCount="infinite" 
+                delay={600}
+                style={styles.featureItem}
+              >
+                <MaterialCommunityIcons name="trending-up" size={24} color="#fff" />
+                <Text style={styles.featureText}>Market Analysis</Text>
+              </Animatable.View>
+
+              <Animatable.View 
+                animation="pulse" 
+                easing="ease-out" 
+                iterationCount="infinite" 
+                delay={800}
+                style={styles.featureItem}
+              >
+                <MaterialCommunityIcons name="chart-bubble" size={24} color="#fff" />
+                <Text style={styles.featureText}>Industry Trends</Text>
+              </Animatable.View>
+
+              <Animatable.View 
+                animation="pulse" 
+                easing="ease-out" 
+                iterationCount="infinite" 
+                delay={1000}
+                style={styles.featureItem}
+              >
+                <MaterialCommunityIcons name="lightbulb-on" size={24} color="#fff" />
+                <Text style={styles.featureText}>Smart Recommendations</Text>
+              </Animatable.View>
             </Animatable.View>
-          ))}
-        </Animatable.View>
-      </Animatable.View>
-    </View>
+
+            <Animatable.View 
+              animation="fadeInUp" 
+              delay={900}
+              style={styles.buttonContainer}
+            >
+              <TouchableOpacity 
+                style={styles.button}
+                onPress={onGetStarted}
+              >
+                <LinearGradient
+                  colors={['#4158D0', '#C850C0']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.buttonGradient}
+                >
+                  <Text style={styles.buttonText}>Get Started</Text>
+                  <MaterialCommunityIcons name="arrow-right" size={24} color="#fff" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animatable.View>
+
+            <Animatable.View
+              animation="fadeInUp"
+              delay={1100}
+              style={styles.scrollIndicator}
+            >
+              <MaterialCommunityIcons name="chevron-down" size={32} color="#fff" />
+              <Text style={styles.scrollText}>Scroll to explore more</Text>
+            </Animatable.View>
+          </Animatable.View>
+        </LinearGradient>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   container: {
-    height: height * 0.9,
-    overflow: 'hidden',
-    position: 'relative',
-    zIndex: 2,
-    backgroundColor: 'transparent',
+    width: '100%',
+    height: height,
   },
   gradient: {
-    opacity: 0.9,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
-    margin: 10,
-  },
-  heroContainer: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
+    width: '100%',
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
-    paddingHorizontal: 20,
-    position: 'relative',
-    zIndex: 3,
-  },
-  logoContainer: {
-    marginBottom: 30,
-    backgroundColor: 'transparent',
-    zIndex: 3,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    overflow: 'hidden',
+    justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 36,
+    fontSize: 48,
     fontWeight: 'bold',
-    color: '#2d3436',
+    color: '#fff',
     textAlign: 'center',
-    marginBottom: 15,
-    backgroundColor: 'transparent',
-    textShadowColor: 'rgba(255,255,255,0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    marginBottom: 16,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#636e72',
+    fontSize: 20,
+    color: '#fff',
     textAlign: 'center',
-    marginBottom: 30,
-    width: '80%',
-    backgroundColor: 'transparent',
-    textShadowColor: 'rgba(255,255,255,0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    marginBottom: 40,
+    opacity: 0.9,
+  },
+  featuresContainer: {
+    width: '100%',
+    marginBottom: 40,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    backdropFilter: 'blur(10px)',
+  },
+  featureText: {
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 12,
+    fontWeight: '500',
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 15,
-    backgroundColor: 'transparent',
+    width: '100%',
+    paddingHorizontal: 20,
     marginBottom: 40,
-    zIndex: 3,
   },
   button: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    elevation: 3,
+    width: '100%',
+    height: 56,
+    borderRadius: 28,
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  buttonGradient: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: 320,
-    marginTop: 20,
-    zIndex: 3,
-  },
-  statItem: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    padding: width < 380 ? 10 : 15,
-    borderRadius: 12,
-    width: width < 380 ? width * 0.27 : width * 0.25,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  statNumber: {
-    fontSize: width < 380 ? 18 : 22,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#0984e3',
-    marginBottom: 4,
+    marginRight: 8,
   },
-  statLabel: {
-    fontSize: width < 380 ? 12 : 14,
-    color: '#636e72',
-    textAlign: 'center',
+  scrollIndicator: {
+    position: 'absolute',
+    bottom: 40,
+    alignItems: 'center',
+    opacity: 0.8,
+  },
+  scrollText: {
+    color: '#fff',
+    fontSize: 14,
+    marginTop: 8,
+    opacity: 0.8,
   },
 });

@@ -176,6 +176,8 @@ const SECTIONS = {
 
 export default function TechStackPage({ route }) {
   console.log('[TechStackPage] route.params:', route.params);
+  console.log('[TechStackPage] rawData received:', route.params?.rawData);
+  console.log('[TechStackPage] techStackData:', route.params?.rawData?.techStackData);
   return (
     <TechStackProvider rawData={route.params?.rawData}>
       <TechStackPageContent />

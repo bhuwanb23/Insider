@@ -17,6 +17,8 @@ const SECTIONS = {
 
 export default function NewsHighlightsPage({ route }) {
   console.log('[NewsHighlightsPage] route.params:', route.params);
+  console.log('[NewsHighlightsPage] rawData received:', route.params?.rawData);
+  console.log('[NewsHighlightsPage] newsData:', route.params?.rawData?.newsData);
   return (
     <NewsProvider rawData={route.params?.rawData}>
       <NewsHighlightsContent />
@@ -31,12 +33,18 @@ function NewsHighlightsContent() {
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsContainer}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabsContainer}
+        contentContainerStyle={styles.tabsContentContainer}
+      >
         {Object.entries(SECTIONS).map(([key, { title, icon }]) => (
           <TouchableOpacity
             key={key}
             onPress={() => setActiveSection(key)}
             style={[styles.tab, activeSection === key && styles.activeTab]}
+            activeOpacity={0.8}
           >
             <LinearGradient
               colors={activeSection === key ? ['#4158D0', '#C850C0'] : ['#ffffff', '#ffffff']}
@@ -66,21 +74,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   tabsContainer: {
-    flexDirection: 'row',
     height: 44,
-    paddingVertical: 0,
-    paddingHorizontal: 5,
     backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    zIndex: 2,
+  },
+  tabsContentContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 5,
   },
   tab: {
     marginHorizontal: 5,
     borderRadius: 20,
     overflow: 'hidden',
+    height: 36,
+    justifyContent: 'center',
   },
   tabGradient: {
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
+    minHeight: 36,
+    justifyContent: 'center',
   },
   activeTab: {
     elevation: 3,

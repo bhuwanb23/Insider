@@ -2,14 +2,25 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const SUGGESTED_COMPANIES = [
+  'Google', 'Microsoft', 'Amazon', 'Meta', 'Apple',
+  'Netflix', 'Twitter', 'LinkedIn', 'Uber', 'Airbnb'
+];
 
 export default function SearchCompany({ onSearch }) {
   const [company, setCompany] = useState('');
 
   const handleSearch = () => {
-    if (company.trim()) {
-      onSearch && onSearch(company.trim());
+    if (company?.trim()) {
+      onSearch(company.trim());
     }
+  };
+
+  const handleSuggestionPress = (suggestedCompany) => {
+    setCompany(suggestedCompany);
+    onSearch(suggestedCompany);
   };
 
   return (
@@ -26,18 +37,22 @@ export default function SearchCompany({ onSearch }) {
       >
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <Animatable.Text animation="fadeInDown" style={styles.header}>
-            <Text style={styles.logo}>🔍</Text> Company Search
+            <Text style={styles.logo}>🔍</Text> Search
           </Animatable.Text>
           <Animatable.View animation="fadeInUp" delay={200} style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Type company name..."
-              value={company}
-              onChangeText={setCompany}
-              returnKeyType="search"
-              onSubmitEditing={handleSearch}
-              autoFocus
-            />
+            <View style={styles.searchContainer}>
+              <MaterialCommunityIcons name="magnify" size={24} style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search for a company..."
+                value={company}
+                onChangeText={setCompany}
+                onSubmitEditing={handleSearch}
+                returnKeyType="search"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
             <TouchableOpacity style={styles.button} onPress={handleSearch}>
               <Text style={styles.buttonText}>Search</Text>
             </TouchableOpacity>
@@ -45,6 +60,27 @@ export default function SearchCompany({ onSearch }) {
           <Animatable.Text animation="fadeIn" delay={600} style={styles.tip}>
             Enter a company name to explore insights, jobs, and more!
           </Animatable.Text>
+
+          <View style={styles.suggestionsContainer}>
+            <Text style={styles.suggestionsTitle}>Popular Companies</Text>
+            <View style={styles.suggestionsGrid}>
+              {SUGGESTED_COMPANIES.map((suggestedCompany, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.suggestionCard}
+                  onPress={() => handleSuggestionPress(suggestedCompany)}
+                >
+                  <MaterialCommunityIcons 
+                    name="office-building" 
+                    size={20} 
+                    color="#4158D0" 
+                    style={styles.companyIcon}
+                  />
+                  <Text style={styles.suggestionText}>{suggestedCompany}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -87,15 +123,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  input: {
-    width: '100%',
-    fontSize: 18,
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#dfe6e9',
-    marginBottom: 16,
-    backgroundColor: '#f8f9fa',
+  searchContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 12,
+    paddingVertical: 8,
+  },
+  searchIcon: {
+    color: '#4158D0',
   },
   button: {
     backgroundColor: '#0984e3',
@@ -122,5 +171,49 @@ const styles = StyleSheet.create({
     marginTop: 12,
     textAlign: 'center',
     opacity: 0.85,
+  },
+  container: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  suggestionsContainer: {
+    marginTop: 16,
+  },
+  suggestionsTitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+    fontWeight: '600',
+  },
+  suggestionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  suggestionCard: {
+    width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(65, 88, 208, 0.1)',
+  },
+  companyIcon: {
+    marginRight: 8,
+  },
+  suggestionText: {
+    color: '#333',
+    fontSize: 14,
+    fontWeight: '500',
+    flex: 1,
   },
 }); 

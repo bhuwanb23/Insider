@@ -44,23 +44,19 @@ export default function SearchPage({ navigation, onBack }) {
     setLoading(true);
     setError(null);
     setAllData(null);
-    // Optionally clear context data if needed
-    // clearWaysData();
-    // clearCoreData();
+
     try {
       console.log('Starting sequential API calls for company:', company);
       const results = {};
       let anySuccess = false;
-      // Helper to try API call and store both parsed and raw
+
       const tryApi = async (fn, label) => {
         try {
           const res = await fn(company);
-          // For all data types, ensure raw is a stringified JSON
           results[label] = { parsed: res, raw: JSON.stringify(res) };
           anySuccess = true;
           console.log(`[SearchPage] ${label} data received:`, res);
         } catch (err) {
-          // If error has a cleaned response, store it as raw
           if (err.cleanedResponse) {
             results[label] = { parsed: null, raw: err.cleanedResponse };
           } else {
@@ -69,6 +65,7 @@ export default function SearchPage({ navigation, onBack }) {
           console.error(`[SearchPage] ${label} failed:`, err.message);
         }
       };
+
       await tryApi(getCoreCompanyDetails, 'coreData');
       await tryApi(getCompanyWaysToGetIn, 'waysData');
       await tryApi(getCompanyCulture, 'cultureData');
@@ -76,18 +73,17 @@ export default function SearchPage({ navigation, onBack }) {
       await tryApi(getCompanyJobHiringInsights, 'jobHiringData');
       await tryApi(getCompanyNewsHighlights, 'newsData');
       await tryApi(getCompanyTechStack, 'techStackData');
-      console.log('[SearchPage] allData before setAllData:', results);
+
       setAllData(results);
       setLoading(false);
       if (!anySuccess) {
-        setError('Failed to fetch any company data. Please try again.');
+        setError('Some data might be unavailable, but you can still explore available topics.');
       } else {
         setError(null);
-        console.log('[SearchPage] All API calls attempted, some data may be unparsed.');
       }
     } catch (err) {
       setLoading(false);
-      setError('Failed to fetch company data. Please try again.');
+      setError('Some data might be unavailable, but you can still explore available topics.');
       console.error('[SearchPage] Error during company data fetch:', err);
     }
   };
@@ -205,12 +201,12 @@ export default function SearchPage({ navigation, onBack }) {
     setSearchedCompany(null);
   };
 
-  // Show company topics list if we have all data
-  if (searchedCompany && allData && !loading && !error) {
+  // Show company topics list if we have a company name, regardless of data or error
+  if (searchedCompany && !loading) {
     return (
       <CompanyTopicsList 
         company={searchedCompany}
-        companyData={allData.coreData}
+        companyData={allData?.coreData}
         allData={allData}
       />
     );
@@ -260,8 +256,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    // paddingTop: 24,
-    paddingBottom: 16,
+    paddingTop: 12,
+    paddingBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 0,
@@ -275,13 +271,13 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     position: 'relative',
-    // paddingBottom: 80,
+    paddingTop: 16,
     backgroundColor: 'transparent',
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(65, 88, 208, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -330,17 +326,17 @@ const styles = StyleSheet.create({
     color: '#ff4d6d',
     textAlign: 'center',
     marginBottom: 12,
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     letterSpacing: 0.2,
   },
   retryButton: {
-    backgroundColor: 'linear-gradient(90deg, #4158D0 0%, #C850C0 100%)',
-    paddingHorizontal: 28,
+    backgroundColor: '#4158D0',
+    paddingHorizontal: 24,
     paddingVertical: 10,
-    borderRadius: 24,
+    borderRadius: 20,
     marginTop: 6,
-    shadowColor: '#C850C0',
+    shadowColor: '#4158D0',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.14,
     shadowRadius: 8,
@@ -348,8 +344,8 @@ const styles = StyleSheet.create({
   },
   retryText: {
     color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '600',
     letterSpacing: 0.3,
   },
 });
