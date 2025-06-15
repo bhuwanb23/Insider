@@ -21,6 +21,10 @@ const parseInterviewData = (content) => {
     const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
     let jsonStr = jsonMatch ? jsonMatch[1] : content;
     jsonStr = jsonStr.trim();
+
+    // TEMPORARY: Fix common JSON issues (single quote at end of value)
+    jsonStr = jsonStr.replace(/"([^"]+)":\s*"([^"]*)'([^"]*)"/g, '"$1": "$2$3"');
+
     if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
         (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
       jsonStr = jsonStr.slice(1, -1);

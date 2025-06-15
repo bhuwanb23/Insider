@@ -6,7 +6,7 @@ function parseNewsResponse(content) {
     if (typeof content === 'object' && content !== null) {
       return content;
     }
-    // Try to find JSON between triple backticks
+    // Remove triple backticks if present
     const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
     let jsonStr = match ? match[1] : content;
     jsonStr = jsonStr.trim();

@@ -13,6 +13,9 @@ const SENTIMENT_COLORS = {
 
 export default function SocialSentiment() {
   const { newsData } = useNews();
+
+  if (!newsData || !newsData.socialSentiment) return null;
+
   const { overall, sources, trends } = newsData.socialSentiment;
 
   const renderSentimentBar = (data, showLabels = true) => {

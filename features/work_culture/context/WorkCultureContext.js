@@ -19,6 +19,8 @@ export function WorkCultureProvider({ children, rawData }) {
       const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
       let jsonStr = match ? match[1] : content;
       jsonStr = jsonStr.trim();
+      // Remove bad control characters (e.g., tabs)
+      jsonStr = jsonStr.replace(/[\u0000-\u001F\u007F\u2028\u2029]/g, ' ');
       if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
           (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
         jsonStr = jsonStr.slice(1, -1);

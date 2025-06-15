@@ -6,6 +6,8 @@ import { useNews } from '../context/NewsContext';
 export default function TopHeadlines() {
   const { newsData } = useNews();
 
+  if (!newsData || !Array.isArray(newsData.headlines)) return null;
+
   const handleReadMore = (url) => {
     Linking.openURL(url);
   };

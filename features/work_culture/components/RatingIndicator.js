@@ -3,10 +3,14 @@ import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function RatingIndicator({ score, label, size = 'medium', showText = true }) {
+  // Always coerce score to a number
+  const safeScore = typeof score === 'number' ? score : Number(score);
+  const displayScore = !isNaN(safeScore) ? safeScore.toFixed(1) : 'N/A';
+
   const getStars = () => {
     const stars = [];
-    const fullStars = Math.floor(score);
-    const hasHalfStar = score % 1 >= 0.5;
+    const fullStars = Math.floor(safeScore);
+    const hasHalfStar = safeScore % 1 >= 0.5;
 
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
@@ -21,8 +25,8 @@ export default function RatingIndicator({ score, label, size = 'medium', showTex
   };
 
   const getStatusColor = () => {
-    if (score >= 4) return '#4CAF50';
-    if (score >= 3) return '#FFC107';
+    if (safeScore >= 4) return '#4CAF50';
+    if (safeScore >= 3) return '#FFC107';
     return '#F44336';
   };
 
@@ -44,7 +48,7 @@ export default function RatingIndicator({ score, label, size = 'medium', showTex
       {showText && (
         <View style={styles.textContainer}>
           <Text style={[styles.score, { color: getStatusColor() }]}>
-            {score.toFixed(1)}
+            {displayScore}
           </Text>
           {label && <Text style={styles.label}>{label}</Text>}
         </View>

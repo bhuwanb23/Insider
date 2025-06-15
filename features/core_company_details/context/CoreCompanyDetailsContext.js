@@ -21,6 +21,10 @@ const parseCoreCompanyDetails = (rawResponse) => {
       }
       // Remove any leading/trailing whitespace
       jsonStr = jsonStr.trim();
+      // Remove bad control characters (e.g., tabs)
+      jsonStr = jsonStr.replace(/[\u0000-\u001F\u007F\u2028\u2029]/g, ' ');
+      // Fix common unterminated quote in URLs (e.g., ...azure/)") to ...azure/")")
+      jsonStr = jsonStr.replace(/(https?:[^"\s]+)\)/g, '$1")');
       // Remove leading/trailing quotes if present
       if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
           (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {

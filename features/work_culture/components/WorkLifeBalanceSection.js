@@ -4,11 +4,21 @@ import RatingIndicator from './RatingIndicator';
 import Badge from '../../tech_stack/components/Badge';
 
 export default function WorkLifeBalanceSection({ data }) {
+  // Helper to extract numeric score from strings like '4.2/5'
+  const parseScore = (val) => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const match = val.match(/([\d.]+)/);
+      return match ? parseFloat(match[1]) : NaN;
+    }
+    return NaN;
+  };
+
   return (
     <View style={styles.sectionContent}>
       <View style={styles.ratingContainer}>
         <RatingIndicator
-          score={data.rating}
+          score={parseScore(data.rating)}
           label="Overall Rating"
           size="large"
         />
@@ -21,7 +31,7 @@ export default function WorkLifeBalanceSection({ data }) {
         {data.metrics.map((metric, index) => (
           <View key={index} style={styles.metricItem}>
             <Text style={styles.metricLabel}>{metric.category}</Text>
-            <RatingIndicator score={metric.score} showText={false} size="small" />
+            <RatingIndicator score={parseScore(metric.score)} showText={false} size="small" />
             <Badge label={metric.status} variant={metric.status === 'great' ? 'success' : 'primary'} />
           </View>
         ))}

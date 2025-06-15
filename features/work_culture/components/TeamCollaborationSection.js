@@ -3,11 +3,21 @@ import { View, Text, StyleSheet } from 'react-native';
 import RatingIndicator from './RatingIndicator';
 
 export default function TeamCollaborationSection({ data }) {
+  // Helper to extract numeric score from strings like '4.8/5'
+  const parseScore = (val) => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const match = val.match(/([\d.]+)/);
+      return match ? parseFloat(match[1]) : NaN;
+    }
+    return NaN;
+  };
+
   return (
     <View style={styles.sectionContent}>
       <View style={styles.scoreContainer}>
         <Text style={styles.subheading}>Team Spirit Score</Text>
-        <RatingIndicator score={data.overallScore} size="large" />
+        <RatingIndicator score={parseScore(data.overallScore)} size="large" />
       </View>
 
       <View style={styles.activitiesContainer}>

@@ -6,6 +6,8 @@ import { useNews } from '../context/NewsContext';
 export default function StudentImpact() {
   const { newsData } = useNews();
 
+  if (!newsData || !Array.isArray(newsData.studentImpact)) return null;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
