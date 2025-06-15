@@ -53,7 +53,10 @@ export default function SearchPage({ navigation, onBack }) {
       const tryApi = async (fn, label) => {
         try {
           const res = await fn(company);
-          results[label] = { parsed: res, raw: JSON.stringify(res) };
+          results[label] = { 
+            parsed: res, 
+            raw: typeof res === 'string' ? res : JSON.stringify(res) 
+          };
           anySuccess = true;
           console.log(`[SearchPage] ${label} data received:`, res);
         } catch (err) {
@@ -74,6 +77,7 @@ export default function SearchPage({ navigation, onBack }) {
       await tryApi(getCompanyNewsHighlights, 'newsData');
       await tryApi(getCompanyTechStack, 'techStackData');
 
+      console.log('[SearchPage] All data after API calls:', results);
       setAllData(results);
       setLoading(false);
       if (!anySuccess) {
@@ -96,7 +100,7 @@ export default function SearchPage({ navigation, onBack }) {
       switch (topicKey) {
         case 'waysin':
           console.log('[SearchPage] allData.waysData:', allData?.waysData);
-          if (!allData?.waysData) {
+          if (!allData?.waysData || !allData.waysData.raw) {
             console.warn('[SearchPage] No waysData found in allData, not navigating.');
             return;
           }
@@ -110,12 +114,8 @@ export default function SearchPage({ navigation, onBack }) {
         case 'core':
           const coreRaw = allData?.coreData?.raw || allData?.coreData?.parsed;
           console.log('[SearchPage] allData.coreData:', allData?.coreData);
-          if (!allData?.coreData) {
+          if (!allData?.coreData || !coreRaw) {
             console.warn('[SearchPage] No coreData found in allData, not navigating.');
-            return;
-          }
-          if (!coreRaw) {
-            console.error('[SearchPage] No core data available in navigation params');
             return;
           }
           console.log('[SearchPage] Navigating to CompanyDetails with rawData:', { coreData: { raw: coreRaw } });
@@ -126,11 +126,14 @@ export default function SearchPage({ navigation, onBack }) {
           break;
         case 'jobs':
           console.log('[SearchPage] allData.jobHiringData:', allData?.jobHiringData);
-          if (!allData?.jobHiringData) {
+          if (!allData?.jobHiringData || !allData.jobHiringData.raw) {
             console.warn('[SearchPage] No jobHiringData found in allData, not navigating.');
             return;
           }
-          console.log('[SearchPage] Navigating to JobHirings with rawData:', { jobHiringData: allData.jobHiringData });
+          console.log('[SearchPage] Navigating to JobHirings with:', {
+            company: searchedCompany,
+            rawData: { jobHiringData: allData.jobHiringData }
+          });
           navigation.navigate('JobHirings', { 
             company: searchedCompany,
             rawData: { jobHiringData: allData.jobHiringData }
@@ -138,7 +141,7 @@ export default function SearchPage({ navigation, onBack }) {
           break;
         case 'interview':
           console.log('[SearchPage] allData.interviewData:', allData?.interviewData);
-          if (!allData?.interviewData) {
+          if (!allData?.interviewData || !allData.interviewData.raw) {
             console.warn('[SearchPage] No interviewData found in allData, not navigating.');
             return;
           }
@@ -150,7 +153,7 @@ export default function SearchPage({ navigation, onBack }) {
           break;
         case 'culture':
           console.log('[SearchPage] allData.cultureData:', allData?.cultureData);
-          if (!allData?.cultureData) {
+          if (!allData?.cultureData || !allData.cultureData.raw) {
             console.warn('[SearchPage] No cultureData found in allData, not navigating.');
             return;
           }
@@ -162,7 +165,7 @@ export default function SearchPage({ navigation, onBack }) {
           break;
         case 'techstack':
           console.log('[SearchPage] allData.techStackData:', allData?.techStackData);
-          if (!allData?.techStackData) {
+          if (!allData?.techStackData || !allData.techStackData.raw) {
             console.warn('[SearchPage] No techStackData found in allData, not navigating.');
             return;
           }
@@ -174,7 +177,7 @@ export default function SearchPage({ navigation, onBack }) {
           break;
         case 'insights':
           console.log('[SearchPage] allData.newsData:', allData?.newsData);
-          if (!allData?.newsData) {
+          if (!allData?.newsData || !allData.newsData.raw) {
             console.warn('[SearchPage] No newsData found in allData, not navigating.');
             return;
           }

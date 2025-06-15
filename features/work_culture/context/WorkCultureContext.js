@@ -11,19 +11,25 @@ export function WorkCultureProvider({ children, rawData }) {
   // Parse the raw API response data
   const parseWorkCultureData = (content) => {
     try {
-      // Extract JSON from between triple backticks
-      const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
-      if (jsonMatch) {
-        const jsonStr = jsonMatch[1];
-        const parsedData = JSON.parse(jsonStr);
-        console.log('Successfully parsed work culture data');
-        setWorkCultureData(parsedData);
-        return parsedData;
+      if (typeof content === 'object' && content !== null) {
+        setWorkCultureData(content);
+        return content;
       }
-      console.log('No JSON content found in the expected format');
-      throw new Error('No JSON content found in the expected format');
+      // Extract JSON from between triple backticks if present
+      const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+      let jsonStr = match ? match[1] : content;
+      jsonStr = jsonStr.trim();
+      if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
+          (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
+        jsonStr = jsonStr.slice(1, -1);
+      }
+      const parsedData = JSON.parse(jsonStr);
+      setWorkCultureData(parsedData);
+      return parsedData;
     } catch (error) {
-      console.error('Error parsing work culture data:', error);
+      console.error('Error parsing work culture data:', error, content);
+      setWorkCultureData(null);
+      setError('Failed to parse work culture data');
       return null;
     }
   };
@@ -33,11 +39,10 @@ export function WorkCultureProvider({ children, rawData }) {
     if (rawData?.cultureData?.raw) {
       try {
         console.log('[WorkCultureProvider] rawData to parse:', rawData.cultureData.raw);
-        const parsed = parseWorkCultureData(rawData.cultureData.raw);
-        console.log('[WorkCultureProvider] parsed workCultureData:', parsed);
-        setWorkCultureData(parsed);
+        parseWorkCultureData(rawData.cultureData.raw);
       } catch (err) {
         setError('Failed to parse work culture data');
+        setWorkCultureData(null);
         console.error('[WorkCultureProvider] Error parsing work culture data:', err);
       }
     } else {

@@ -3,16 +3,22 @@ import React, { createContext, useContext, useState } from 'react';
 // Function to parse tech stack data from API response
 const parseTechStackResponse = (content) => {
   try {
+    if (typeof content === 'object' && content !== null) {
+      return content;
+    }
     // Extract JSON from between triple backticks if present
-    const jsonMatch = content.match(/```([\s\S]*?)```/);
-    const jsonStr = jsonMatch ? jsonMatch[1] : content;
-    
-    // Parse the JSON string
+    const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    let jsonStr = match ? match[1] : content;
+    jsonStr = jsonStr.trim();
+    if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
+        (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
+      jsonStr = jsonStr.slice(1, -1);
+    }
     const parsedData = JSON.parse(jsonStr);
     console.log('Successfully parsed tech stack data');
     return parsedData;
   } catch (error) {
-    console.error('Error parsing tech stack data:', error);
+    console.error('Error parsing tech stack data:', error, content);
     return null;
   }
 };
@@ -174,16 +180,20 @@ export const techStackData = {
 
 export function TechStackProvider({ children, rawData }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [techStack, setTechStack] = useState(techStackData);
+  const [techStack, setTechStack] = useState(null);
 
   // Parse and update tech stack data when rawData changes
   React.useEffect(() => {
     if (rawData?.techStackData?.raw) {
-      const content = rawData.techStackData.raw.choices[0].message.content;
+      const content = rawData.techStackData.raw;
       const parsedData = parseTechStackResponse(content);
       if (parsedData) {
         setTechStack(parsedData);
+      } else {
+        setTechStack(null);
       }
+    } else {
+      setTechStack(null);
     }
   }, [rawData]);
 

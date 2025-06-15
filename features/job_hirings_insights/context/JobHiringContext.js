@@ -15,18 +15,24 @@ function parseJobHiringData(rawData) {
     if (!rawData?.jobHiringData?.raw) {
       throw new Error('No job hiring data available');
     }
-
     const content = rawData.jobHiringData.raw;
+    if (typeof content === 'object' && content !== null) {
+      return content;
+    }
     // Extract JSON from between triple backticks if present
-    const jsonMatch = content.match(/```(.*?)```/s);
-    const jsonStr = jsonMatch ? jsonMatch[1] : content;
-
+    const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    let jsonStr = match ? match[1] : content;
+    jsonStr = jsonStr.trim();
+    if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
+        (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
+      jsonStr = jsonStr.slice(1, -1);
+    }
     // Try to parse the JSON string
     const parsedData = JSON.parse(jsonStr);
     console.log('Successfully parsed job hiring data');
     return parsedData;
   } catch (error) {
-    console.error('Error parsing job hiring data:', error);
+    console.error('Error parsing job hiring data:', error, rawData);
     throw new Error('Failed to parse job hiring data');
   }
 }

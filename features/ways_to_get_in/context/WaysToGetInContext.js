@@ -4,22 +4,23 @@ import { getCompanyWaysToGetIn } from '../../../api/api';
 // Function to parse and extract JSON from API response
 const parseWaysToGetInData = (rawData) => {
     try {
-      // If the data is already a parsed object, return it
       if (typeof rawData === 'object' && rawData !== null) {
         console.log('Successfully parsed ways to get in data (already parsed object)');
         return rawData;
       }
-
       // Try to find JSON between triple backticks
-      const match = rawData.match(/```([\s\S]*?)```/);
-      const jsonStr = match ? match[1] : rawData;
-
-      // Parse the JSON string
+      const match = rawData.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+      let jsonStr = match ? match[1] : rawData;
+      jsonStr = jsonStr.trim();
+      if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
+          (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
+        jsonStr = jsonStr.slice(1, -1);
+      }
       const parsedData = JSON.parse(jsonStr);
       console.log('Successfully parsed ways to get in data');
       return parsedData;
     } catch (error) {
-      console.error('Error parsing ways to get in data:', error);
+      console.error('Error parsing ways to get in data:', error, rawData);
       throw new Error('Failed to parse response data');
     }
   };

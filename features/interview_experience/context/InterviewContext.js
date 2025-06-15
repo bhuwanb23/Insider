@@ -14,21 +14,23 @@ export function useInterview() {
 // Function to parse interview data from API response
 const parseInterviewData = (content) => {
   try {
-    // Check if content is already an object
     if (typeof content === 'object' && content !== null) {
       return content;
     }
-    
     // Extract JSON from between triple backticks if present
-    const jsonMatch = content.match(/```(?:json)?\n?([\s\S]*?)\n?```/);
-    const jsonStr = jsonMatch ? jsonMatch[1] : content;
-    
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    let jsonStr = jsonMatch ? jsonMatch[1] : content;
+    jsonStr = jsonStr.trim();
+    if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
+        (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
+      jsonStr = jsonStr.slice(1, -1);
+    }
     // Parse the JSON string
     const parsedData = JSON.parse(jsonStr);
     console.log('Successfully parsed interview data');
     return parsedData;
   } catch (error) {
-    console.error('Error parsing interview data:', error);
+    console.error('Error parsing interview data:', error, content);
     return null;
   }
 };

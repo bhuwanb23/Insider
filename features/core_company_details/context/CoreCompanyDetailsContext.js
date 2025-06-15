@@ -14,10 +14,17 @@ const parseCoreCompanyDetails = (rawResponse) => {
     // If response is a string, try to extract JSON
     let jsonStr = rawResponse;
     if (typeof rawResponse === 'string') {
-      // Try to extract JSON from triple backticks if present
-      const match = rawResponse.match(/```([\s\S]*?)```/);
+      // Remove triple backticks if present
+      const match = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
       if (match && match[1]) {
         jsonStr = match[1];
+      }
+      // Remove any leading/trailing whitespace
+      jsonStr = jsonStr.trim();
+      // Remove leading/trailing quotes if present
+      if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
+          (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
+        jsonStr = jsonStr.slice(1, -1);
       }
     }
 
@@ -26,7 +33,7 @@ const parseCoreCompanyDetails = (rawResponse) => {
     console.log('Successfully parsed core company details');
     return parsedData;
   } catch (err) {
-    console.error('Error parsing core company details:', err);
+    console.error('Error parsing core company details:', err, rawResponse);
     return null;
   }
 };

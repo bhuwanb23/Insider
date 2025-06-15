@@ -104,7 +104,7 @@ const topics = [
   },
 ];
 
-export default function CompanyTopicsList({ company }) {
+export default function CompanyTopicsList({ company, allData }) {
   const navigation = useNavigation();
 
   const handleBackPress = () => {
@@ -114,11 +114,24 @@ export default function CompanyTopicsList({ company }) {
   const handleTopicPress = (topicKey) => {
     const route = TOPIC_ROUTES[topicKey];
     if (route) {
+      // Map topicKey to the correct rawData key
+      const rawDataKeyMap = {
+        core: 'coreData',
+        jobs: 'jobHiringData',
+        interview: 'interviewData',
+        culture: 'cultureData',
+        techstack: 'techStackData',
+        waysin: 'waysData',
+        insights: 'newsData'
+      };
+      const rawDataKey = rawDataKeyMap[topicKey];
+      const rawData = allData && rawDataKey ? { [rawDataKey]: allData[rawDataKey] } : undefined;
+
       navigation.navigate(route.screen, {
         company,
         ...route.params,
-        // Add any additional params needed by the feature
-        timestamp: new Date().getTime() // Ensure unique navigation
+        rawData, // Pass the correct rawData for the topic
+        timestamp: new Date().getTime()
       });
     } else {
       console.warn(`No route found for topic: ${topicKey}`);
