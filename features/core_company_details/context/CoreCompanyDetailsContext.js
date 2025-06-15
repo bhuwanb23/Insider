@@ -52,12 +52,11 @@ export function useCoreCompanyDetails() {
   return context;
 }
 
-export function CoreCompanyDetailsProvider({ children, rawData }) {
-  console.log('[CoreCompanyDetailsProvider] received rawData:', rawData);
-  console.log('[CoreCompanyDetailsProvider] coreData:', rawData?.coreData);
+export function CoreCompanyDetailsProvider({ children, parsedData }) {
+  console.log('[CoreCompanyDetailsProvider] received parsedData:', parsedData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [companyData, setCompanyData] = useState(null);
+  const [companyData, setCompanyData] = useState(parsedData || null);
 
   const clearData = () => {
     console.log('Clearing core company details data');
@@ -65,32 +64,18 @@ export function CoreCompanyDetailsProvider({ children, rawData }) {
     setError(null);
   };
 
-  const fetchCompanyData = async (companyName, apiResponse = null) => {
+  // fetchCompanyData can be used to update companyData if needed, but no parsing here
+  const fetchCompanyData = async (companyName, newParsedData = null) => {
     if (!companyName) return;
-
-    console.log('[CoreCompanyDetailsProvider] Setting core company details for:', companyName);
     setLoading(true);
     setError(null);
-
     try {
-      if (apiResponse) {
-        console.log('[CoreCompanyDetailsProvider] Processing API response for:', companyName, apiResponse);
-        const rawData = apiResponse.raw || apiResponse;
-        console.log('[CoreCompanyDetailsProvider] rawData to parse:', rawData);
-        const parsedData = parseCoreCompanyDetails(rawData);
-        console.log('[CoreCompanyDetailsProvider] parsedData:', parsedData);
-        if (parsedData) {
-          setCompanyData(parsedData);
-          console.log('[CoreCompanyDetailsProvider] set companyData:', parsedData);
-        } else {
-          throw new Error('Failed to parse company details');
-        }
+      if (newParsedData) {
+        setCompanyData(newParsedData);
       } else {
-        console.error('[CoreCompanyDetailsProvider] No API response provided');
-        setError('Failed to fetch company details');
+        setError('No data provided');
       }
     } catch (err) {
-      console.error('[CoreCompanyDetailsProvider] Error processing company details:', err);
       setError(err.message || 'Failed to process company details');
     } finally {
       setLoading(false);

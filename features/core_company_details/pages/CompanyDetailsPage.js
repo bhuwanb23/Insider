@@ -22,10 +22,46 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
+function parseCoreCompanyDetails(rawResponse) {
+  if (!rawResponse) return null;
+  try {
+    if (typeof rawResponse === 'object' && !Array.isArray(rawResponse)) {
+      return rawResponse;
+    }
+    let jsonStr = rawResponse;
+    if (typeof rawResponse === 'string') {
+      // Remove triple backticks if present
+      const match = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+      if (match && match[1]) {
+        jsonStr = match[1];
+      }
+      jsonStr = jsonStr.trim();
+      // Remove bad control characters
+      jsonStr = jsonStr.replace(/[\u0000-\u001F\u007F\u2028\u2029]/g, ' ');
+      // Fix unterminated URLs in 'source' fields (e.g., .../)") to .../")")
+      jsonStr = jsonStr.replace(/("source":\s*"https?:[^"\s]+)\)/g, '$1"');
+      // Remove trailing commas before } or ]
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+      // Remove leading/trailing quotes if present
+      if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
+          (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
+        jsonStr = jsonStr.slice(1, -1);
+      }
+    }
+    return JSON.parse(jsonStr);
+  } catch (err) {
+    console.error('Error parsing core company details:', err, rawResponse);
+    return null;
+  }
+}
+
 export default function CompanyDetailsPage({ route }) {
-  console.log('[CompanyDetailsPage] route.params:', route.params);
+  const rawData = route.params?.rawData;
+  // Parse here!
+  const parsedCoreData = parseCoreCompanyDetails(rawData?.coreData?.raw || rawData?.coreData);
+
   return (
-    <CoreCompanyDetailsProvider rawData={route.params?.rawData}>
+    <CoreCompanyDetailsProvider parsedData={parsedCoreData}>
       <CompanyDetailsContent route={route} />
     </CoreCompanyDetailsProvider>
   );
