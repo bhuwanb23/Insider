@@ -12,11 +12,13 @@ import NewsHighlightsPage from './features/news_highlights/pages/NewsHighlightsP
 import WaysToGetInPage from './features/ways_to_get_in/pages/WaysToGetInPage';
 import TechStackPage from './features/tech_stack/pages/TechStackPage';
 import WorkCulturePage from './features/work_culture/pages/WorkCulturePage';
+import SettingsPage from './pages/Settings';
 import { NewsProvider } from './features/news_highlights/context/NewsContext';
 import { WaysToGetInProvider } from './features/ways_to_get_in/context/WaysToGetInContext';
 import { TechStackProvider } from './features/tech_stack/context/TechStackContext';
 import { WorkCultureProvider } from './features/work_culture/context/WorkCultureContext';
 import { CoreCompanyDetailsProvider } from './features/core_company_details/context/CoreCompanyDetailsContext';
+import SearchPage from './pages/SearchPage';
 
 const Stack = createStackNavigator();
 
@@ -74,6 +76,11 @@ export default function App() {
                       <Stack.Screen 
                         name="Landing" 
                         component={LandingPage}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="Search"
+                        component={SearchPage}
                         options={{ headerShown: false }}
                       />
                       <Stack.Screen
@@ -165,6 +172,14 @@ export default function App() {
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
                           },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="Settings"
+                        component={SettingsPage}
+                        options={{
+                          title: 'Settings',
+                          headerShown: false,
                         }}
                       />
                     </Stack.Navigator>

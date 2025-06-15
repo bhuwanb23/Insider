@@ -1,8 +1,10 @@
 import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetailsPrompt, getCompanyInterviewExperiencePrompt, getCompanyJobHiringInsightsPrompt, getCompanyNewsHighlightsPrompt, getCompanyTechStackPrompt } from './prompts.js';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // OpenRouter API config
-const OPENROUTER_API_KEY = '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';
+export const API_KEY_STORAGE_KEY = 'openrouter_api_key';
+export const API_REQUEST_COUNT_KEY = 'openrouter_api_request_count'; // New storage key for the counter
+const OPENROUTER_API_KEY_FALLBACK = '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'; // Keep your current hardcoded key as a fallback
 
 // const OPENROUTER_API_KEY = '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';
 
@@ -17,6 +19,17 @@ const OPENROUTER_SITE_NAME = process.env.OPENROUTER_SITE_NAME || '';
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
 
+// Function to increment API request count
+const incrementApiRequestCount = async () => {
+    try {
+        let currentCount = await AsyncStorage.getItem(API_REQUEST_COUNT_KEY);
+        currentCount = currentCount ? parseInt(currentCount, 10) + 1 : 1;
+        await AsyncStorage.setItem(API_REQUEST_COUNT_KEY, currentCount.toString());
+    } catch (error) {
+        console.error('Failed to increment API request count', error);
+    }
+};
+
 // Helper function to clean markdown code blocks from response
 const cleanJsonResponse = (response) => {
     // Return raw response for context files to handle parsing
@@ -26,10 +39,17 @@ const cleanJsonResponse = (response) => {
 // OpenRouter API call helper
 const makeOpenRouterApiCall = async (prompt, label) => {
     try {
+        const storedApiKey = await AsyncStorage.getItem(API_KEY_STORAGE_KEY);
+        const currentApiKey = storedApiKey || OPENROUTER_API_KEY_FALLBACK;
+
+        if (!currentApiKey) {
+            throw new Error('OpenRouter API Key not found. Please set it in settings.');
+        }
+
         const res = await fetch(OPENROUTER_API_URL, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Authorization': `Bearer ${currentApiKey}`,
                 'HTTP-Referer': OPENROUTER_SITE_URL,
                 'X-Title': OPENROUTER_SITE_NAME,
                 'Content-Type': 'application/json'
@@ -61,6 +81,9 @@ const makeOpenRouterApiCall = async (prompt, label) => {
             console.error(`No content in OpenRouter response for ${label}:`, JSON.stringify(data));
             throw new Error(`No content in OpenRouter response for ${label}`);
         }
+
+        // Increment the counter on successful API response
+        await incrementApiRequestCount();
 
         console.log(`Raw ${label} API Response received`);
         // Return raw response content for context files to handle parsing

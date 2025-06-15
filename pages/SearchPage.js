@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import SearchCompany from '../components/search_page/SearchCompany';
 import CompanyTopicsList from '../components/company_topics/CompanyTopicsList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -9,11 +11,13 @@ import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInCo
 import { useCoreCompanyDetails } from '../features/core_company_details/context/CoreCompanyDetailsContext';
 import { getCompanyWaysToGetIn, getCoreCompanyDetails, getCompanyCulture, getCompanyInterviewExperience, getCompanyJobHiringInsights, getCompanyNewsHighlights, getCompanyTechStack } from '../api/api';
 
-export default function SearchPage({ navigation, onBack }) {
+export default function SearchPage({ onBack }) {
+  const navigation = useNavigation();
   const [searchedCompany, setSearchedCompany] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [allData, setAllData] = useState(null);
+  const insets = useSafeAreaInsets();
 
   const { 
     loading: waysLoading, 
@@ -219,7 +223,7 @@ export default function SearchPage({ navigation, onBack }) {
     <View style={styles.container}>
       <LinearGradient
         colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
-        style={styles.header}
+        style={[styles.header, { paddingTop: insets.top, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
       >
         <TouchableOpacity 
           onPress={handleBackToLanding}
@@ -227,9 +231,15 @@ export default function SearchPage({ navigation, onBack }) {
         >
           <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Settings')}
+          style={styles.settingsButton}
+        >
+          <MaterialCommunityIcons name="cog" size={24} color="#4158D0" />
+        </TouchableOpacity>
       </LinearGradient>
 
-      <View style={styles.content}>
+      <View style={[styles.content, { paddingTop: 0 }]}>
         <SearchCompany onSearch={handleSearch} />
         {loading && (
           <View style={styles.loadingContainer}>
@@ -259,10 +269,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 12,
     paddingBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
     borderBottomWidth: 0,
     backgroundColor: 'transparent',
     shadowColor: '#4158D0',
@@ -270,11 +277,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 4,
+    zIndex: 10,
+  },
+  settingsButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(65, 88, 208, 0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
+    zIndex: 11,
   },
   content: {
     flex: 1,
     position: 'relative',
-    paddingTop: 16,
     backgroundColor: 'transparent',
   },
   backButton: {

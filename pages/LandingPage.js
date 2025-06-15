@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View, Animated } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import LandingHero from '../components/landing_page/LandingHero';
 import Features from '../components/landing_page/Features';
 import BackgroundEffects from '../components/landing_page/BackgroundEffects';
-import SearchPage from '../pages/SearchPage';
 
 export default function LandingPage() {
+  const navigation = useNavigation();
   const [showSearch, setShowSearch] = useState(false);
   const scrollY = new Animated.Value(0);
 
@@ -17,10 +18,6 @@ export default function LandingPage() {
   const handleBackToLanding = () => {
     setShowSearch(false);
   };
-
-  if (showSearch) {
-    return <SearchPage onBack={handleBackToLanding} />;
-  }
 
   return (
     <View style={styles.container}>
@@ -35,7 +32,7 @@ export default function LandingPage() {
         scrollEventThrottle={16}
       >
         <View style={styles.contentWrapper}>
-          <LandingHero onGetStarted={() => setShowSearch(true)} />
+          <LandingHero onGetStarted={() => navigation.navigate('Search')} />
           <Features />
         </View>
       </Animated.ScrollView>
