@@ -36,9 +36,6 @@ export default function SearchCompany({ onSearch }) {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Animatable.Text animation="fadeInDown" style={styles.header}>
-            <Text style={styles.logo}>🔍</Text> Search
-          </Animatable.Text>
           <Animatable.View animation="fadeInUp" delay={200} style={styles.inputContainer}>
             <View style={styles.searchContainer}>
               <MaterialCommunityIcons name="magnify" size={24} style={styles.searchIcon} />
@@ -92,7 +89,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 60,
     paddingHorizontal: 24,
     alignItems: 'center',
     flexGrow: 1,
@@ -101,7 +97,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#2d3436',
-    marginBottom: 32,
+    marginBottom: 10,
     textAlign: 'center',
     letterSpacing: 1,
   },
@@ -121,7 +117,8 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
     alignItems: 'center',
-    marginBottom: 24,
+    marginTop: 0,
+    // marginBottom: 24,
   },
   searchContainer: {
     backgroundColor: '#fff',
@@ -152,7 +149,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 20,
     shadowColor: '#0984e3',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.18,

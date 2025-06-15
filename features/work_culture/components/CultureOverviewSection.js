@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Badge from '../../tech_stack/components/Badge';
 
 export default function CultureOverviewSection({ data }) {
@@ -15,7 +16,12 @@ export default function CultureOverviewSection({ data }) {
         ))}
       </View>
 
-      <View style={styles.culturalVibeContainer}>
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.culturalVibeContainer}
+      >
         <Text style={styles.subheading}>Cultural Vibe</Text>
         <Text style={styles.vibeText}>
           {data.culturalVibe.icon} {data.culturalVibe.type}
@@ -25,7 +31,7 @@ export default function CultureOverviewSection({ data }) {
             <Badge key={index} label={attr} variant="primary" />
           ))}
         </View>
-      </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -68,24 +74,25 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   culturalVibeContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
-    elevation: 2,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   subheading: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
     marginBottom: 12,
   },
   vibeText: {
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
     marginBottom: 12,
   },
   attributesContainer: {

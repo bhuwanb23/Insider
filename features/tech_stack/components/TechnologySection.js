@@ -8,7 +8,7 @@ export default function TechnologySection({ section, data }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <FontAwesome5 name={data.icon} size={24} color="#6366f1" style={styles.icon} />
+        <FontAwesome5 name={data.icon} size={24} color="#C850C0" style={styles.icon} />
         <Text style={styles.title}>{data.title}</Text>
       </View>
       
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#4158D0',
   },
   badgeContainer: {
     flexDirection: 'row',

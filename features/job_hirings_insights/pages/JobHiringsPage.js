@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { JobHiringProvider, useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CommonRoles from '../components/CommonRoles';
 import InternshipConversion from '../components/InternshipConversion';
 import HiringChannels from '../components/HiringChannels';
@@ -29,7 +30,7 @@ export default function JobHiringsPage({ navigation, route }) {
   const [activeSection, setActiveSection] = useState(SECTIONS.ROLES);
   const rawData = route.params?.rawData;
 
-  function JobHiringsContent() {
+  function JobHiringsContent({ activeSection, setActiveSection }) {
     const { loading, error, jobHiringData } = useJobHiring();
     console.log('[JobHiringsContent] loading:', loading, 'error:', error, 'jobHiringData:', jobHiringData);
 
@@ -123,16 +124,21 @@ export default function JobHiringsPage({ navigation, route }) {
           </ScrollView>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>{renderContent()}</View>
-        </ScrollView>
+        <SafeAreaView style={styles.content}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.contentContainer}>{renderContent()}</View>
+          </ScrollView>
+        </SafeAreaView>
       </LinearGradient>
     );
   }
 
   return (
     <JobHiringProvider rawData={rawData}>
-      <JobHiringsContent />
+      <JobHiringsContent 
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
     </JobHiringProvider>
   );
 }
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   tabsContainer: {
     maxHeight: 44,
@@ -216,6 +222,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 0,
   },
 });

@@ -41,7 +41,7 @@ export default function TopHeadlines() {
               style={styles.readMoreButton}
               onPress={() => handleReadMore(article.url)}
             >
-              <Text style={styles.readMoreText}>Read More →</Text>
+              <Text style={styles.readMoreText}>Read More</Text>
             </TouchableOpacity>
           </LinearGradient>
         </TouchableOpacity>
@@ -53,6 +53,7 @@ export default function TopHeadlines() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 24,
   },
   header: {
     flexDirection: 'row',

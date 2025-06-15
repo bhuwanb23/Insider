@@ -86,6 +86,7 @@ export default function HighlightSnippets() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 24,
   },
   header: {
     flexDirection: 'row',

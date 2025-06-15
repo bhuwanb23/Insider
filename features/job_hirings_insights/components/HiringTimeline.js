@@ -9,7 +9,7 @@ export default function HiringTimeline() {
 
   const renderTimelineItem = (title, data) => (
     <LinearGradient
-      colors={['#4158D0', '#C850C0']}
+      colors={["#4158D0", "#C850C0"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.timelineCard}
@@ -63,7 +63,6 @@ export default function HiringTimeline() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 16,
@@ -83,33 +82,38 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   timelineContainer: {
-    gap: 16,
+    gap: 12,
   },
   timelineCard: {
-    padding: 16,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   timelineTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   timelineDetails: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 12,
   },
   timelineItem: {
-    minWidth: '45%',
+    width: '47%',
   },
   itemLabel: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 4,
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 2,
   },
   itemValue: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#fff',
   },

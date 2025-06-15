@@ -1,10 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function DiversitySection({ data }) {
   return (
     <View style={styles.sectionContent}>
-      <View style={styles.statsContainer}>
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.statsContainer}
+      >
         <Text style={styles.subheading}>Diversity Statistics</Text>
         {Object.entries(data.stats).map(([key, value]) => (
           <View key={key} style={styles.statItem}>
@@ -12,17 +18,23 @@ export default function DiversitySection({ data }) {
             <Text style={styles.statValue}>{value}</Text>
           </View>
         ))}
-      </View>
+      </LinearGradient>
 
       <View style={styles.initiativesContainer}>
         {data.initiatives.map((initiative, index) => (
-          <View key={index} style={styles.initiativeCard}>
+          <LinearGradient
+            key={index}
+            colors={['#4158D0', '#C850C0']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.initiativeCard}
+          >
             <Text style={styles.initiativeIcon}>{initiative.icon}</Text>
             <View style={styles.initiativeInfo}>
               <Text style={styles.initiativeName}>{initiative.name}</Text>
               <Text style={styles.initiativeMembers}>{initiative.members} members</Text>
             </View>
-          </View>
+          </LinearGradient>
         ))}
       </View>
     </View>
@@ -34,20 +46,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statsContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
     marginBottom: 24,
-    elevation: 2,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   subheading: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
     marginBottom: 12,
   },
   statItem: {
@@ -56,17 +69,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
   },
   statLabel: {
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
     textTransform: 'capitalize',
   },
   statValue: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   initiativesContainer: {
     marginTop: 16,
@@ -74,31 +87,32 @@ const styles = StyleSheet.create({
   initiativeCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
     marginBottom: 12,
-    elevation: 2,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   initiativeIcon: {
-    fontSize: 24,
+    fontSize: 22,
     marginRight: 12,
   },
   initiativeInfo: {
     flex: 1,
   },
   initiativeName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 2,
   },
   initiativeMembers: {
     fontSize: 12,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
   },
 }); 

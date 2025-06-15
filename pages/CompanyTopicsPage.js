@@ -2,11 +2,13 @@ import React, { useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Text, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInContext';
 
 export default function CompanyTopicsPage({ company, onSelectTopic, onBack, navigation }) {
   const { waysData } = useWaysToGetIn();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -56,7 +58,7 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack, navi
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <LinearGradient
         colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
-        style={styles.header}
+        style={[styles.header, { paddingTop: insets.top }]}
       >
         <TouchableOpacity onPress={() => {
           if (navigation) {
@@ -71,12 +73,12 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack, navi
       </LinearGradient>
       
       <ScrollView 
-        style={styles.content} 
+        style={styles.content}
         contentContainerStyle={styles.gridContainer}
         showsVerticalScrollIndicator={false}
       >
         {Object.entries(waysData)
-          .filter(([_, data]) => data && data.title) // Filter out invalid data
+          .filter(([_, data]) => data && data.title)
           .map(([key, data]) => renderTopicCard(key, data))}
       </ScrollView>
     </Animated.View>
@@ -90,7 +92,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    // paddingTop: 16,
     paddingBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',

@@ -56,7 +56,7 @@ export default function Awards({ data }) {
           <Text style={styles.awardYear}>{award.year}</Text>
         </View>
         <View style={styles.awardContent}>
-          <Text style={styles.awardTitle} numberOfLines={2}>{award.title}</Text>
+          <Text style={styles.awardTitle}>{award.title}</Text>
           {award.rank && (
             <View style={styles.rankContainer}>
               <Text style={styles.rankLabel}>Rank</Text>
@@ -64,7 +64,7 @@ export default function Awards({ data }) {
             </View>
           )}
           {award.description && (
-            <Text style={styles.awardDescription} numberOfLines={2}>
+            <Text style={styles.awardDescription}>
               {award.description}
             </Text>
           )}
@@ -139,10 +139,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: 16,
   },
   awardCard: {
     width: '48%',
-    height: 200,
     marginBottom: 16,
     borderRadius: 16,
     overflow: 'hidden',
@@ -151,10 +151,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    minHeight: 180,
   },
   awardBadge: {
     padding: 12,
-    height: '100%',
+    flex: 1,
     justifyContent: 'space-between',
   },
   cardHeader: {

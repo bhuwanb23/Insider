@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import RatingIndicator from './RatingIndicator';
 import Badge from '../../tech_stack/components/Badge';
 
@@ -27,15 +28,26 @@ export default function WorkLifeBalanceSection({ data }) {
         </Text>
       </View>
 
-      <View style={styles.metricsContainer}>
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.metricsContainer}
+      >
         {data.metrics.map((metric, index) => (
-          <View key={index} style={styles.metricItem}>
+          <View
+            key={index}
+            style={[
+              styles.metricItem,
+              index === data.metrics.length - 1 && { borderBottomWidth: 0 },
+            ]}
+          >
             <Text style={styles.metricLabel}>{metric.category}</Text>
             <RatingIndicator score={parseScore(metric.score)} showText={false} size="small" />
             <Badge label={metric.status} variant={metric.status === 'great' ? 'success' : 'primary'} />
           </View>
         ))}
-      </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -54,14 +66,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   metricsContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
-    elevation: 2,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   metricItem: {
     flexDirection: 'row',
@@ -69,11 +82,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
   },
   metricLabel: {
     fontSize: 14,
-    color: '#333',
+    color: '#fff',
     flex: 1,
+    fontWeight: '500',
   },
 }); 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import RatingIndicator from './RatingIndicator';
 
 export default function MentalHealthSection({ data }) {
@@ -20,9 +21,20 @@ export default function MentalHealthSection({ data }) {
         <RatingIndicator score={parseScore(data.overallScore)} size="large" />
       </View>
 
-      <View style={styles.programsContainer}>
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.programsContainer}
+      >
         {data.programs.map((program, index) => (
-          <View key={index} style={styles.programCard}>
+          <View
+            key={index}
+            style={[
+              styles.programCard,
+              index === data.programs.length - 1 && { marginBottom: 0 },
+            ]}
+          >
             <Text style={styles.programIcon}>{program.icon}</Text>
             <View style={styles.programInfo}>
               <Text style={styles.programName}>{program.name}</Text>
@@ -30,7 +42,7 @@ export default function MentalHealthSection({ data }) {
             </View>
           </View>
         ))}
-      </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -50,36 +62,42 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   programsContainer: {
-    marginTop: 16,
+    borderRadius: 14,
+    padding: 16,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   programCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   programIcon: {
-    fontSize: 24,
+    fontSize: 22,
     marginRight: 12,
   },
   programInfo: {
     flex: 1,
   },
   programName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 2,
   },
   programDetails: {
     fontSize: 12,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
   },
 }); 

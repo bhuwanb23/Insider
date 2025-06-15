@@ -13,7 +13,7 @@ export default function MockInterviewTips() {
         <Text style={styles.title}>Mock Interview Tips</Text>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {interviewData.mockInterviewTips.map((section, index) => (
           <LinearGradient
             key={index}
@@ -53,11 +53,12 @@ export default function MockInterviewTips() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     paddingHorizontal: 16,
   },
   sectionIcon: {
@@ -69,22 +70,28 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1a1a1a',
   },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
   card: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    marginHorizontal: 16,
-    elevation: 3,
+    padding: 18,
+    borderRadius: 16,
+    marginBottom: 18,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#fff',
     marginBottom: 12,
+    letterSpacing: 0.2,
   },
   tipsContainer: {
     marginTop: 8,
@@ -103,7 +110,7 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
   },
 }); 

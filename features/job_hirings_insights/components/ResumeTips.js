@@ -81,7 +81,7 @@ export default function ResumeTips() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    // padding: 16,
     backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 16,
@@ -161,17 +161,19 @@ const styles = StyleSheet.create({
   keywordsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
   },
   keywordTag: {
     backgroundColor: '#4158D0',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 8,
   },
   keywordText: {
     fontSize: 12,
     color: '#fff',
+    flexShrink: 1,
   },
   optimizationSection: {
     marginBottom: 8,

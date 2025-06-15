@@ -88,28 +88,6 @@ export default function LandingHero({ onGetStarted }) {
                 <MaterialCommunityIcons name="trending-up" size={24} color="#fff" />
                 <Text style={styles.featureText}>Market Analysis</Text>
               </Animatable.View>
-
-              <Animatable.View 
-                animation="pulse" 
-                easing="ease-out" 
-                iterationCount="infinite" 
-                delay={800}
-                style={styles.featureItem}
-              >
-                <MaterialCommunityIcons name="chart-bubble" size={24} color="#fff" />
-                <Text style={styles.featureText}>Industry Trends</Text>
-              </Animatable.View>
-
-              <Animatable.View 
-                animation="pulse" 
-                easing="ease-out" 
-                iterationCount="infinite" 
-                delay={1000}
-                style={styles.featureItem}
-              >
-                <MaterialCommunityIcons name="lightbulb-on" size={24} color="#fff" />
-                <Text style={styles.featureText}>Smart Recommendations</Text>
-              </Animatable.View>
             </Animatable.View>
 
             <Animatable.View 

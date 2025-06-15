@@ -4,7 +4,7 @@ import { useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width - 32; // Full width minus padding
+const CARD_WIDTH = width * 0.85; // Made card width 85% of screen width
 
 export default function CommonRoles() {
   const { jobHiringData } = useJobHiring();
@@ -81,51 +81,51 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   roleCard: {
-    width: CARD_WIDTH,
-    borderRadius: 20,
-    elevation: 5,
+    width: '100%',
+    borderRadius: 18,
+    elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
   },
   cardContent: {
-    padding: 20,
+    padding: 14,
   },
   topSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   roleIcon: {
-    fontSize: 24,
+    fontSize: 20,
   },
   roleInfo: {
     flex: 1,
   },
   roleTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   departmentText: {
-    fontSize: 14,
+    fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
   },
   divider: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginVertical: 16,
+    height: 0.8,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    marginVertical: 12,
   },
   bottomSection: {
     flexDirection: 'row',
@@ -140,23 +140,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   labelText: {
-    fontSize: 12,
+    fontSize: 11,
     color: 'rgba(255, 255, 255, 0.7)',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   valueText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#fff',
     fontWeight: '600',
   },
   locationTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 18,
   },
   locationText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#fff',
     fontWeight: '600',
   },

@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -104,11 +105,16 @@ const topics = [
   },
 ];
 
-export default function CompanyTopicsList({ company, allData }) {
+export default function CompanyTopicsList({ company, allData, onBack }) {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const handleBackPress = () => {
-    navigation.goBack();
+    if (onBack) {
+      onBack();
+    } else {
+      navigation.goBack();
+    }
   };
 
   const handleTopicPress = (topicKey) => {
@@ -184,7 +190,7 @@ export default function CompanyTopicsList({ company, allData }) {
         end={{ x: 1, y: 1 }}
       />
       
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
         </TouchableOpacity>
@@ -216,9 +222,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 40,
-    paddingHorizontal: 20,
-    marginBottom: 10,
+    paddingTop: 0,
+    paddingBottom: 4,
+    paddingHorizontal: 10,
+    backgroundColor: 'transparent',
+    zIndex: 2,
   },
   backButton: {
     width: 40,
@@ -231,24 +239,23 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#2d3436',
+    color: '#4158D0',
+    marginLeft: 8,
     letterSpacing: 1,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 3,
   },
   icon: {
     fontSize: 32,
   },
   subHeader: {
-    fontSize: 16,
-    color: '#636e72',
-    marginBottom: 24,
+    fontSize: 14,
+    color: '#333',
     textAlign: 'center',
-    opacity: 0.85,
-    paddingHorizontal: 20,
+    marginTop: 2,
+    marginBottom: 8,
+    fontWeight: '500',
+    letterSpacing: 0.2,
   },
   list: {
     paddingHorizontal: 20,

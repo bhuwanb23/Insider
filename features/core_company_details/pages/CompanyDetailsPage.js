@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 import { useRoute } from '@react-navigation/native';
 import BasicIdentity from '../components/BasicIdentity';
@@ -133,9 +134,9 @@ function CompanyDetailsContent({ route }) {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>{company}</Text>
-      </View>
+      </View> */}
 
       <View style={styles.tabsWrapper}>
         <ScrollView
@@ -174,9 +175,11 @@ function CompanyDetailsContent({ route }) {
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.content}>
-        {renderContent()}
-      </ScrollView>
+      <SafeAreaView style={styles.content}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {renderContent()}
+        </ScrollView>
+      </SafeAreaView>
     </LinearGradient>
   );
 }
@@ -205,7 +208,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   tabsContainer: {
     maxHeight: 44,
@@ -247,6 +250,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingTop: 0,
   },
   centerContainer: {
     padding: 20,

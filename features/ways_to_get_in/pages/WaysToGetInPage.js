@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CampusRecruitment from '../components/CampusRecruitment';
 import JobPortals from '../components/JobPortals';
 import Referrals from '../components/Referrals';
@@ -17,7 +18,7 @@ const SECTIONS = {
   REFERRALS: { title: 'Referrals', icon: '👥', key: 'referrals' },
   HACKATHONS: { title: 'Hackathons', icon: '🧩', key: 'hackathons' },
   OUTREACH: { title: 'Cold Outreach', icon: '✉️', key: 'coldOutreach' },
-  INTERNSHIP: { title: 'Internship → Full-Time', icon: '🚀', key: 'internshipConversion' },
+  INTERNSHIP: { title: 'Internship - Full-Time', icon: '🚀', key: 'internshipConversion' },
   CONTRACT: { title: 'Contract Roles', icon: '💼', key: 'contractRoles' },
 };
 
@@ -155,7 +156,7 @@ function WaysToGetInContent({ route }) {
         </ScrollView>
       </View>
 
-      <Animated.View
+      <SafeAreaView
         style={[
           styles.content,
           {
@@ -169,7 +170,7 @@ function WaysToGetInContent({ route }) {
             {renderContent()}
           </View>
         </ScrollView>
-      </Animated.View>
+      </SafeAreaView>
     </LinearGradient>
   );
 }
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   tabsContainer: {
     maxHeight: 44,
@@ -254,6 +255,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 0,
   },
 });

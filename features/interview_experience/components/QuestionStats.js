@@ -48,20 +48,19 @@ export default function QuestionStats() {
             <View key={index} style={styles.categoryRow}>
               <View style={styles.categoryInfo}>
                 <Text style={styles.categoryName}>{category.name}</Text>
-                <View style={[
-                  styles.trendBadge,
-                  { backgroundColor: `${getTrendColor(category.trend)}20` }
-                ]}>
-                  <Text style={[
-                    styles.trendText,
-                    { color: getTrendColor(category.trend) }
-                  ]}>
+                <View style={styles.trendBadge}>
+                  <Text style={[styles.trendText, { color: getTrendColor(category.trend) }]}>
                     {getTrendIcon(category.trend)}
                   </Text>
                 </View>
               </View>
               <View style={styles.percentageBar}>
-                <View style={[styles.percentageFill, { width: `${category.percentage}%` }]} />
+                <LinearGradient
+                  colors={['#7FD7B9', getTrendColor(category.trend)]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.percentageFill, { width: `${category.percentage}%` }]} 
+                />
                 <Text style={styles.percentageText}>{category.percentage}%</Text>
               </View>
             </View>
@@ -80,7 +79,12 @@ export default function QuestionStats() {
               <View key={index} style={styles.difficultyItem}>
                 <Text style={styles.difficultyLabel}>{level}</Text>
                 <View style={styles.difficultyBar}>
-                  <View style={[styles.difficultyFill, { width: `${percentage}%` }]} />
+                  <LinearGradient
+                    colors={['#7FD7B9', '#C850C0']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.difficultyFill, { width: `${percentage}%` }]} 
+                  />
                   <Text style={styles.difficultyPercentage}>{percentage}%</Text>
                 </View>
               </View>
@@ -95,11 +99,12 @@ export default function QuestionStats() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     paddingHorizontal: 16,
   },
   sectionIcon: {
@@ -113,52 +118,61 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   card: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    elevation: 3,
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#fff',
-    marginBottom: 16,
+    marginBottom: 18,
+    letterSpacing: 0.5,
   },
   categoryRow: {
-    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
   },
   categoryInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
   categoryName: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#fff',
-    marginRight: 8,
+    marginRight: 10,
+    fontWeight: '500',
   },
   trendBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 24,
+    minWidth: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
   },
   trendText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
   percentageBar: {
-    height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 4,
+    flex: 1,
+    height: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderRadius: 5,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -167,32 +181,36 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 4,
+    borderRadius: 5,
   },
   percentageText: {
     position: 'absolute',
-    right: -24,
-    top: -4,
-    fontSize: 12,
+    right: 8,
+    top: -2,
+    fontSize: 11,
     color: '#fff',
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   difficultyContainer: {
-    marginTop: 8,
+    marginTop: 10,
   },
   difficultyItem: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   difficultyLabel: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: 6,
     textTransform: 'capitalize',
+    fontWeight: '500',
   },
   difficultyBar: {
-    height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 4,
+    height: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderRadius: 5,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -201,14 +219,17 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 4,
+    borderRadius: 5,
   },
   difficultyPercentage: {
     position: 'absolute',
-    right: -24,
-    top: -4,
-    fontSize: 12,
+    right: 8,
+    top: -2,
+    fontSize: 11,
     color: '#fff',
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
 }); 

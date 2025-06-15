@@ -51,7 +51,7 @@ export default function HackathonsCompetitions() {
                   <Text style={styles.platformName}>{platform.name}</Text>
                   <Text style={styles.platformUrl}>{platform.url}</Text>
                 </View>
-                <Text style={styles.visitText}>Visit →</Text>
+                <Text style={styles.visitText}>Visit</Text>
               </LinearGradient>
             </TouchableOpacity>
           ))}

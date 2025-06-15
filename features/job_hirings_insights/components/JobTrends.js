@@ -34,9 +34,8 @@ export default function JobTrends() {
             end={{ x: 1, y: 1 }}
             style={styles.trendCard}
           >
-            <Text style={styles.growthValue}>↑ {growth}%</Text>
+            <Text style={styles.growthValue}>{growth}</Text>
             <Text style={styles.growthLabel}>{dept.charAt(0).toUpperCase() + dept.slice(1)} Growth</Text>
-            <Text style={styles.periodLabel}>This Quarter</Text>
           </LinearGradient>
         ))}
       </View>
@@ -124,11 +123,14 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   trendsContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     gap: 16,
     marginBottom: 24,
   },
   trendCard: {
+    width: CARD_WIDTH,
     padding: 16,
     borderRadius: 16,
     elevation: 3,

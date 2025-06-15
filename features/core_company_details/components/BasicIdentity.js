@@ -125,7 +125,7 @@ export default function BasicIdentity({ data }) {
                         onPress={() => handleLinkedInPress(person.linkedIn)}
                       >
                         <LinearGradient
-                          colors={['#0077B5', '#00A0DC']}
+                          colors={['#C850C0', '#8257E5']}
                           style={styles.linkedInGradient}
                           start={{ x: 0, y: 0 }}
                           end={{ x: 1, y: 0 }}
@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   linkedInGradient: {
+    colors: ['#C850C0', '#8257E5'],
     paddingVertical: 6,
     paddingHorizontal: 12,
     alignItems: 'center',

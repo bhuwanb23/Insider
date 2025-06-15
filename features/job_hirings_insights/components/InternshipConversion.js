@@ -20,7 +20,7 @@ export default function InternshipConversion() {
         style={styles.conversionCard}
       >
         <View style={styles.rateContainer}>
-          <Text style={styles.rateText}>{internshipConversion.rate}%</Text>
+          <Text style={styles.rateText}>{internshipConversion.rate}</Text>
           <Text style={styles.rateLabel}>Conversion Rate</Text>
         </View>
         <View style={styles.statsContainer}>
@@ -47,12 +47,12 @@ export default function InternshipConversion() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 16,
   },
   header: {
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,

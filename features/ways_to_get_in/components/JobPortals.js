@@ -48,7 +48,7 @@ export default function JobPortals() {
               >
                 <Text style={styles.platformIcon}>🔗</Text>
                 <Text style={styles.platformName}>{platform.name}</Text>
-                <Text style={styles.visitText}>Visit →</Text>
+                <Text style={styles.visitText}>Visit</Text>
               </LinearGradient>
             </TouchableOpacity>
           ))}

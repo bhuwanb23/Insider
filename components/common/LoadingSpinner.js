@@ -118,9 +118,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'transparent',
     zIndex: 1000,
-    backdropFilter: 'blur(5px)',
   },
   card: {
     padding: 32,
@@ -135,6 +134,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#fff',
   },
   logoContainer: {
     width: 80,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NewsProvider } from '../context/NewsContext';
 import TopHeadlines from '../components/TopHeadlines';
 import SocialSentiment from '../components/SocialSentiment';
@@ -58,12 +59,14 @@ function NewsHighlightsContent() {
         ))}
       </ScrollView>
 
-      <ScrollView style={styles.contentContainer}>
-        {activeSection === 'HEADLINES' && <TopHeadlines />}
-        {activeSection === 'SENTIMENT' && <SocialSentiment />}
-        {activeSection === 'SNIPPETS' && <HighlightSnippets />}
-        {activeSection === 'IMPACT' && <StudentImpact />}
-      </ScrollView>
+      <SafeAreaView style={styles.contentContainer}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {activeSection === 'HEADLINES' && <TopHeadlines />}
+          {activeSection === 'SENTIMENT' && <SocialSentiment />}
+          {activeSection === 'SNIPPETS' && <HighlightSnippets />}
+          {activeSection === 'IMPACT' && <StudentImpact />}
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 }
@@ -74,29 +77,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   tabsContainer: {
-    height: 44,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    zIndex: 2,
+    maxHeight: 44,
+    marginBottom: 12,
   },
   tabsContentContainer: {
+    paddingHorizontal: 16,
     alignItems: 'center',
-    paddingHorizontal: 5,
   },
   tab: {
-    marginHorizontal: 5,
+    marginHorizontal: 3,
     borderRadius: 20,
     overflow: 'hidden',
-    height: 36,
-    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   tabGradient: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    minHeight: 36,
-    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   activeTab: {
     elevation: 3,
@@ -107,14 +110,16 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
-    color: '#333',
     fontWeight: '600',
+    color: '#666',
   },
   activeTabText: {
-    color: '#ffffff',
+    color: '#fff',
+    fontWeight: '700',
   },
   contentContainer: {
     flex: 1,
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingTop: 0,
   },
 });

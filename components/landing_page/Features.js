@@ -44,8 +44,7 @@ export default function Features() {
       </Animatable.Text>
 
       <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {FEATURES.map((feature, index) => (
@@ -98,11 +97,12 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   featureCard: {
-    width: width * 0.8,
-    height: 200,
-    marginRight: 20,
+    width: '100%',
+    minHeight: 180,
+    marginBottom: 24,
     borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',

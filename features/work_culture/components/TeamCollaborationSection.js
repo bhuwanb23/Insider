@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import RatingIndicator from './RatingIndicator';
 
 export default function TeamCollaborationSection({ data }) {
@@ -20,9 +21,20 @@ export default function TeamCollaborationSection({ data }) {
         <RatingIndicator score={parseScore(data.overallScore)} size="large" />
       </View>
 
-      <View style={styles.activitiesContainer}>
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.activitiesContainer}
+      >
         {data.activities.map((activity, index) => (
-          <View key={index} style={styles.activityCard}>
+          <View
+            key={index}
+            style={[
+              styles.activityCard,
+              index === data.activities.length - 1 && { marginBottom: 0 },
+            ]}
+          >
             <Text style={styles.activityIcon}>{activity.icon}</Text>
             <View style={styles.activityInfo}>
               <Text style={styles.activityType}>{activity.type}</Text>
@@ -32,7 +44,7 @@ export default function TeamCollaborationSection({ data }) {
             </View>
           </View>
         ))}
-      </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -52,36 +64,42 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   activitiesContainer: {
-    marginTop: 16,
+    borderRadius: 14,
+    padding: 16,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   activityCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   activityIcon: {
-    fontSize: 24,
+    fontSize: 22,
     marginRight: 12,
   },
   activityInfo: {
     flex: 1,
   },
   activityType: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 2,
   },
   activityDetails: {
     fontSize: 12,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
   },
 }); 
