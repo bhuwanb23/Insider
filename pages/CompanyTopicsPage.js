@@ -62,7 +62,7 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack, navi
       >
         <TouchableOpacity onPress={() => {
           if (navigation) {
-            navigation.goBack();
+            navigation.navigate('SearchPage');
           } else if (onBack) {
             onBack();
           }

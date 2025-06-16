@@ -52,7 +52,7 @@ export default function ColdOutreach() {
         <Text style={styles.sectionTitle}>Email Template</Text>
         <View style={styles.templateCard}>
           <View style={styles.templateHeader}>
-            <Text style={styles.templateSubject}>
+            <Text style={styles.templateSubject} numberOfLines={2} ellipsizeMode="tail">
               Subject: {coldOutreach.emailTemplate?.subject}
             </Text>
             <TouchableOpacity
@@ -65,13 +65,13 @@ export default function ColdOutreach() {
             </TouchableOpacity>
           </View>
           <View style={styles.templateBody}>
-            <Text style={styles.templateText}>
+            <Text style={styles.templateText} selectable={true}>
               {coldOutreach.emailTemplate?.body}
             </Text>
           </View>
           <View style={styles.templateNote}>
             <Text style={styles.noteIcon}>💡</Text>
-            <Text style={styles.noteText}>
+            <Text style={styles.noteText} numberOfLines={2} ellipsizeMode="tail">
               Remember to customize the placeholders marked with [brackets]
             </Text>
           </View>
@@ -171,6 +171,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1a1a1a',
+    flex: 1,
+    flexWrap: 'wrap',
   },
   shareButton: {
     flexDirection: 'row',
@@ -197,6 +199,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1a1a1a',
     lineHeight: 20,
+    flexWrap: 'wrap',
+    width: '100%',
   },
   templateNote: {
     flexDirection: 'row',
@@ -212,6 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#1a1a1a',
     flex: 1,
+    flexWrap: 'wrap',
   },
   tipsList: {
     gap: 12,

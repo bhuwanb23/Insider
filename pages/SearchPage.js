@@ -266,9 +266,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f6f8fc',
+    // paddingTop: 12,
   },
   header: {
     paddingHorizontal: 16,
+    // paddingBottom: 12,
     paddingBottom: 12,
     borderBottomWidth: 0,
     backgroundColor: 'transparent',
@@ -278,6 +280,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
     zIndex: 10,
+    marginBottom: 20,
   },
   settingsButton: {
     width: 40,

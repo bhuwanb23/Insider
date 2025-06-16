@@ -7,48 +7,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_REQUEST_COUNT_KEY } from '../api/api'; // Import the key
 
 const API_KEY_STORAGE_KEY = 'openrouter_api_key';
-const LAST_RESET_DATE_KEY = 'openrouter_last_reset_date'; // New storage key
 
-export default function SettingsPage({ navigation }) {
+export default function SettingsPage({ navigation, route }) {
   const [apiKey, setApiKey] = useState('');
   const [requestCount, setRequestCount] = useState(0);
   const insets = useSafeAreaInsets();
+  const previousScreen = route?.params?.previousScreen;
 
   useEffect(() => {
     loadApiKey();
-    loadAndCheckRequestCount(); // Modified to handle daily reset
+    loadRequestCount();
   }, []);
-
-  // Helper to check if two dates are the same day (ignoring time)
-  const isSameDay = (date1, date2) => {
-    if (!date1 || !date2) return false;
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    return d1.getFullYear() === d2.getFullYear() &&
-           d1.getMonth() === d2.getMonth() &&
-           d1.getDate() === d2.getDate();
-  };
-
-  const loadAndCheckRequestCount = async () => {
-    try {
-      const storedCount = await AsyncStorage.getItem(API_REQUEST_COUNT_KEY);
-      const storedDate = await AsyncStorage.getItem(LAST_RESET_DATE_KEY);
-      const today = new Date();
-
-      if (!storedDate || !isSameDay(storedDate, today.toISOString())) {
-        // It's a new day or no date stored, reset count
-        await AsyncStorage.setItem(API_REQUEST_COUNT_KEY, '0');
-        await AsyncStorage.setItem(LAST_RESET_DATE_KEY, today.toISOString());
-        setRequestCount(0);
-      } else {
-        // Same day, load existing count
-        setRequestCount(storedCount ? parseInt(storedCount, 10) : 0);
-      }
-    } catch (error) {
-      console.error('Failed to load or check request count', error);
-      setRequestCount(0); // Default to 0 on error
-    }
-  };
 
   const loadApiKey = async () => {
     try {
@@ -58,6 +27,16 @@ export default function SettingsPage({ navigation }) {
       }
     } catch (error) {
       console.error('Failed to load API key from AsyncStorage', error);
+    }
+  };
+
+  const loadRequestCount = async () => {
+    try {
+      const storedCount = await AsyncStorage.getItem(API_REQUEST_COUNT_KEY);
+      setRequestCount(storedCount ? parseInt(storedCount, 10) : 0);
+    } catch (error) {
+      console.error('Failed to load request count', error);
+      setRequestCount(0); // Default to 0 on error
     }
   };
 
@@ -71,16 +50,11 @@ export default function SettingsPage({ navigation }) {
     }
   };
 
-  const resetRequestCount = async () => {
-    try {
-      const today = new Date();
-      await AsyncStorage.setItem(API_REQUEST_COUNT_KEY, '0');
-      await AsyncStorage.setItem(LAST_RESET_DATE_KEY, today.toISOString()); // Update reset date
-      setRequestCount(0);
-      Alert.alert('Success', 'API Request count reset!');
-    } catch (error) {
-      console.error('Failed to reset API request count', error);
-      Alert.alert('Error', 'Failed to reset API Request count.');
+  const handleBack = () => {
+    if (previousScreen) {
+      navigation.navigate(previousScreen, route.params);
+    } else {
+      navigation.goBack();
     }
   };
 
@@ -90,7 +64,7 @@ export default function SettingsPage({ navigation }) {
         colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
         style={[styles.header, { paddingTop: insets.top }]}
       >
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
@@ -124,18 +98,9 @@ export default function SettingsPage({ navigation }) {
           <Text style={styles.sectionTitle}>Usage Statistics</Text>
           <View style={styles.statsRow}>
             <MaterialCommunityIcons name="chart-bar" size={24} color="#4158D0" />
-            <Text style={styles.statText}>Requests Made: <Text style={styles.statValue}>{requestCount}</Text> / 50</Text>
+            <Text style={styles.statText}>Requests Made: <Text style={styles.statValue}>{requestCount}</Text></Text>
           </View>
-          <Text style={styles.sectionDescription}>OpenRouter free limit is 50 requests per day. This counter tracks your requests locally.</Text>
-          <TouchableOpacity style={styles.resetButton} onPress={resetRequestCount}>
-            <LinearGradient
-              colors={['#F4D03F', '#F7DC6F']}
-              style={styles.saveButtonGradient} // Reuse saveButtonGradient style
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-            >
-              <Text style={styles.resetButtonText}>Reset Request Count</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <Text style={styles.sectionDescription}>This counter tracks the total number of API requests made from this device. It is persistent and does not reset on app reload.</Text>
         </View>
 
         {/* Other Information Section */}
@@ -250,18 +215,6 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  // New style for reset button
-  resetButton: {
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginTop: 15,
-  },
-  resetButtonText: {
-    color: '#333', // Darker text for a lighter button
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 0.5,

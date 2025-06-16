@@ -156,7 +156,7 @@ function WaysToGetInContent({ route }) {
         </ScrollView>
       </View>
 
-      <SafeAreaView
+      <Animated.View
         style={[
           styles.content,
           {
@@ -165,12 +165,14 @@ function WaysToGetInContent({ route }) {
           }
         ]}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>
-            {renderContent()}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.contentContainer}>
+              {renderContent()}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </Animated.View>
     </LinearGradient>
   );
 }
