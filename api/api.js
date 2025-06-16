@@ -14,8 +14,6 @@ const OPENROUTER_API_KEY_FALLBACK = 'sk-or-v1-326b523172339624fa71351e1239fa7f96
 // trndship api
 // const OPENROUTER_API_KEY = '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';
 
-const OPENROUTER_SITE_URL = process.env.OPENROUTER_SITE_URL || '';
-const OPENROUTER_SITE_NAME = process.env.OPENROUTER_SITE_NAME || '';
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
 
@@ -50,8 +48,8 @@ const makeOpenRouterApiCall = async (prompt, label) => {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${currentApiKey}`,
-                'HTTP-Referer': OPENROUTER_SITE_URL,
-                'X-Title': OPENROUTER_SITE_NAME,
+                // 'HTTP-Referer': OPENROUTER_SITE_URL,
+                // 'X-Title': OPENROUTER_SITE_NAME,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
