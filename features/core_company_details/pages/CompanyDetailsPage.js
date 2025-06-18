@@ -23,66 +23,36 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-function parseCoreCompanyDetails(rawResponse) {
-  if (!rawResponse) return null;
-  try {
-    if (typeof rawResponse === 'object' && !Array.isArray(rawResponse)) {
-      return rawResponse;
-    }
-    let jsonStr = rawResponse;
-    if (typeof rawResponse === 'string') {
-      // Remove triple backticks if present
-      const match = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-      if (match && match[1]) {
-        jsonStr = match[1];
-      }
-      jsonStr = jsonStr.trim();
-      // Remove bad control characters
-      jsonStr = jsonStr.replace(/[\u0000-\u001F\u007F\u2028\u2029]/g, ' ');
-      // Fix unterminated URLs in 'source' fields (e.g., .../)") to .../")")
-      jsonStr = jsonStr.replace(/("source":\s*"https?:[^"\s]+)\)/g, '$1"');
-      // Remove trailing commas before } or ]
-      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
-      // Remove leading/trailing quotes if present
-      if ((jsonStr.startsWith('"') && jsonStr.endsWith('"')) ||
-          (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
-        jsonStr = jsonStr.slice(1, -1);
-      }
-    }
-    return JSON.parse(jsonStr);
-  } catch (err) {
-    console.error('Error parsing core company details:', err, rawResponse);
-    return null;
-  }
-}
-
-export default function CompanyDetailsPage({ route }) {
+export default function CompanyDetailsPage({ route, navigation }) {
   const rawData = route.params?.rawData;
-  // Parse here!
-  const parsedCoreData = parseCoreCompanyDetails(rawData?.coreData?.raw || rawData?.coreData);
+  const rawCoreData = rawData?.coreData?.raw || rawData?.coreData;
 
   return (
-    <CoreCompanyDetailsProvider parsedData={parsedCoreData}>
-      <CompanyDetailsContent route={route} />
+    <CoreCompanyDetailsProvider parsedData={rawCoreData}>
+      <CompanyDetailsContent route={route} navigation={navigation} />
     </CoreCompanyDetailsProvider>
   );
 }
 
-function CompanyDetailsContent({ route }) {
+function CompanyDetailsContent({ route, navigation }) {
   const [activeSection, setActiveSection] = useState(SECTIONS.BASIC);
   const { company } = route.params;
   const { loading, error, companyData, fetchCompanyData } = useCoreCompanyDetails();
-  console.log('[CompanyDetailsContent] loading:', loading, 'error:', error, 'companyData:', companyData);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (company && !companyData) {
-      if (route.params?.rawData?.coreData?.raw) {
-        fetchCompanyData(company, route.params.rawData.coreData.raw);
+      const rawData = route.params?.rawData;
+      if (rawData?.coreData?.raw || rawData?.coreData) {
+        fetchCompanyData(company, rawData.coreData.raw || rawData.coreData);
       } else {
         console.error('No core data available in navigation params');
       }
     }
-  }, [company]);
+  }, [company, companyData, route.params]);
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
 
   const renderContent = () => {
     if (loading) {
@@ -97,6 +67,12 @@ function CompanyDetailsContent({ route }) {
       return (
         <View style={styles.centerContainer}>
           <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={handleBack}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -105,6 +81,12 @@ function CompanyDetailsContent({ route }) {
       return (
         <View style={styles.centerContainer}>
           <Text style={styles.noDataText}>No company data available for {company}</Text>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={handleBack}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -269,5 +251,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  backButton: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#4158D0',
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

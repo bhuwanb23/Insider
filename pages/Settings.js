@@ -42,8 +42,29 @@ export default function SettingsPage({ navigation, route }) {
 
   const saveApiKey = async () => {
     try {
+      if (!apiKey.trim()) {
+        Alert.alert('Error', 'Please enter a valid API key.');
+        return;
+      }
+
       await AsyncStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-      Alert.alert('Success', 'API Key saved successfully!');
+      Alert.alert(
+        'Success', 
+        'API Key saved successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // If we came from Search page, go back there
+              if (previousScreen === 'Search') {
+                navigation.navigate('Landing', {
+                  screen: 'Search'
+                });
+              }
+            }
+          }
+        ]
+      );
     } catch (error) {
       console.error('Failed to save API key to AsyncStorage', error);
       Alert.alert('Error', 'Failed to save API Key.');
@@ -51,10 +72,12 @@ export default function SettingsPage({ navigation, route }) {
   };
 
   const handleBack = () => {
-    if (previousScreen) {
-      navigation.navigate(previousScreen, route.params);
+    if (previousScreen === 'Search') {
+      navigation.navigate('Landing', {
+        screen: 'Search'
+      });
     } else {
-      navigation.goBack();
+      navigation.navigate('Landing');
     }
   };
 

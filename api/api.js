@@ -41,7 +41,12 @@ const makeOpenRouterApiCall = async (prompt, label) => {
         const currentApiKey = storedApiKey || OPENROUTER_API_KEY_FALLBACK;
 
         if (!currentApiKey) {
-            throw new Error('OpenRouter API Key not found. Please set it in settings.');
+            throw new Error('No API key found. Please set your OpenRouter API key in Settings.');
+        }
+
+        // Check if it's just the fallback key and no stored key
+        if (!storedApiKey && currentApiKey === OPENROUTER_API_KEY_FALLBACK) {
+            throw new Error('Please set up your own OpenRouter API key in Settings to continue.');
         }
 
         const res = await fetch(OPENROUTER_API_URL, {

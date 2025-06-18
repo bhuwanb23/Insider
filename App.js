@@ -30,12 +30,12 @@ export default function App() {
     <SafeAreaProvider>
       <View style={styles.container}>
         <StatusBar
-          barStyle={'dark-content'}
+          barStyle={'light-content'}
           backgroundColor="transparent"
           translucent={true}
         />
         <LinearGradient
-          colors={['#ffffff', '#f8f9fa']}
+          colors={['rgba(65, 88, 208, 0.85)', 'rgba(200, 80, 192, 0.85)', 'rgba(255, 194, 68, 0.85)']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -50,16 +50,19 @@ export default function App() {
                       initialRouteName="Landing"
                       screenOptions={{
                         headerStyle: {
-                          backgroundColor: '#ffffff',
+                          backgroundColor: 'transparent',
                           elevation: 0,
                           shadowOpacity: 0,
                           height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          borderBottomWidth: 0,
                         },
+                        headerTransparent: true,
                         headerTitleStyle: {
                           fontWeight: 'bold',
                           fontSize: 18,
-                          color: '#000000',
+                          color: '#fff',
                         },
+                        headerTintColor: '#fff',
                         headerBackTitleVisible: false,
                         headerTitleAlign: 'center',
                         headerLeftContainerStyle: {
@@ -71,6 +74,13 @@ export default function App() {
                         cardStyle: {
                           backgroundColor: 'transparent',
                         },
+                        presentation: 'card',
+                        animationEnabled: true,
+                        cardStyleInterpolator: ({ current: { progress } }) => ({
+                          cardStyle: {
+                            opacity: progress,
+                          },
+                        }),
                       }}
                     >
                       <Stack.Screen 
@@ -89,10 +99,11 @@ export default function App() {
                         options={{ 
                           title: 'Company Details',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -102,10 +113,11 @@ export default function App() {
                         options={{ 
                           title: 'Jobs & Hiring Insights',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -115,10 +127,11 @@ export default function App() {
                         options={{ 
                           title: 'Interview Experience',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -128,10 +141,11 @@ export default function App() {
                         options={{ 
                           title: 'News & Highlights',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -141,10 +155,11 @@ export default function App() {
                         options={{ 
                           title: 'Ways to Get In',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -154,10 +169,11 @@ export default function App() {
                         options={{ 
                           title: 'Tech Stack & Tools',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -167,10 +183,11 @@ export default function App() {
                         options={{ 
                           title: 'Work Culture & Life',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -178,7 +195,6 @@ export default function App() {
                         name="Settings"
                         component={SettingsPage}
                         options={{
-                          title: 'Settings',
                           headerShown: false,
                         }}
                       />

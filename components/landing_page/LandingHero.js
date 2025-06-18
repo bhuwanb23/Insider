@@ -15,11 +15,14 @@ export default function LandingHero({ onGetStarted }) {
     >
       <View style={styles.container}>
         <LinearGradient
-          colors={['#4158D0', '#C850C0', '#FFCC70']}
+          colors={['rgba(65, 88, 208, 0.45)', 'rgba(200, 80, 192, 0.45)', 'rgba(236, 236, 236, 0.45)']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
         >
+          <View style={StyleSheet.absoluteFill}>
+            <View style={styles.glassOverlay} />
+          </View>
           <Animatable.View 
             animation="fadeIn" 
             duration={1000} 
@@ -46,48 +49,57 @@ export default function LandingHero({ onGetStarted }) {
               delay={700}
               style={styles.featuresContainer}
             >
-              <Animatable.View 
-                animation="pulse" 
-                easing="ease-out" 
-                iterationCount="infinite" 
-                style={styles.featureItem}
-              >
-                <MaterialCommunityIcons name="chart-line" size={24} color="#fff" />
-                <Text style={styles.featureText}>Real-time Insights</Text>
-              </Animatable.View>
+              <View style={styles.featureItemContainer}>
+                <LinearGradient
+                  colors={['rgba(251, 37, 233, 0.88)', 'rgba(65, 88, 208, 0.88)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.glassEffect, { borderRadius: 12 }]}
+                />
+                <View style={styles.featureContent}>
+                  <MaterialCommunityIcons name="chart-line" size={24} color="#fff" />
+                  <Text style={styles.featureText}>Real-time Insights</Text>
+                </View>
+              </View>
 
-              <Animatable.View 
-                animation="pulse" 
-                easing="ease-out" 
-                iterationCount="infinite" 
-                delay={200}
-                style={styles.featureItem}
-              >
-                <MaterialCommunityIcons name="briefcase-search" size={24} color="#fff" />
-                <Text style={styles.featureText}>Job Opportunities</Text>
-              </Animatable.View>
+              <View style={styles.featureItemContainer}>
+                <LinearGradient
+                  colors={['rgba(251, 37, 233, 0.88)', 'rgba(65, 88, 208, 0.88)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.glassEffect, { borderRadius: 12 }]}
+                />
+                <View style={styles.featureContent}>
+                  <MaterialCommunityIcons name="briefcase-search" size={24} color="#fff" />
+                  <Text style={styles.featureText}>Job Opportunities</Text>
+                </View>
+              </View>
 
-              <Animatable.View 
-                animation="pulse" 
-                easing="ease-out" 
-                iterationCount="infinite" 
-                delay={400}
-                style={styles.featureItem}
-              >
-                <MaterialCommunityIcons name="account-group" size={24} color="#fff" />
-                <Text style={styles.featureText}>Company Culture</Text>
-              </Animatable.View>
+              <View style={styles.featureItemContainer}>
+                <LinearGradient
+                  colors={['rgba(251, 37, 233, 0.88)', 'rgba(65, 88, 208, 0.88)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.glassEffect, { borderRadius: 12 }]}
+                />
+                <View style={styles.featureContent}>
+                  <MaterialCommunityIcons name="account-group" size={24} color="#fff" />
+                  <Text style={styles.featureText}>Company Culture</Text>
+                </View>
+              </View>
 
-              <Animatable.View 
-                animation="pulse" 
-                easing="ease-out" 
-                iterationCount="infinite" 
-                delay={600}
-                style={styles.featureItem}
-              >
-                <MaterialCommunityIcons name="trending-up" size={24} color="#fff" />
-                <Text style={styles.featureText}>Market Analysis</Text>
-              </Animatable.View>
+              <View style={styles.featureItemContainer}>
+                <LinearGradient
+                  colors={['rgba(251, 37, 233, 0.88)', 'rgba(65, 88, 208, 0.88)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.glassEffect, { borderRadius: 12 }]}
+                />
+                <View style={styles.featureContent}>
+                  <MaterialCommunityIcons name="trending-up" size={24} color="#fff" />
+                  <Text style={styles.featureText}>Market Analysis</Text>
+                </View>
+              </View>
             </Animatable.View>
 
             <Animatable.View 
@@ -100,14 +112,15 @@ export default function LandingHero({ onGetStarted }) {
                 onPress={onGetStarted}
               >
                 <LinearGradient
-                  colors={['#4158D0', '#C850C0']}
+                  colors={['rgba(251, 37, 233, 0.88)', 'rgba(65, 88, 208, 0.88)']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={styles.buttonGradient}
-                >
-                  <Text style={styles.buttonText}>Get Started</Text>
+                  style={[styles.buttonGlassEffect]}
+                />
+                <View style={styles.buttonContent}>
+                  <Text style={[styles.buttonText, { color: '#fff' }]}>Get Started</Text>
                   <MaterialCommunityIcons name="arrow-right" size={24} color="#fff" />
-                </LinearGradient>
+                </View>
               </TouchableOpacity>
             </Animatable.View>
 
@@ -116,8 +129,8 @@ export default function LandingHero({ onGetStarted }) {
               delay={1100}
               style={styles.scrollIndicator}
             >
-              <MaterialCommunityIcons name="chevron-down" size={32} color="#fff" />
-              <Text style={styles.scrollText}>Scroll to explore more</Text>
+              <MaterialCommunityIcons name="chevron-down" size={32} color="rgba(65, 88, 208, 0.9)" />
+              <Text style={[styles.scrollText, { color: 'rgba(65, 88, 208, 0.9)' }]}>Scroll to explore more</Text>
             </Animatable.View>
           </Animatable.View>
         </LinearGradient>
@@ -129,20 +142,29 @@ export default function LandingHero({ onGetStarted }) {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
+    backgroundColor: 'transparent',
+    color: '#fff',
   },
   container: {
     width: '100%',
     height: height,
+    backgroundColor: 'transparent',
   },
   gradient: {
     flex: 1,
     width: '100%',
+    backgroundColor: 'transparent',
+  },
+  glassOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    // backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: 'transparent',
   },
   title: {
     fontSize: 48,
@@ -150,9 +172,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     marginBottom: 16,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   subtitle: {
     fontSize: 20,
@@ -160,25 +182,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 40,
     opacity: 0.9,
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   featuresContainer: {
     width: '100%',
     marginBottom: 40,
   },
-  featureItem: {
+  featureItemContainer: {
+    marginBottom: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  glassEffect: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  featureContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    backdropFilter: 'blur(10px)',
+    zIndex: 1,
   },
   featureText: {
     color: '#fff',
     fontSize: 16,
     marginLeft: 12,
-    fontWeight: '500',
+    fontWeight: '600',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   buttonContainer: {
     width: '100%',
@@ -190,24 +225,28 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
-  buttonGradient: {
+  buttonGlassEffect: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 28,
+  },
+  buttonContent: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
+    zIndex: 1,
   },
   buttonText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
     marginRight: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   scrollIndicator: {
     position: 'absolute',
@@ -216,9 +255,12 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   scrollText: {
-    color: '#fff',
     fontSize: 14,
     marginTop: 8,
     opacity: 0.8,
+    color: 'rgba(65, 88, 208, 0.9)',
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
 });

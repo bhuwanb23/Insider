@@ -3,10 +3,94 @@ import { View, StyleSheet, Text, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const LoadingSpinner = ({ message = 'Loading...' }) => {
+const TopicStatusItem = ({ item, onAnimationComplete }) => {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    // Entry animation
+    const entryAnimation = Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]);
+
+    // Exit animation when status is 'completed' or 'error'
+    const exitAnimation = Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: -20,
+        duration: 500,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]);
+
+    if (item.status === 'loading') {
+      entryAnimation.start();
+    } else if (item.status === 'completed' || item.status === 'error') {
+      entryAnimation.start(() => {
+        // Wait a moment to show the success/error state
+        setTimeout(() => {
+          exitAnimation.start(() => {
+            if (onAnimationComplete) {
+              onAnimationComplete();
+            }
+          });
+        }, 1000); // Show completed state for 1 second
+      });
+    }
+  }, [item.status]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.topicStatusContainer,
+        {
+          opacity,
+          transform: [{ translateY }],
+        },
+      ]}
+    >
+      <View style={styles.topicIconContainer}>
+        {item.status === 'loading' ? (
+          <MaterialCommunityIcons name="loading" size={16} color="#4158D0" />
+        ) : item.status === 'completed' ? (
+          <MaterialCommunityIcons name="check-circle" size={16} color="#4CAF50" />
+        ) : (
+          <MaterialCommunityIcons name="alert-circle" size={16} color="#FF9800" />
+        )}
+      </View>
+      <Text style={[
+        styles.topicText,
+        item.status === 'completed' && styles.completedText,
+        item.status === 'error' && styles.errorText
+      ]}>
+        {item.topic}
+      </Text>
+    </Animated.View>
+  );
+};
+
+const LoadingSpinner = ({ message = 'Loading...', topicStatuses = [] }) => {
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  const progressAnim = useRef(new Animated.Value(0)).current;
+  const [currentTopicIndex, setCurrentTopicIndex] = React.useState(0);
+  
+  // Get current topic
+  const currentTopic = topicStatuses[currentTopicIndex];
 
   useEffect(() => {
     // Rotation animation for the outer circle
@@ -36,34 +120,18 @@ const LoadingSpinner = ({ message = 'Loading...' }) => {
         }),
       ])
     ).start();
-
-    // Progress bar animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(progressAnim, {
-          toValue: 1,
-          duration: 1500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(progressAnim, {
-          toValue: 0,
-          duration: 0,
-          useNativeDriver: false,
-        }),
-      ])
-    ).start();
-  }, [rotateAnim, pulseAnim, progressAnim]);
+  }, [rotateAnim, pulseAnim]);
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
   });
 
-  const progressWidth = progressAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
-  });
+  const handleTopicComplete = () => {
+    if (currentTopicIndex < topicStatuses.length - 1) {
+      setCurrentTopicIndex(prev => prev + 1);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -95,14 +163,19 @@ const LoadingSpinner = ({ message = 'Loading...' }) => {
           <Text style={styles.title}>Company Insider</Text>
           <Text style={styles.text}>{message}</Text>
           
-          <View style={styles.progressContainer}>
-            <Animated.View 
-              style={[
-                styles.progressBar, 
-                { width: progressWidth }
-              ]} 
-            />
+          <View style={styles.topicListContainer}>
+            {currentTopic && (
+              <TopicStatusItem
+                key={currentTopic.topic}
+                item={currentTopic}
+                onAnimationComplete={handleTopicComplete}
+              />
+            )}
           </View>
+
+          <Text style={styles.progressText}>
+            {`Step ${currentTopicIndex + 1} of ${topicStatuses.length}`}
+          </Text>
         </LinearGradient>
       </Animated.View>
     </View>
@@ -183,17 +256,43 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     maxWidth: 240,
   },
-  progressContainer: {
-    height: 4,
+  topicListContainer: {
     width: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    borderRadius: 2,
-    overflow: 'hidden',
+    height: 40, // Fixed height to prevent layout shifts
+    marginTop: 16,
+    justifyContent: 'center',
   },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#4158D0',
-    borderRadius: 2,
+  topicStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(65, 88, 208, 0.05)',
+    borderRadius: 8,
+  },
+  topicIconContainer: {
+    marginRight: 8,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topicText: {
+    fontSize: 14,
+    color: '#555',
+    flex: 1,
+  },
+  completedText: {
+    color: '#4CAF50',
+  },
+  errorText: {
+    color: '#FF9800',
+  },
+  progressText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 16,
+    textAlign: 'center',
   },
 });
 

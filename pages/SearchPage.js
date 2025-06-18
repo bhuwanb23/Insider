@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SearchCompany from '../components/search_page/SearchCompany';
 import CompanyTopicsList from '../components/company_topics/CompanyTopicsList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -17,6 +18,10 @@ export default function SearchPage({ onBack }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [allData, setAllData] = useState(null);
+  const [topicStatuses, setTopicStatuses] = useState([]);
+  const [hasApiError, setHasApiError] = useState(false);
+  const [showError, setShowError] = useState(true);
+  const [showApiKeyNotification, setShowApiKeyNotification] = useState(false);
   const insets = useSafeAreaInsets();
 
   const { 
@@ -42,56 +47,135 @@ export default function SearchPage({ onBack }) {
     };
   }, []);
 
+  // Reset showError when error changes
+  useEffect(() => {
+    if (error) {
+      setShowError(true);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    checkApiKey();
+  }, []);
+
+  const checkApiKey = async () => {
+    try {
+      const apiKey = await AsyncStorage.getItem('openrouter_api_key');
+      if (!apiKey) {
+        setShowApiKeyNotification(true);
+      }
+    } catch (error) {
+      console.error('Failed to check API key:', error);
+    }
+  };
+
+  const handleGoToSettings = () => {
+    navigation.navigate('Settings', { previousScreen: 'Search' });
+    setShowApiKeyNotification(false);
+  };
+
+  const handleDismissError = () => {
+    setShowError(false);
+  };
+
   const handleSearch = async (company) => {
     if (!company?.trim()) return;
     setSearchedCompany(company);
     setLoading(true);
     setError(null);
     setAllData(null);
+    setHasApiError(false);
+
+    // Initialize topic statuses
+    const initialTopics = [
+      { topic: 'Core Company Details', status: 'loading' },
+      { topic: 'Ways to Get In', status: 'pending' },
+      { topic: 'Work Culture', status: 'pending' },
+      { topic: 'Interview Experience', status: 'pending' },
+      { topic: 'Job Hiring Insights', status: 'pending' },
+      { topic: 'News & Highlights', status: 'pending' },
+      { topic: 'Tech Stack', status: 'pending' }
+    ];
+    setTopicStatuses(initialTopics);
 
     try {
       console.log('Starting sequential API calls for company:', company);
       const results = {};
       let anySuccess = false;
+      let isRateLimited = false;
 
-      const tryApi = async (fn, label) => {
+      const updateTopicStatus = (index, status) => {
+        setTopicStatuses(prev => {
+          const updated = [...prev];
+          updated[index] = { ...updated[index], status };
+          return updated;
+        });
+      };
+
+      const tryApi = async (fn, label, topicIndex) => {
         try {
+          updateTopicStatus(topicIndex, 'loading');
           const res = await fn(company);
           results[label] = { 
             parsed: res, 
             raw: typeof res === 'string' ? res : JSON.stringify(res) 
           };
           anySuccess = true;
+          updateTopicStatus(topicIndex, 'completed');
           console.log(`[SearchPage] ${label} data received:`, res);
         } catch (err) {
+          // Check for rate limit error
+          if (err.message?.includes('Rate limit exceeded') || 
+              (err.response?.status === 429) || 
+              err.message?.includes('429')) {
+            isRateLimited = true;
+            setError('API rate limit exceeded. Please try again later.');
+          }
+
           if (err.cleanedResponse) {
             results[label] = { parsed: null, raw: err.cleanedResponse };
           } else {
             results[label] = { parsed: null, raw: null, error: err.message };
           }
+          updateTopicStatus(topicIndex, 'error');
+          setHasApiError(true);
           console.error(`[SearchPage] ${label} failed:`, err.message);
         }
       };
 
-      await tryApi(getCoreCompanyDetails, 'coreData');
-      await tryApi(getCompanyWaysToGetIn, 'waysData');
-      await tryApi(getCompanyCulture, 'cultureData');
-      await tryApi(getCompanyInterviewExperience, 'interviewData');
-      await tryApi(getCompanyJobHiringInsights, 'jobHiringData');
-      await tryApi(getCompanyNewsHighlights, 'newsData');
-      await tryApi(getCompanyTechStack, 'techStackData');
+      await tryApi(getCoreCompanyDetails, 'coreData', 0);
+      
+      // Only continue with other APIs if core data succeeded and we're not rate limited
+      if (!isRateLimited && results.coreData?.parsed) {
+        await tryApi(getCompanyWaysToGetIn, 'waysData', 1);
+        await tryApi(getCompanyCulture, 'cultureData', 2);
+        await tryApi(getCompanyInterviewExperience, 'interviewData', 3);
+        await tryApi(getCompanyJobHiringInsights, 'jobHiringData', 4);
+        await tryApi(getCompanyNewsHighlights, 'newsData', 5);
+        await tryApi(getCompanyTechStack, 'techStackData', 6);
+      }
 
       console.log('[SearchPage] All data after API calls:', results);
       setAllData(results);
       setLoading(false);
-      if (!anySuccess) {
-        setError('Some data might be unavailable, but you can still explore available topics.');
+
+      if (isRateLimited) {
+        setError('API rate limit exceeded. Please try again later.');
+        setHasApiError(true);
+      } else if (!anySuccess) {
+        setError('Unable to fetch company data. Please try again.');
+        setHasApiError(true);
+      } else if (!results.coreData?.parsed) {
+        setError('Unable to fetch core company data. Please try again.');
+        setHasApiError(true);
       } else {
         setError(null);
+        setHasApiError(false);
       }
     } catch (err) {
       setLoading(false);
-      setError('Some data might be unavailable, but you can still explore available topics.');
+      setError('An unexpected error occurred. Please try again.');
+      setHasApiError(true);
       console.error('[SearchPage] Error during company data fetch:', err);
     }
   };
@@ -202,14 +286,18 @@ export default function SearchPage({ onBack }) {
     setAllData(null);
     setError(null);
     if (onBack) onBack();
+    else navigation.navigate('Landing');
   };
 
   const handleBackToSearch = () => {
     setSearchedCompany(null);
+    navigation.navigate('Landing', {
+      screen: 'Search'
+    });
   };
 
-  // Show company topics list if we have a company name, regardless of data or error
-  if (searchedCompany && !loading) {
+  // Only show company topics list if we have a company name, no errors, and not loading
+  if (searchedCompany && !loading && !hasApiError) {
     return (
       <CompanyTopicsList 
         company={searchedCompany}
@@ -240,14 +328,51 @@ export default function SearchPage({ onBack }) {
       </LinearGradient>
 
       <View style={[styles.content, { paddingTop: 0 }]}>
+        {showApiKeyNotification && (
+          <View style={styles.apiKeyNotification}>
+            <MaterialCommunityIcons name="key-alert" size={24} color="#4158D0" />
+            <Text style={styles.apiKeyNotificationText}>
+              Please set up your OpenRouter API key to start using the app
+            </Text>
+            <TouchableOpacity 
+              style={styles.setupButton}
+              onPress={handleGoToSettings}
+            >
+              <Text style={styles.setupButtonText}>Set up now</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         <SearchCompany onSearch={handleSearch} />
         {loading && (
           <View style={styles.loadingContainer}>
-            <LoadingSpinner message={`Fetching information about ${searchedCompany}...`} />
+            <LoadingSpinner 
+              message={`Fetching information about ${searchedCompany}...`}
+              topicStatuses={topicStatuses}
+            />
           </View>
         )}
-        {error && (
-          <View style={styles.errorContainer}>
+        {error && showError && (
+          <Animated.View 
+            style={[
+              styles.errorContainer, 
+              error.includes('rate limit') && styles.rateLimitError
+            ]}
+          >
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleDismissError}
+            >
+              <MaterialCommunityIcons 
+                name="close" 
+                size={20} 
+                color="rgba(255, 77, 109, 0.8)"
+              />
+            </TouchableOpacity>
+            <MaterialCommunityIcons 
+              name={error.includes('rate limit') ? "clock-alert" : "alert-circle"} 
+              size={24} 
+              color="#ff4d6d" 
+            />
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity 
               style={styles.retryButton}
@@ -255,7 +380,7 @@ export default function SearchPage({ onBack }) {
             >
               <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         )}
       </View>
     </View>
@@ -333,6 +458,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  rateLimitError: {
+    backgroundColor: '#fff0f3',
+    borderColor: '#ff9800',
+  },
   errorContainer: {
     position: 'absolute',
     bottom: 90,
@@ -340,6 +469,7 @@ const styles = StyleSheet.create({
     right: 20,
     backgroundColor: '#fff0f3',
     padding: 20,
+    paddingTop: 24, // Increased to accommodate close button
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#ff4d6d',
@@ -353,7 +483,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#ff4d6d',
     textAlign: 'center',
-    marginBottom: 12,
+    marginVertical: 12,
     fontSize: 15,
     fontWeight: '600',
     letterSpacing: 0.2,
@@ -371,6 +501,57 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   retryText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 77, 109, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  apiKeyNotification: {
+    backgroundColor: '#fff',
+    margin: 16,
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(65, 88, 208, 0.2)',
+  },
+  apiKeyNotificationText: {
+    color: '#333',
+    fontSize: 15,
+    textAlign: 'center',
+    marginVertical: 12,
+    lineHeight: 20,
+  },
+  setupButton: {
+    backgroundColor: '#4158D0',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginTop: 6,
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  setupButtonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',

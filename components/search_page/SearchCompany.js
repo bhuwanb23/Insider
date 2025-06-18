@@ -13,14 +13,16 @@ export default function SearchCompany({ onSearch }) {
   const [company, setCompany] = useState('');
 
   const handleSearch = () => {
-    if (company?.trim()) {
-      onSearch(company.trim());
+    const searchTerm = company.trim();
+    if (searchTerm.length > 0) {
+      onSearch(searchTerm);
     }
   };
 
   const handleSuggestionPress = (suggestedCompany) => {
-    setCompany(suggestedCompany);
-    onSearch(suggestedCompany);
+    const searchTerm = suggestedCompany.trim();
+    setCompany(searchTerm);
+    onSearch(searchTerm);
   };
 
   return (
@@ -43,11 +45,15 @@ export default function SearchCompany({ onSearch }) {
                 style={styles.searchInput}
                 placeholder="Search for a company..."
                 value={company}
-                onChangeText={setCompany}
+                onChangeText={text => setCompany(text)}
                 onSubmitEditing={handleSearch}
                 returnKeyType="search"
                 autoCapitalize="none"
                 autoCorrect={false}
+                blurOnSubmit={true}
+                enablesReturnKeyAutomatically={true}
+                maxLength={50}
+                textContentType="organizationName"
               />
             </View>
             <TouchableOpacity style={styles.button} onPress={handleSearch}>
