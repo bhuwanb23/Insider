@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as NavigationBar from 'expo-navigation-bar';
 import LandingPage from './pages/LandingPage';
 import CompanyDetailsPage from './features/core_company_details/pages/CompanyDetailsPage';
 import JobHiringsPage from './features/job_hirings_insights/pages/JobHiringsPage';
@@ -26,6 +27,14 @@ const HEADER_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight || 0;
 
 export default function App() {
+  React.useEffect(() => {
+    if (Platform.OS === 'android') {
+      // Set the navigation bar color and make buttons dark
+      NavigationBar.setBackgroundColorAsync('rgba(65, 88, 208, 0.85)');
+      NavigationBar.setButtonStyleAsync('dark');
+    }
+  }, []);
+
   return (
     <SafeAreaProvider>
       <View style={styles.container}>

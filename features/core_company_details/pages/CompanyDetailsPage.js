@@ -169,6 +169,7 @@ function CompanyDetailsContent({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: '110',
     backgroundColor: '#fff',
   },
   header: {

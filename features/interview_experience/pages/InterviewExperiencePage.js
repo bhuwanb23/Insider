@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   container: {
+    marginTop: '100',
     flex: 1,
     backgroundColor: '#fff',
   },

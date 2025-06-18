@@ -1,298 +1,299 @@
 import React, { useRef, useEffect } from 'react';
 import { View, StyleSheet, Text, Animated, Easing } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const TopicStatusItem = ({ item, onAnimationComplete }) => {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(20)).current;
+const WaveLoader = ({ color = '#4158D0' }) => {
+  const wave1 = useRef(new Animated.Value(0)).current;
+  const wave2 = useRef(new Animated.Value(0)).current;
+  const wave3 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Entry animation
-    const entryAnimation = Animated.parallel([
-      Animated.timing(opacity, {
+    const animate = (value, delay) => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(value, {
+            toValue: 1,
+            duration: 1200,
+            easing: Easing.ease,
+            useNativeDriver: true,
+          }),
+          Animated.timing(value, {
+            toValue: 0,
+            duration: 1200,
+            easing: Easing.ease,
+            useNativeDriver: true,
+          })
+        ])
+      );
+    };
+
+    Animated.parallel([
+      animate(wave1, 0),
+      animate(wave2, 400),
+      animate(wave3, 800),
+    ]).start();
+  }, []);
+
+  const getWaveStyle = (wave) => ({
+    ...styles.wave,
+    opacity: wave.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [0.2, 0.6, 0.2],
+    }),
+    transform: [
+      {
+        scale: wave.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.6],
+        }),
+      },
+    ],
+    backgroundColor: color,
+  });
+
+  return (
+    <View style={styles.waveContainer}>
+      <Animated.View style={getWaveStyle(wave1)} />
+      <Animated.View style={getWaveStyle(wave2)} />
+      <Animated.View style={getWaveStyle(wave3)} />
+      <View style={[styles.dot, { backgroundColor: color }]} />
+    </View>
+  );
+};
+
+const StepIndicator = ({ currentStep, totalSteps }) => {
+  return (
+    <View style={styles.stepsRow}>
+      {Array(totalSteps).fill(0).map((_, index) => (
+        <View
+          key={index}
+          style={[
+            styles.step,
+            index === currentStep && styles.activeStep,
+            index < currentStep && styles.completedStep,
+          ]}
+        >
+          {index < currentStep && (
+            <MaterialCommunityIcons name="check" size={12} color="#fff" />
+          )}
+        </View>
+      ))}
+    </View>
+  );
+};
+
+const StatusBadge = ({ status, message }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 500,
+        duration: 400,
+        easing: Easing.ease,
         useNativeDriver: true,
       }),
-      Animated.timing(translateY, {
+      Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 500,
-        easing: Easing.out(Easing.cubic),
+        duration: 400,
+        easing: Easing.ease,
         useNativeDriver: true,
       }),
-    ]);
+    ]).start();
+  }, [message]);
 
-    // Exit animation when status is 'completed' or 'error'
-    const exitAnimation = Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: -20,
-        duration: 500,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]);
-
-    if (item.status === 'loading') {
-      entryAnimation.start();
-    } else if (item.status === 'completed' || item.status === 'error') {
-      entryAnimation.start(() => {
-        // Wait a moment to show the success/error state
-        setTimeout(() => {
-          exitAnimation.start(() => {
-            if (onAnimationComplete) {
-              onAnimationComplete();
-            }
-          });
-        }, 1000); // Show completed state for 1 second
-      });
+  const getStatusConfig = () => {
+    switch (status) {
+      case 'loading':
+        return { color: '#4158D0', icon: 'loading' };
+      case 'completed':
+        return { color: '#10B981', icon: 'check-circle' };
+      case 'error':
+        return { color: '#EF4444', icon: 'alert-circle' };
+      default:
+        return { color: '#6B7280', icon: 'information' };
     }
-  }, [item.status]);
+  };
+
+  const config = getStatusConfig();
 
   return (
     <Animated.View
       style={[
-        styles.topicStatusContainer,
+        styles.badgeContainer,
         {
-          opacity,
-          transform: [{ translateY }],
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+          backgroundColor: `${config.color}15`,
         },
       ]}
     >
-      <View style={styles.topicIconContainer}>
-        {item.status === 'loading' ? (
-          <MaterialCommunityIcons name="loading" size={16} color="#4158D0" />
-        ) : item.status === 'completed' ? (
-          <MaterialCommunityIcons name="check-circle" size={16} color="#4CAF50" />
-        ) : (
-          <MaterialCommunityIcons name="alert-circle" size={16} color="#FF9800" />
-        )}
-      </View>
-      <Text style={[
-        styles.topicText,
-        item.status === 'completed' && styles.completedText,
-        item.status === 'error' && styles.errorText
-      ]}>
-        {item.topic}
+      <MaterialCommunityIcons
+        name={config.icon}
+        size={18}
+        color={config.color}
+        style={styles.badgeIcon}
+      />
+      <Text style={[styles.badgeText, { color: config.color }]}>
+        {message}
       </Text>
     </Animated.View>
   );
 };
 
-const LoadingSpinner = ({ message = 'Loading...', topicStatuses = [] }) => {
-  const rotateAnim = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const [currentTopicIndex, setCurrentTopicIndex] = React.useState(0);
-  
-  // Get current topic
-  const currentTopic = topicStatuses[currentTopicIndex];
+const LoadingSpinner = ({
+  message = 'Loading...',
+  topicStatuses = [],
+  onComplete,
+}) => {
+  const [currentStep, setCurrentStep] = React.useState(0);
+  const currentStatus = topicStatuses[currentStep] || {};
 
   useEffect(() => {
-    // Rotation animation for the outer circle
-    Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 2000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-
-    // Subtle pulse animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.05,
-          duration: 1000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [rotateAnim, pulseAnim]);
-
-  const rotate = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const handleTopicComplete = () => {
-    if (currentTopicIndex < topicStatuses.length - 1) {
-      setCurrentTopicIndex(prev => prev + 1);
+    if (currentStep === topicStatuses.length - 1 && onComplete) {
+      onComplete();
     }
-  };
+  }, [currentStep, topicStatuses.length, onComplete]);
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={{
-          transform: [{ scale: pulseAnim }],
-        }}
-      >
-        <LinearGradient
-          colors={['#ffffff', '#f8f9fa']}
-          style={styles.card}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <View style={styles.logoContainer}>
-            <Animated.View style={[styles.spinnerRing, { transform: [{ rotate }] }]}>
-              <LinearGradient
-                colors={['#4158D0', '#C850C0', '#FFCC70', '#4158D0']}
-                style={styles.spinnerGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              />
-            </Animated.View>
-            <View style={styles.iconContainer}>
-              <MaterialCommunityIcons name="briefcase-search" size={36} color="#4158D0" />
-            </View>
-          </View>
-          
-          <Text style={styles.title}>Company Insider</Text>
-          <Text style={styles.text}>{message}</Text>
-          
-          <View style={styles.topicListContainer}>
-            {currentTopic && (
-              <TopicStatusItem
-                key={currentTopic.topic}
-                item={currentTopic}
-                onAnimationComplete={handleTopicComplete}
-              />
-            )}
-          </View>
+    <View style={styles.overlay}>
+      <View style={styles.container}>
+        <View style={styles.card}>
+          {/* Wave Loader Animation */}
+          <WaveLoader />
 
-          <Text style={styles.progressText}>
-            {`Step ${currentTopicIndex + 1} of ${topicStatuses.length}`}
+          {/* Content */}
+          <Text style={styles.title}>Company Insider</Text>
+          <Text style={styles.message}>{message}</Text>
+
+          {/* Step Progress */}
+          <StepIndicator
+            currentStep={currentStep}
+            totalSteps={topicStatuses.length}
+          />
+
+          {/* Status Badge */}
+          <StatusBadge
+            status={currentStatus.status || 'loading'}
+            message={currentStatus.topic || 'Preparing...'}
+          />
+
+          {/* Step Counter */}
+          <Text style={styles.stepCounter}>
+            {`Step ${currentStep + 1} of ${topicStatuses.length}`}
           </Text>
-        </LinearGradient>
-      </Animated.View>
+        </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  overlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: 'rgba(249, 250, 251, 0.95)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
     zIndex: 1000,
   },
-  card: {
-    padding: 32,
-    borderRadius: 20,
+  container: {
+    padding: 20,
+    width: '100%',
+    maxWidth: 380,
     alignItems: 'center',
-    minWidth: 280,
-    maxWidth: '80%',
-    elevation: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    backgroundColor: '#fff',
   },
-  logoContainer: {
-    width: 80,
-    height: 80,
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 28,
+    padding: 32,
+    width: '100%',
+    alignItems: 'center',
+    elevation: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.12,
+    shadowRadius: 30,
+  },
+  waveContainer: {
+    width: 100,
+    height: 100,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
   },
-  spinnerRing: {
+  wave: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    overflow: 'hidden',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
-  spinnerGradient: {
-    width: '100%',
-    height: '100%',
-    opacity: 0.8,
-  },
-  iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#4158D0',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
-    color: '#333',
-    marginBottom: 12,
-    letterSpacing: 0.5,
-  },
-  text: {
-    color: '#555',
-    fontSize: 16,
-    fontWeight: '500',
+    color: '#111827',
+    marginBottom: 8,
     textAlign: 'center',
-    marginBottom: 24,
-    maxWidth: 240,
   },
-  topicListContainer: {
-    width: '100%',
-    height: 40, // Fixed height to prevent layout shifts
-    marginTop: 16,
+  message: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  stepsRow: {
+    flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    gap: 8,
   },
-  topicStatusContainer: {
+  step: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activeStep: {
+    backgroundColor: '#4158D0',
+    transform: [{ scale: 1.2 }],
+  },
+  completedStep: {
+    backgroundColor: '#10B981',
+  },
+  badgeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: 'rgba(65, 88, 208, 0.05)',
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    width: '100%',
   },
-  topicIconContainer: {
+  badgeIcon: {
     marginRight: 8,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  topicText: {
+  badgeText: {
     fontSize: 14,
-    color: '#555',
+    fontWeight: '600',
     flex: 1,
   },
-  completedText: {
-    color: '#4CAF50',
-  },
-  errorText: {
-    color: '#FF9800',
-  },
-  progressText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 16,
-    textAlign: 'center',
+  stepCounter: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    fontWeight: '500',
   },
 });
 

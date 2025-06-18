@@ -105,6 +105,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: 'transparent',
   },
-});
+}); 
 
 export default LandingPage; 
