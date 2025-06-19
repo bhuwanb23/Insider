@@ -4,80 +4,60 @@ import { getCoreCompanyDetailsPrompt } from '../../../api/prompts';
 // Function to parse core company details from raw response
 const parseCoreCompanyDetails = (rawResponse) => {
   if (!rawResponse) return null;
-  
+  // If already an object, return as is
+  if (typeof rawResponse === 'object' && !Array.isArray(rawResponse)) {
+    return rawResponse;
+  }
+  let jsonStr = rawResponse;
+  // Try direct parse
   try {
-    // If response is already a parsed object
-    if (typeof rawResponse === 'object' && !Array.isArray(rawResponse)) {
-      return rawResponse;
-    }
-
-    // If response is a string, try to parse it
-    let jsonStr = rawResponse;
-    if (typeof rawResponse === 'string') {
-      // First try to extract JSON from markdown code blocks
-      const codeBlockMatch = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch && codeBlockMatch[1]) {
-        jsonStr = codeBlockMatch[1];
-      }
-
-      // First attempt: Try parsing as is
+    return JSON.parse(jsonStr);
+  } catch (e1) {
+    // Try extracting from code block
+    const codeBlockMatch = typeof jsonStr === 'string' && jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (codeBlockMatch && codeBlockMatch[1]) {
+      jsonStr = codeBlockMatch[1];
       try {
-        const parsedData = JSON.parse(jsonStr);
-        console.log('Successfully parsed core company details on first attempt');
-        return parsedData;
-      } catch (firstError) {
-        console.error('First parse attempt failed:', firstError);
-        
-        // Second attempt: Basic cleaning
+        return JSON.parse(jsonStr);
+      } catch (e2) {
+        // Try minimal cleaning
         try {
           jsonStr = jsonStr
-            .trim()
-            // Remove bad control characters
             .replace(/[\u0000-\u001F\u007F\u2028\u2029]/g, ' ')
-            // Fix common JSON formatting issues
-            .replace(/,(\s*[}\]])/g, '$1')
-            // Fix unescaped quotes in URLs
-            .replace(/(https?:\/\/[^"'\s]+)"/g, '$1\\"')
-            // Remove any trailing commas before closing brackets
-            .replace(/,(\s*[}\]])/g, '$1');
-
-          const parsedData = JSON.parse(jsonStr);
-          console.log('Successfully parsed core company details after basic cleaning');
-          return parsedData;
-        } catch (secondError) {
-          console.error('Second parse attempt failed:', secondError);
-          
-          // Third attempt: Aggressive cleaning
-          try {
-            jsonStr = jsonStr
-              // Remove any invalid image URLs
-              .replace(/"image":\s*"[^"]*?(?:signdate|indic|p_key)[^"]*"/g, '"image": ""')
-              // Fix unescaped quotes
-              .replace(/(?<!\\)"/g, '\\"')
-              .replace(/\\\\"/g, '\\"')
-              // Remove any non-printable characters
-              .replace(/[^\x20-\x7E]/g, '')
-              // Fix any remaining common JSON syntax issues
-              .replace(/,\s*([\]}])/g, '$1')
-              .replace(/([{[]\s*),/g, '$1');
-
-            const parsedData = JSON.parse(jsonStr);
-            console.log('Successfully parsed core company details after aggressive cleaning');
-            return parsedData;
-          } catch (finalError) {
-            console.error('Final parse attempt failed:', finalError);
-            console.error('Raw response:', rawResponse);
-            throw finalError;
-          }
+            .replace(/,([\s*[}\]])/g, '$1');
+          // Fix: quote numbers with commas or dashes that are not already quoted
+          jsonStr = jsonStr.replace(/(:\s*)(-?\d[\d,\-]*\d)(?=\s*[,}\]])/g, (match, p1, p2) => {
+            // If p2 contains a comma or dash, quote it
+            if (p2.match(/[,-]/)) {
+              return `${p1}"${p2}"`;
+            }
+            return match;
+          });
+          return JSON.parse(jsonStr);
+        } catch (e3) {
+          console.error('All parse attempts failed:', e1, e2, e3);
+          return null;
         }
       }
+    } else {
+      // Try minimal cleaning on original string
+      try {
+        jsonStr = jsonStr
+          .replace(/[\u0000-\u001F\u007F\u2028\u2029]/g, ' ')
+          .replace(/,([\s*[}\]])/g, '$1');
+        // Fix: quote numbers with commas or dashes that are not already quoted
+        jsonStr = jsonStr.replace(/(:\s*)(-?\d[\d,\-]*\d)(?=\s*[,}\]])/g, (match, p1, p2) => {
+          if (p2.match(/[,-]/)) {
+            return `${p1}"${p2}"`;
+          }
+          return match;
+        });
+        return JSON.parse(jsonStr);
+      } catch (e4) {
+        console.error('All parse attempts failed:', e1, e4);
+        return null;
+      }
     }
-
-    return null;
-  } catch (err) {
-    console.error('Error parsing core company details:', err);
-    console.error('Warning: Raw response:', rawResponse);
-    return null;
   }
 };
 

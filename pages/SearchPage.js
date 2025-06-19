@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator, Animated } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Animated, Platform, StatusBar, Dimensions, Easing } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,6 +12,61 @@ import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInCo
 import { useCoreCompanyDetails } from '../features/core_company_details/context/CoreCompanyDetailsContext';
 import { getCompanyWaysToGetIn, getCoreCompanyDetails, getCompanyCulture, getCompanyInterviewExperience, getCompanyJobHiringInsights, getCompanyNewsHighlights, getCompanyTechStack } from '../api/api';
 
+const { width, height } = Dimensions.get('window');
+
+// Animated background shapes (now with more shapes and variety)
+function AnimatedBgShapes() {
+  const anims = Array.from({ length: 6 }, (_, i) => React.useRef(new Animated.Value(0)).current);
+  const shapeConfigs = [
+    // size, left, top, right, bottom, opacity range, duration
+    { w: 180, h: 180, left: -40, top: 40, opacity: [0.18, 0.32], duration: 6000 },
+    { w: 120, h: 120, right: 0, top: height * 0.18, opacity: [0.12, 0.22], duration: 8000 },
+    { w: 220, h: 220, left: width * 0.18, top: height * 0.68, opacity: [0.10, 0.18], duration: 10000 },
+    { w: 90, h: 90, left: width * 0.7, top: height * 0.08, opacity: [0.10, 0.18], duration: 9000 },
+    { w: 140, h: 60, left: width * 0.55, top: height * 0.5, opacity: [0.08, 0.16], duration: 7000, borderRadius: 40 },
+    { w: 60, h: 60, left: width * 0.05, top: height * 0.82, opacity: [0.10, 0.22], duration: 11000 },
+  ];
+
+  React.useEffect(() => {
+    anims.forEach((anim, i) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1, duration: shapeConfigs[i].duration, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: shapeConfigs[i].duration, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ])
+      ).start();
+    });
+  }, []);
+
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      {shapeConfigs.map((cfg, i) => (
+        <Animated.View
+          key={i}
+          style={[
+            styles.bgShape,
+            {
+              width: cfg.w,
+              height: cfg.h,
+              left: cfg.left,
+              right: cfg.right,
+              top: cfg.top,
+              bottom: cfg.bottom,
+              borderRadius: cfg.borderRadius || 999,
+              opacity: anims[i].interpolate({ inputRange: [0, 1], outputRange: cfg.opacity }),
+              transform: [
+                { translateX: anims[i].interpolate({ inputRange: [0, 1], outputRange: [0, (cfg.w / 8) * (i % 2 === 0 ? 1 : -1)] }) },
+                { translateY: anims[i].interpolate({ inputRange: [0, 1], outputRange: [0, (cfg.h / 8) * (i % 2 === 1 ? 1 : -1)] }) },
+                { scale: anims[i].interpolate({ inputRange: [0, 1], outputRange: [1, 1 + 0.06 * (i % 3 + 1)] }) },
+              ],
+            },
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
+
 export default function SearchPage({ onBack }) {
   const navigation = useNavigation();
   const [searchedCompany, setSearchedCompany] = useState(null);
@@ -23,6 +78,7 @@ export default function SearchPage({ onBack }) {
   const [showError, setShowError] = useState(true);
   const [showApiKeyNotification, setShowApiKeyNotification] = useState(false);
   const insets = useSafeAreaInsets();
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
   const { 
     loading: waysLoading, 
@@ -45,6 +101,14 @@ export default function SearchPage({ onBack }) {
     return () => {
       clearWaysData();
     };
+  }, []);
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
   // Reset showError when error changes
@@ -79,6 +143,7 @@ export default function SearchPage({ onBack }) {
   };
 
   const handleSearch = async (company) => {
+    console.log('SearchPage handleSearch company:', company);
     if (!company?.trim()) return;
     setSearchedCompany(company);
     setLoading(true);
@@ -99,7 +164,6 @@ export default function SearchPage({ onBack }) {
     setTopicStatuses(initialTopics);
 
     try {
-      console.log('Starting sequential API calls for company:', company);
       const results = {};
       let anySuccess = false;
       let isRateLimited = false;
@@ -122,16 +186,13 @@ export default function SearchPage({ onBack }) {
           };
           anySuccess = true;
           updateTopicStatus(topicIndex, 'completed');
-          console.log(`[SearchPage] ${label} data received:`, res);
         } catch (err) {
-          // Check for rate limit error
           if (err.message?.includes('Rate limit exceeded') || 
               (err.response?.status === 429) || 
               err.message?.includes('429')) {
             isRateLimited = true;
             setError('API rate limit exceeded. Please try again later.');
           }
-
           if (err.cleanedResponse) {
             results[label] = { parsed: null, raw: err.cleanedResponse };
           } else {
@@ -139,13 +200,10 @@ export default function SearchPage({ onBack }) {
           }
           updateTopicStatus(topicIndex, 'error');
           setHasApiError(true);
-          console.error(`[SearchPage] ${label} failed:`, err.message);
         }
       };
 
       await tryApi(getCoreCompanyDetails, 'coreData', 0);
-      
-      // Only continue with other APIs if core data succeeded and we're not rate limited
       if (!isRateLimited && results.coreData?.parsed) {
         await tryApi(getCompanyWaysToGetIn, 'waysData', 1);
         await tryApi(getCompanyCulture, 'cultureData', 2);
@@ -154,11 +212,8 @@ export default function SearchPage({ onBack }) {
         await tryApi(getCompanyNewsHighlights, 'newsData', 5);
         await tryApi(getCompanyTechStack, 'techStackData', 6);
       }
-
-      console.log('[SearchPage] All data after API calls:', results);
       setAllData(results);
       setLoading(false);
-
       if (isRateLimited) {
         setError('API rate limit exceeded. Please try again later.');
         setHasApiError(true);
@@ -176,7 +231,6 @@ export default function SearchPage({ onBack }) {
       setLoading(false);
       setError('An unexpected error occurred. Please try again.');
       setHasApiError(true);
-      console.error('[SearchPage] Error during company data fetch:', err);
     }
   };
 
@@ -308,138 +362,151 @@ export default function SearchPage({ onBack }) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.outerContainer}>
       <LinearGradient
-        colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
-        style={[styles.header, { paddingTop: insets.top, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
+        colors={['#4158D0', '#C850C0', '#FFC246']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      <AnimatedBgShapes />
+      <Animated.View
+        style={[
+          styles.fullWidthHeader,
+          {
+            opacity: fadeAnim,
+            top: insets.top + 10,
+          },
+        ]}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={handleBackToLanding}
-          style={styles.backButton}
+          style={styles.headerIconBtn}
+          activeOpacity={0.7}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
+          <MaterialCommunityIcons name="arrow-left" size={30} color="#fff" style={{ borderWidth: 1, borderColor: 'white', borderRadius: 50, padding: 5 }} />
         </TouchableOpacity>
+        <View style={{ flex: 1 }} />
         <TouchableOpacity
           onPress={() => navigation.navigate('Settings')}
-          style={styles.settingsButton}
+          style={styles.headerIconBtn}
+          activeOpacity={0.7}
         >
-          <MaterialCommunityIcons name="cog" size={24} color="#4158D0" />
+          <MaterialCommunityIcons name="cog" size={30} color="#fff" style={{ borderWidth: 1, borderColor: 'white', borderRadius: 50, padding: 5 }} />
         </TouchableOpacity>
-      </LinearGradient>
-
-      <View style={[styles.content, { paddingTop: 0 }]}>
-        {showApiKeyNotification && (
-          <View style={styles.apiKeyNotification}>
-            <MaterialCommunityIcons name="key-alert" size={24} color="#4158D0" />
-            <Text style={styles.apiKeyNotificationText}>
-              Please set up your OpenRouter API key to start using the app
-            </Text>
-            <TouchableOpacity 
-              style={styles.setupButton}
-              onPress={handleGoToSettings}
-            >
-              <Text style={styles.setupButtonText}>Set up now</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+      </Animated.View>
+      <Animated.View style={[styles.glassCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) }] }]}> 
         <SearchCompany onSearch={handleSearch} />
-        {loading && (
-          <View style={styles.loadingContainer}>
-            <LoadingSpinner 
-              message={`Fetching information about ${searchedCompany}...`}
-              topicStatuses={topicStatuses}
-            />
+        {/* Notification overlays, always centered */}
+        {showApiKeyNotification && (
+          <View style={styles.centeredNotificationContainer}>
+            <View style={styles.apiKeyNotification}>
+              <MaterialCommunityIcons name="key-alert" size={24} color="#4158D0" />
+              <Text style={styles.apiKeyNotificationText}>
+                Please set up your OpenRouter API key to start using the app
+              </Text>
+              <TouchableOpacity 
+                style={styles.setupButton}
+                onPress={handleGoToSettings}
+              >
+                <Text style={styles.setupButtonText}>Set up now</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
         {error && showError && (
-          <Animated.View 
-            style={[
-              styles.errorContainer, 
-              error.includes('rate limit') && styles.rateLimitError
-            ]}
-          >
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={handleDismissError}
-            >
+          <View style={styles.centeredNotificationContainer}>
+            <View style={[styles.errorContainer, error.includes('rate limit') && styles.rateLimitError]}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={handleDismissError}
+              >
+                <MaterialCommunityIcons 
+                  name="close" 
+                  size={20} 
+                  color="rgba(255, 77, 109, 0.8)"
+                />
+              </TouchableOpacity>
               <MaterialCommunityIcons 
-                name="close" 
-                size={20} 
-                color="rgba(255, 77, 109, 0.8)"
+                name={error.includes('rate limit') ? "clock-alert" : "alert-circle"} 
+                size={24} 
+                color="#ff4d6d" 
               />
-            </TouchableOpacity>
-            <MaterialCommunityIcons 
-              name={error.includes('rate limit') ? "clock-alert" : "alert-circle"} 
-              size={24} 
-              color="#ff4d6d" 
-            />
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity 
-              style={styles.retryButton}
-              onPress={() => searchedCompany && handleSearch(searchedCompany)}
-            >
-              <Text style={styles.retryText}>Retry</Text>
-            </TouchableOpacity>
-          </Animated.View>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity 
+                style={styles.retryButton}
+                onPress={() => searchedCompany && handleSearch(searchedCompany)}
+              >
+                <Text style={styles.retryText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
-      </View>
+        {loading && (
+          <View style={styles.centeredLoaderContainer}>
+            <LoadingSpinner 
+              message={`Fetching information about ${searchedCompany}...`}
+              topicStatuses={topicStatuses}
+              currentStep={topicStatuses.findIndex(t => t.status === 'loading') !== -1 ? topicStatuses.findIndex(t => t.status === 'loading') : topicStatuses.findIndex(t => t.status === 'pending') !== -1 ? topicStatuses.findIndex(t => t.status === 'pending') : topicStatuses.length - 1}
+            />
+          </View>
+        )}
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
-    backgroundColor: '#f6f8fc',
-    // paddingTop: 12,
-  },
-  header: {
-    paddingHorizontal: 16,
-    // paddingBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 0,
     backgroundColor: 'transparent',
-    shadowColor: '#4158D0',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-    zIndex: 10,
-    marginBottom: 20,
-  },
-  settingsButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(65, 88, 208, 0.12)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    shadowColor: '#4158D0',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 3,
-    zIndex: 11,
-  },
-  content: {
-    flex: 1,
     position: 'relative',
-    backgroundColor: 'transparent',
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(65, 88, 208, 0.12)',
+  fullWidthHeader: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    borderRadius: 18,
+    paddingHorizontal: 18,
+    // shadowColor: '#4158D0',
+    // shadowOffset: { width: 0, height: 4 },
+    // shadowOpacity: 0.08,
+    // shadowRadius: 12,
+    // elevation: 8,
+    zIndex: 20,
+  },
+  headerIconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(65, 88, 208, 0.10)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    marginHorizontal: 2,
     shadowColor: '#4158D0',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.10,
     shadowRadius: 6,
     elevation: 3,
+  },
+  glassCard: {
+    // marginTop: height * 0.13,
+    marginHorizontal: 18,
+    // backgroundColor: 'rgba(255,255,255,0.65)',
+    borderRadius: 32,
+    padding: 24,
+    // shadowColor: '#4158D0',
+    // shadowOffset: { width: 0, height: 8 },
+    // shadowOpacity: 0.10,
+    // shadowRadius: 24,
+    // elevation: 12,
+    alignItems: 'center',
+    minHeight: height * 0.45,
+    justifyContent: 'center',
+    backdropFilter: 'blur(18px)', // for web, ignored on native
   },
   loadingContainer: {
     position: 'absolute',
@@ -450,27 +517,62 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    borderRadius: 20,
-    margin: 16,
+    borderRadius: 32,
+    margin: 0,
     shadowColor: '#4158D0',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.10,
     shadowRadius: 8,
     elevation: 4,
   },
-  rateLimitError: {
-    backgroundColor: '#fff0f3',
-    borderColor: '#ff9800',
+  apiKeyNotification: {
+    backgroundColor: '#fff',
+    marginBottom: 18,
+    padding: 18,
+    borderRadius: 18,
+    alignItems: 'center',
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(65, 88, 208, 0.2)',
+  },
+  apiKeyNotificationText: {
+    color: '#333',
+    fontSize: 15,
+    textAlign: 'center',
+    marginVertical: 12,
+    lineHeight: 20,
+  },
+  setupButton: {
+    backgroundColor: '#4158D0',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginTop: 6,
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  setupButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
   errorContainer: {
     position: 'absolute',
-    bottom: 90,
+    bottom: 40,
     left: 20,
     right: 20,
     backgroundColor: '#fff0f3',
     padding: 20,
-    paddingTop: 24, // Increased to accommodate close button
-    borderRadius: 16,
+    paddingTop: 24,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: '#ff4d6d',
     alignItems: 'center',
@@ -479,6 +581,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 4,
+  },
+  rateLimitError: {
+    backgroundColor: '#fff7e6',
+    borderColor: '#ff9800',
   },
   errorText: {
     color: '#ff4d6d',
@@ -518,43 +624,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  apiKeyNotification: {
-    backgroundColor: '#fff',
-    margin: 16,
-    padding: 20,
-    borderRadius: 16,
+  topSearchContainer: {
+    width: '100%',
     alignItems: 'center',
-    shadowColor: '#4158D0',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(65, 88, 208, 0.2)',
+    marginTop: 80,
+    marginBottom: 8,
+    zIndex: 5,
   },
-  apiKeyNotificationText: {
-    color: '#333',
-    fontSize: 15,
-    textAlign: 'center',
-    marginVertical: 12,
-    lineHeight: 20,
+  bgShape: {
+    position: 'absolute',
+    backgroundColor: '#fff',
+    borderRadius: 999,
+    // glass effect
+    shadowColor: '#fff',
+    shadowOpacity: 0.18,
+    shadowRadius: 32,
+    shadowOffset: { width: 0, height: 0 },
+    // iOS glass effect
+    // For web, you could add: backdropFilter: 'blur(12px)',
   },
-  setupButton: {
-    backgroundColor: '#4158D0',
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 20,
-    marginTop: 6,
-    shadowColor: '#4158D0',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.14,
-    shadowRadius: 8,
-    elevation: 4,
+  centeredLoaderContainer: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
   },
-  setupButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    letterSpacing: 0.3,
+  centeredNotificationContainer: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2000,
   },
 });

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const { width } = Dimensions.get('window');
 
@@ -108,6 +109,15 @@ const topics = [
 export default function CompanyTopicsList({ company, allData, onBack }) {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setLoading(true);
+      const timer = setTimeout(() => setLoading(false), 3500);
+      return () => clearTimeout(timer);
+    }, [])
+  );
 
   const handleBackPress = () => {
     if (onBack) {
@@ -180,6 +190,14 @@ export default function CompanyTopicsList({ company, allData, onBack }) {
       </TouchableOpacity>
     </Animatable.View>
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <LoadingSpinner message="Loading topics..." />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -327,5 +345,17 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     marginLeft: 8,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 9999,
   },
 }); 

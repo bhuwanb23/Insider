@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: 22,
     overflow: 'hidden',
+    marginTop: 2,
   },
   tabGradient: {
     flexDirection: 'row',

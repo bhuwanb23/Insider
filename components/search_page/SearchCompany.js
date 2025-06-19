@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Animatable from 'react-native-animatable';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, FlatList, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const SUGGESTED_COMPANIES = [
-  'Google', 'Microsoft', 'Amazon', 'Meta', 'Apple',
-  'Netflix', 'Twitter', 'LinkedIn', 'Uber', 'Airbnb'
 ];
+
+const { width, height } = Dimensions.get('window');
 
 export default function SearchCompany({ onSearch }) {
   const [company, setCompany] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+  const inputAnim = React.useRef(new Animated.Value(0)).current;
 
-  const handleSearch = () => {
-    const searchTerm = company.trim();
+  const handleSearch = (input) => {
+    console.log('handleSearch input:', input);
+    const searchTerm = (input !== undefined ? input : company).trim();
     if (searchTerm.length > 0) {
       onSearch(searchTerm);
     }
@@ -25,198 +26,213 @@ export default function SearchCompany({ onSearch }) {
     onSearch(searchTerm);
   };
 
-  return (
-    <LinearGradient
-      colors={["#f6f9fc", "#ecf0f3"]}
-      style={styles.gradientBg}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Animatable.View animation="fadeInUp" delay={200} style={styles.inputContainer}>
-            <View style={styles.searchContainer}>
-              <MaterialCommunityIcons name="magnify" size={24} style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search for a company..."
-                value={company}
-                onChangeText={text => setCompany(text)}
-                onSubmitEditing={handleSearch}
-                returnKeyType="search"
-                autoCapitalize="none"
-                autoCorrect={false}
-                blurOnSubmit={true}
-                enablesReturnKeyAutomatically={true}
-                maxLength={50}
-                textContentType="organizationName"
-              />
-            </View>
-            <TouchableOpacity style={styles.button} onPress={handleSearch}>
-              <Text style={styles.buttonText}>Search</Text>
-            </TouchableOpacity>
-          </Animatable.View>
-          <Animatable.Text animation="fadeIn" delay={600} style={styles.tip}>
-            Enter a company name to explore insights, jobs, and more!
-          </Animatable.Text>
+  const handleFocus = () => {
+    setIsFocused(true);
+    Animated.timing(inputAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
+  };
+  const handleBlur = () => {
+    setIsFocused(false);
+    Animated.timing(inputAnim, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
+  };
 
-          <View style={styles.suggestionsContainer}>
-            <Text style={styles.suggestionsTitle}>Popular Companies</Text>
-            <View style={styles.suggestionsGrid}>
-              {SUGGESTED_COMPANIES.map((suggestedCompany, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.suggestionCard}
-                  onPress={() => handleSuggestionPress(suggestedCompany)}
-                >
-                  <MaterialCommunityIcons 
-                    name="office-building" 
-                    size={20} 
-                    color="#4158D0" 
-                    style={styles.companyIcon}
-                  />
-                  <Text style={styles.suggestionText}>{suggestedCompany}</Text>
-                </TouchableOpacity>
-              ))}
+  // Animated styles for input focus
+  const animatedInputStyle = {
+    width: inputAnim.interpolate({ inputRange: [0, 1], outputRange: [width * 0.85, width * 0.95] }),
+    backgroundColor: inputAnim.interpolate({ inputRange: [0, 1], outputRange: ['#f4f8fd', '#e3edfa'] }),
+    shadowOpacity: inputAnim.interpolate({ inputRange: [0, 1], outputRange: [0.08, 0.16] }),
+    borderColor: inputAnim.interpolate({ inputRange: [0, 1], outputRange: ['#dbeafe', '#60a5fa'] }),
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.fullScreenContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+    >
+      <View style={styles.centeredContent}>
+        {/* Search Bar */}
+        <Animated.View style={[styles.inputRow, animatedInputStyle]}>
+          <MaterialCommunityIcons name="magnify" size={26} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search"
+            placeholderTextColor="#6b7280"
+            value={company}
+            onChangeText={text => setCompany(text)}
+            onSubmitEditing={e => handleSearch(e.nativeEvent.text)}
+            returnKeyType="search"
+            autoCapitalize="none"
+            autoCorrect={false}
+            blurOnSubmit={true}
+            enablesReturnKeyAutomatically={true}
+            maxLength={50}
+            textContentType="organizationName"
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            accessibilityLabel="Search for a company"
+          />
+          <TouchableOpacity style={styles.fabButton} onPress={() => handleSearch(company)} activeOpacity={0.85} accessibilityLabel="Submit search">
+            <View style={styles.fabGradient}>
+              <MaterialCommunityIcons name="arrow-right" size={22} color="#fff" />
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+          </TouchableOpacity>
+        </Animated.View>
+        {/* Popular Companies */}
+        <View style={styles.suggestionsContainer}>
+          {/* <Text style={styles.suggestionsTitle}>Popular Companies</Text> */}
+          <FlatList
+            data={SUGGESTED_COMPANIES}
+            keyExtractor={item => item}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chipList}
+            removeClippedSubviews={false}
+            style={{ width: '100%', maxWidth: 480 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.chipWrapper}
+                activeOpacity={0.85}
+                onPress={() => handleSuggestionPress(item)}
+                accessibilityLabel={`Search for ${item}`}
+              >
+                <View style={styles.chip}>
+                  <MaterialCommunityIcons name="office-building" size={15} color="#2563eb" style={{ marginRight: 6 }} />
+                  <Text style={styles.chipText}>{item}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  gradientBg: {
+  fullScreenContainer: {
     flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    flexGrow: 1,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2d3436',
-    marginBottom: 10,
-    textAlign: 'center',
-    letterSpacing: 1,
-  },
-  logo: {
-    fontSize: 32,
-    marginRight: 8,
-  },
-  inputContainer: {
     width: '100%',
-    maxWidth: 400,
-    backgroundColor: 'rgba(255,255,255,0.98)',
-    borderRadius: 20,
-    padding: 18,
-    shadowColor: '#0984e3',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 8,
+    height: '100%',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 0,
-    // marginBottom: 24,
   },
-  searchContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  centeredContent: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
+    paddingTop: height * 0.20,
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#4158D0',
+    borderRadius: 28,
+    backgroundColor: '#f4f8fd',
+    borderWidth: 1.5,
+    borderColor: '#dbeafe',
+    shadowColor: '#60a5fa',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 3,
+    paddingHorizontal: 18,
+    paddingVertical: 6,
+    minHeight: 54,
+    marginBottom: 32,
+    width: width > 500 ? 420 : '92%',
+    maxWidth: 480,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#333',
-    marginLeft: 12,
-    paddingVertical: 8,
+    fontSize: 18,
+    color: '#222',
+    marginLeft: 10,
+    paddingVertical: 0,
+    backgroundColor: 'transparent',
+    height: 44,
+    fontWeight: '500',
+    letterSpacing: 0.1,
   },
   searchIcon: {
-    color: '#4158D0',
+    color: '#2563eb',
   },
-  button: {
-    backgroundColor: '#0984e3',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 20,
+  fabButton: {
+    marginLeft: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
-    shadowColor: '#0984e3',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 6,
-    elevation: 4,
+    backgroundColor: '#2563eb',
+    shadowColor: '#2563eb',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.10,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  tip: {
-    fontSize: 16,
-    color: '#636e72',
-    marginTop: 12,
-    textAlign: 'center',
-    opacity: 0.85,
-  },
-  container: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 16,
+  fabGradient: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#2563eb',
   },
   suggestionsContainer: {
-    marginTop: 16,
+    width: '100%',
+    maxWidth: 480,
+    alignItems: 'flex-start',
+    marginTop: 8,
   },
   suggestionsTitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    fontWeight: '600',
+    fontSize: 16,
+    color: '#2563eb',
+    marginBottom: 10,
+    fontWeight: '700',
+    marginLeft: 8,
+    letterSpacing: 0.2,
   },
-  suggestionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  suggestionCard: {
-    width: '48%',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
+  chipList: {
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#4158D0',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingLeft: 8,
+    paddingRight: 8,
+    width: '100%',
+  },
+  chipWrapper: {
+    marginRight: 12,
+    marginBottom: 2,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    backgroundColor: '#eaf1fb',
     borderWidth: 1,
-    borderColor: 'rgba(65, 88, 208, 0.1)',
+    borderColor: '#60a5fa',
   },
-  companyIcon: {
-    marginRight: 8,
-  },
-  suggestionText: {
-    color: '#333',
-    fontSize: 14,
-    fontWeight: '500',
-    flex: 1,
+  chipText: {
+    color: '#2563eb',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
 }); 

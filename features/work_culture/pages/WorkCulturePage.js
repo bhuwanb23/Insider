@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: '100',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   gradientBackground: {
     flex: 1,
@@ -164,6 +164,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     paddingBottom: 12,
+    marginBottom: 12,
   },
   tabsContent: {
     paddingHorizontal: 12,
@@ -206,6 +207,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 16,
     paddingTop: 0,
+    marginTop: 8,
   },
   loadingContainer: {
     justifyContent: 'center',
