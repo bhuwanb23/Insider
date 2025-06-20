@@ -32,6 +32,41 @@ export default function CultureOverviewSection({ data }) {
           ))}
         </View>
       </LinearGradient>
+
+      {/* Employee Empowerment Section */}
+      {data.employeeEmpowerment && (
+        <View style={styles.empowermentContainer}>
+          <Text style={styles.sectionHeader}>Employee Empowerment</Text>
+          <Text style={styles.empowermentRating}>Empowerment Rating: {data.employeeEmpowerment.rating}/5</Text>
+          {data.employeeEmpowerment.initiatives && data.employeeEmpowerment.initiatives.length > 0 && (
+            <View style={styles.initiativesList}>
+              {data.employeeEmpowerment.initiatives.map((initiative, idx) => (
+                <Text key={idx} style={styles.initiativeItem}>• {initiative}</Text>
+              ))}
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Leadership Style Section */}
+      {data.leadershipStyle && (
+        <LinearGradient
+          colors={['#4158D0', '#C850C0']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.leadershipContainer}
+        >
+          <Text style={styles.sectionHeader}>Leadership Style</Text>
+          <Text style={styles.leadershipType}>{data.leadershipStyle.icon} {data.leadershipStyle.type}</Text>
+          {data.leadershipStyle.features && data.leadershipStyle.features.length > 0 && (
+            <View style={styles.featuresList}>
+              {data.leadershipStyle.features.map((feature, idx) => (
+                <Text key={idx} style={styles.featureItem}>• {feature}</Text>
+              ))}
+            </View>
+          )}
+        </LinearGradient>
+      )}
     </View>
   );
 }
@@ -99,5 +134,57 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginTop: 12,
+  },
+  empowermentContainer: {
+    backgroundColor: '#f5f6fa',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+    marginHorizontal: 2,
+    elevation: 2,
+  },
+  sectionHeader: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#4158D0',
+  },
+  empowermentRating: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 4,
+  },
+  initiativesList: {
+    marginLeft: 8,
+  },
+  initiativeItem: {
+    fontSize: 13,
+    color: '#555',
+    marginBottom: 2,
+  },
+  leadershipContainer: {
+    borderRadius: 14,
+    padding: 16,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    marginBottom: 16,
+  },
+  leadershipType: {
+    fontSize: 15,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  featuresList: {
+    marginLeft: 8,
+  },
+  featureItem: {
+    fontSize: 13,
+    color: '#fff',
+    marginBottom: 2,
   },
 }); 

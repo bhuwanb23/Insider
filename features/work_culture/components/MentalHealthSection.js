@@ -39,10 +39,28 @@ export default function MentalHealthSection({ data }) {
             <View style={styles.programInfo}>
               <Text style={styles.programName}>{program.name}</Text>
               <Text style={styles.programDetails}>Coverage: {program.coverage}</Text>
+              {program.sessions && (
+                <Text style={styles.programDetails}>Sessions: {program.sessions}</Text>
+              )}
+              {program.apps && program.apps.length > 0 && (
+                <Text style={styles.programDetails}>Apps: {program.apps.join(', ')}</Text>
+              )}
             </View>
           </View>
         ))}
       </LinearGradient>
+
+      {/* EAP Services Section */}
+      {data.eapServices && (
+        <View style={styles.eapContainer}>
+          <Text style={styles.eapTitle}>EAP Services</Text>
+          <Text style={styles.eapDetail}>Available: {data.eapServices.available}</Text>
+          <Text style={styles.eapDetail}>Coverage: {data.eapServices.coverage}</Text>
+          {data.eapServices.includes && data.eapServices.includes.length > 0 && (
+            <Text style={styles.eapDetail}>Includes: {data.eapServices.includes.join(', ')}</Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -99,5 +117,24 @@ const styles = StyleSheet.create({
   programDetails: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
+  },
+  eapContainer: {
+    backgroundColor: '#f5f6fa',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 16,
+    marginHorizontal: 2,
+    elevation: 2,
+  },
+  eapTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#4158D0',
+  },
+  eapDetail: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 2,
   },
 }); 

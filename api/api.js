@@ -15,7 +15,8 @@ const OPENROUTER_API_KEY_FALLBACK = 'sk-or-v1-326b523172339624fa71351e1239fa7f96
 // const OPENROUTER_API_KEY = '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';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
+// const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
+const OPENROUTER_MODEL = 'deepseek/deepseek-chat-v3-0324:free';
 
 // Function to increment API request count
 const incrementApiRequestCount = async () => {

@@ -143,7 +143,6 @@ export default function SearchPage({ onBack }) {
   };
 
   const handleSearch = async (company) => {
-    console.log('SearchPage handleSearch company:', company);
     if (!company?.trim()) return;
     setSearchedCompany(company);
     setLoading(true);

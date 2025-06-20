@@ -45,6 +45,17 @@ export default function TeamCollaborationSection({ data }) {
           </View>
         ))}
       </LinearGradient>
+
+      {/* Manager Support Section */}
+      {data.managerSupport && (
+        <View style={styles.managerSupportContainer}>
+          <Text style={styles.managerSupportTitle}>Manager Support</Text>
+          <Text style={styles.managerSupportDetail}>Rating: {data.managerSupport.rating || 'N/A'}/5</Text>
+          <Text style={styles.managerSupportDetail}>Feedback Frequency: {data.managerSupport.feedbackFrequency || 'N/A'}</Text>
+          <Text style={styles.managerSupportDetail}>1:1 Meetings: {data.managerSupport.oneOnOneMeetings || 'N/A'}</Text>
+          <Text style={styles.managerSupportTestimonial}>{data.managerSupport.testimonial || 'No testimonial provided.'}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -101,5 +112,30 @@ const styles = StyleSheet.create({
   activityDetails: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
+  },
+  managerSupportContainer: {
+    backgroundColor: '#f5f6fa',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 16,
+    marginHorizontal: 2,
+    elevation: 2,
+  },
+  managerSupportTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#4158D0',
+  },
+  managerSupportDetail: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 2,
+  },
+  managerSupportTestimonial: {
+    fontSize: 13,
+    color: '#555',
+    marginTop: 6,
+    fontStyle: 'italic',
   },
 }); 

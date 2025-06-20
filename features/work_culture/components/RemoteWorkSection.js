@@ -38,46 +38,62 @@ export default function RemoteWorkSection({ data }) {
         end={{ x: 1, y: 0 }}
         style={styles.policyHeader}
       >
-        <MaterialCommunityIcons name="laptop" size={28} color="#fff" />
+        <MaterialCommunityIcons name="laptop" size={32} color="#fff" style={{ marginRight: 12 }} />
         <Text style={styles.policyTitle}>{data.policy}</Text>
       </LinearGradient>
 
       {/* Details Grid */}
-      <View style={styles.detailsContainer}>
-        {Object.entries(data.details).map(([key, value]) => renderDetail(key, value))}
+      <Text style={styles.sectionHeader}>Remote Work Details</Text>
+      <View style={styles.detailsGrid}>
+        {data.details && Object.keys(data.details).length > 0 ? (
+          Object.entries(data.details).map(([key, value]) => (
+            <View key={key} style={styles.detailCardModern}>
+              <MaterialCommunityIcons
+                name={key === 'remoteAllowed' ? 'home-outline' : key === 'hybridStructure' ? 'calendar-clock' : key === 'globalPolicy' ? 'earth' : 'laptop'}
+                size={22}
+                color="#4158D0"
+                style={styles.detailIcon}
+              />
+              <View style={styles.detailContentModern}>
+                <Text style={styles.detailLabelModern}>{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</Text>
+                <Text style={styles.detailValueModern}>{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value || 'N/A'}</Text>
+              </View>
+            </View>
+          ))
+        ) : (
+          <Text style={{ color: '#888', fontSize: 13 }}>No details available.</Text>
+        )}
       </View>
 
       {/* Benefits Section */}
-      <View style={styles.benefitsContainer}>
-        <Text style={styles.benefitsTitle}>Remote Work Benefits</Text>
-        <View style={styles.benefitsList}>
-          {data.benefits.map((benefit, index) => (
-            <View key={index} style={styles.benefitItem}>
-              <View style={styles.benefitIconContainer}>
-                <MaterialCommunityIcons name="check-circle" size={20} color="#4CAF50" />
-              </View>
+      <Text style={styles.sectionHeader}>Remote Work Benefits</Text>
+      <View style={styles.benefitsGrid}>
+        {data.benefits && data.benefits.length > 0 ? (
+          data.benefits.map((benefit, index) => (
+            <View key={index} style={styles.benefitCard}>
+              <MaterialCommunityIcons name="check-circle" size={20} color="#4CAF50" style={{ marginRight: 8 }} />
               <Text style={styles.benefitText}>{benefit}</Text>
             </View>
-          ))}
-        </View>
+          ))
+        ) : (
+          <Text style={{ color: '#888', fontSize: 13 }}>No benefits listed.</Text>
+        )}
       </View>
 
       {/* Leave Policy */}
-      {data.leaves && (
-        <View style={styles.leavesContainer}>
-          <Text style={styles.leavesTitle}>Leave Policy</Text>
-          <View style={styles.leavesGrid}>
+      {data.leaves && Object.keys(data.leaves).length > 0 ? (
+        <View style={styles.leavesContainerModern}>
+          <Text style={styles.sectionHeader}>Leave Policy</Text>
+          <View style={styles.leavesGridModern}>
             {Object.entries(data.leaves).map(([type, duration]) => (
-              <View key={type} style={styles.leaveItem}>
-                <Text style={styles.leaveType}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </Text>
-                <Text style={styles.leaveDuration}>{duration}</Text>
+              <View key={type} style={styles.leaveCard}>
+                <Text style={styles.leaveType}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+                <Text style={styles.leaveDuration}>{duration || 'N/A'}</Text>
               </View>
             ))}
           </View>
         </View>
-      )}
+      ) : null}
     </View>
   );
 }
@@ -89,21 +105,121 @@ const styles = StyleSheet.create({
   policyHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
   policyTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-    marginLeft: 12,
+    flex: 1,
   },
-  detailsContainer: {
+  sectionHeader: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4158D0',
+    marginBottom: 10,
+    marginLeft: 4,
+  },
+  detailsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 18,
+  },
+  detailCardModern: {
+    width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 14,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  detailContentModern: {
+    flex: 1,
+  },
+  detailLabelModern: {
+    fontSize: 13,
+    color: '#4158D0',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  detailValueModern: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 2,
+  },
+  benefitsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 18,
+  },
+  benefitCard: {
+    width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  benefitText: {
+    fontSize: 13,
+    color: '#555',
+    flex: 1,
+  },
+  leavesContainerModern: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    marginBottom: 10,
+  },
+  leavesGridModern: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  leaveCard: {
+    width: '48%',
+    backgroundColor: '#f5f6fa',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  leaveType: {
+    fontSize: 12,
+    color: '#4158D0',
+    marginBottom: 4,
+    fontWeight: '600',
+  },
+  leaveDuration: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '600',
   },
   detailCard: {
     width: '48%',
@@ -132,84 +248,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '600',
-  },
-  benefitsContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  benefitsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
-  },
-  benefitsList: {
-    marginTop: 8,
-  },
-  benefitItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  benefitIconContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  benefitText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  leavesContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  leavesTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
-  },
-  leavesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  leaveItem: {
-    width: '48%',
-    backgroundColor: 'rgba(65, 88, 208, 0.05)',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-  },
-  leaveType: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  leaveDuration: {
     fontSize: 14,
     color: '#333',
     fontWeight: '600',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, FlatList, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -9,12 +9,12 @@ const { width, height } = Dimensions.get('window');
 
 export default function SearchCompany({ onSearch }) {
   const [company, setCompany] = useState('');
+  const companyRef = useRef('');
   const [isFocused, setIsFocused] = useState(false);
   const inputAnim = React.useRef(new Animated.Value(0)).current;
 
-  const handleSearch = (input) => {
-    console.log('handleSearch input:', input);
-    const searchTerm = (input !== undefined ? input : company).trim();
+  const handleSearch = () => {
+    const searchTerm = companyRef.current.trim();
     if (searchTerm.length > 0) {
       onSearch(searchTerm);
     }
@@ -66,8 +66,10 @@ export default function SearchCompany({ onSearch }) {
             placeholder="Search"
             placeholderTextColor="#6b7280"
             value={company}
-            onChangeText={text => setCompany(text)}
-            onSubmitEditing={e => handleSearch(e.nativeEvent.text)}
+            onChangeText={text => {
+              setCompany(text);
+              companyRef.current = text;
+            }}
             returnKeyType="search"
             autoCapitalize="none"
             autoCorrect={false}
@@ -79,7 +81,7 @@ export default function SearchCompany({ onSearch }) {
             onBlur={handleBlur}
             accessibilityLabel="Search for a company"
           />
-          <TouchableOpacity style={styles.fabButton} onPress={() => handleSearch(company)} activeOpacity={0.85} accessibilityLabel="Submit search">
+          <TouchableOpacity style={styles.fabButton} onPress={handleSearch} activeOpacity={0.85} accessibilityLabel="Submit search">
             <View style={styles.fabGradient}>
               <MaterialCommunityIcons name="arrow-right" size={22} color="#fff" />
             </View>
