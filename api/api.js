@@ -1,103 +1,158 @@
-import OpenAI from 'openai';
-import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetailsPrompt } from './prompts.js';
+import { getCompanyAnalysisPrompt, getCompanyCulturePrompt, getCoreCompanyDetailsPrompt, getCompanyInterviewExperiencePrompt, getCompanyJobHiringInsightsPrompt, getCompanyNewsHighlightsPrompt, getCompanyTechStackPrompt } from './prompts.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const a4fApiKey = "ddc-a4f-7132f706565644e3a56187c91c66d168";
-const a4fBaseUrl = 'https://api.a4f.co/v1';
+// OpenRouter API config
+export const API_KEY_STORAGE_KEY = 'openrouter_api_key';
+export const API_REQUEST_COUNT_KEY = 'openrouter_api_request_count'; // New storage key for the counter
+const OPENROUTER_API_KEY_FALLBACK = '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'; // Keep your current hardcoded key as a fallback
 
-const client = new OpenAI({
-    apiKey: a4fApiKey,
-    baseURL: a4fBaseUrl,
-});
+// const OPENROUTER_API_KEY = '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';
+
+// const OPENROUTER_API_KEY = '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';
+// Bhuwan api
+// const OPENROUTER_API_KEY = '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';
+// trndship api
+// const OPENROUTER_API_KEY = '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';
+
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+// const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
+const OPENROUTER_MODEL = 'deepseek/deepseek-chat-v3-0324:free';
+
+// Function to increment API request count
+const incrementApiRequestCount = async () => {
+    try {
+        let currentCount = await AsyncStorage.getItem(API_REQUEST_COUNT_KEY);
+        currentCount = currentCount ? parseInt(currentCount, 10) + 1 : 1;
+        await AsyncStorage.setItem(API_REQUEST_COUNT_KEY, currentCount.toString());
+    } catch (error) {
+        console.error('Failed to increment API request count', error);
+    }
+};
 
 // Helper function to clean markdown code blocks from response
 const cleanJsonResponse = (response) => {
-    // Remove markdown code block indicators and any language specification
-    let cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    // Trim any whitespace
-    cleaned = cleaned.trim();
-    return cleaned;
+    // Return raw response for context files to handle parsing
+    return response;
 };
 
-// Helper function to make API calls and handle responses
-const makeApiCall = async (prompt, label) => {
+// OpenRouter API call helper
+const makeOpenRouterApiCall = async (prompt, label) => {
     try {
-        const completion = await client.chat.completions.create({
-            model: "provider-4/claude-3.7-sonnet",
-            messages: [
-                { role: "user", content: prompt }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000,
-            response_format: { type: "json_object" }
+        const storedApiKey = await AsyncStorage.getItem(API_KEY_STORAGE_KEY);
+        const currentApiKey = storedApiKey || OPENROUTER_API_KEY_FALLBACK;
+
+        if (!currentApiKey) {
+            throw new Error('No API key found. Please set your OpenRouter API key in Settings.');
+        }
+
+        // Check if it's just the fallback key and no stored key
+        if (!storedApiKey && currentApiKey === OPENROUTER_API_KEY_FALLBACK) {
+            throw new Error('Please set up your own OpenRouter API key in Settings to continue.');
+        }
+
+        const res = await fetch(OPENROUTER_API_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${currentApiKey}`,
+                // 'HTTP-Referer': OPENROUTER_SITE_URL,
+                // 'X-Title': OPENROUTER_SITE_NAME,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: OPENROUTER_MODEL,
+                messages: [
+                    { role: 'user', content: prompt }
+                ]
+            })
         });
 
-        const responseContent = completion.choices[0].message.content;
-        console.log(`Raw ${label} API Response:`);
-
-        const cleanedResponse = cleanJsonResponse(responseContent);
-        console.log(`Cleaned ${label} Response:`);
-
-        try {
-            const parsedResponse = JSON.parse(cleanedResponse);
-            console.log(`Successfully parsed ${label} response as JSON`);
-            return parsedResponse;
-        } catch (parseError) {
-            console.error(`Failed to parse ${label} API response as JSON:`, parseError);
-            console.error('Cleaned response content:', cleanedResponse);
-            throw new Error(`Invalid JSON response from API: ${parseError.message}`);
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error(`HTTP error for ${label}:`, res.status, errorText);
+            throw new Error(`HTTP error ${res.status}: ${errorText}`);
         }
+
+        const data = await res.json();
+
+        // Check for OpenRouter error structure
+        if (data.error) {
+            console.error(`OpenRouter error for ${label}:`, data.error);
+            throw new Error(`OpenRouter error: ${data.error.message || JSON.stringify(data.error)}`);
+        }
+
+        const responseContent = data.choices?.[0]?.message?.content;
+        if (!responseContent) {
+            console.error(`No content in OpenRouter response for ${label}:`, JSON.stringify(data));
+            throw new Error(`No content in OpenRouter response for ${label}`);
+        }
+
+        // Increment the counter on successful API response
+        await incrementApiRequestCount();
+
+        console.log(`Raw ${label} API Response received`);
+        // Return raw response content for context files to handle parsing
+        return responseContent;
     } catch (error) {
         console.error(`Error getting ${label}:`, error);
         throw error;
     }
 };
 
-// Test the API connection
-export const testApiConnection = async () => {
-    try {
-        const testCompletion = await client.chat.completions.create({
-            model: "provider-4/claude-3.7-sonnet",
-            messages: [
-                { role: "user", content: "Hello! Give me a short response." }
-            ]
-        });
-        console.log("Test response:", testCompletion.choices[0].message.content);
-        return true;
-    } catch (error) {
-        console.error("Test API call failed:", error);
-        return false;
-    }
-};
+// // Test the API connection
+// export const testApiConnection = async () => {
+//     try {
+//         const testCompletion = await client.chat.completions.create({
+//             model: "provider-4/claude-3.7-sonnet",
+//             messages: [
+//                 { role: "user", content: "Hello! Give me a short response." }
+//             ]
+//         });
+//         console.log("Test response:", testCompletion.choices[0].message.content);
+//         return true;
+//     } catch (error) {
+//         console.error("Test API call failed:", error);
+//         return false;
+//     }
+// };
 
 export const getCompanyWaysToGetIn = async (companyName) => {
     console.log(`Fetching ways to get in data for company: ${companyName}`);
     const prompt = getCompanyAnalysisPrompt(companyName);
-    return makeApiCall(prompt, 'Ways to Get In');
+    return makeOpenRouterApiCall(prompt, 'Ways to Get In');
 };
 
 export const getCompanyCulture = async (companyName) => {
     console.log(`Fetching culture data for company: ${companyName}`);
     const prompt = getCompanyCulturePrompt(companyName);
-    return makeApiCall(prompt, 'Culture');
+    return makeOpenRouterApiCall(prompt, 'Culture');
 };
 
 export const getCoreCompanyDetails = async (companyName) => {
     console.log(`Fetching core company details for company: ${companyName}`);
     const prompt = getCoreCompanyDetailsPrompt(companyName);
-    return makeApiCall(prompt, 'Core Company Details');
+    return makeOpenRouterApiCall(prompt, 'Core Company Details');
 };
 
-// Example usage
-// const init = async () => {
-//     if (await testApiConnection()) {
-//         try {
-//             const result = await getCompanyWaysToGetIn("Google");
-//             console.log("\nCompany information:");
-//             console.log(result);
-//         } catch (error) {
-//             console.error("Error in main execution:", error);
-//         }
-//     }
-// };
-// 
-// init(); 
+export const getCompanyInterviewExperience = async (companyName) => {
+    console.log(`Fetching interview experience for company: ${companyName}`);
+    const prompt = getCompanyInterviewExperiencePrompt(companyName);
+    return makeOpenRouterApiCall(prompt, 'Interview Experience');
+};
+
+export const getCompanyJobHiringInsights = async (companyName) => {
+    console.log(`Fetching job hiring insights for company: ${companyName}`);
+    const prompt = getCompanyJobHiringInsightsPrompt(companyName);
+    return makeOpenRouterApiCall(prompt, 'Job Hiring Insights');
+};
+
+export const getCompanyNewsHighlights = async (companyName) => {
+    console.log(`Fetching news highlights for company: ${companyName}`);
+    const prompt = getCompanyNewsHighlightsPrompt(companyName);
+    return makeOpenRouterApiCall(prompt, 'News Highlights');
+};
+
+export const getCompanyTechStack = async (companyName) => {
+    console.log(`Fetching tech stack for company: ${companyName}`);
+    const prompt = getCompanyTechStackPrompt(companyName);
+    return makeOpenRouterApiCall(prompt, 'Tech Stack');
+};

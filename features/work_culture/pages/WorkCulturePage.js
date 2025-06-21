@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import SimpleLoader from '../components/SimpleLoader';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useWorkCulture } from '../context/WorkCultureContext';
 import CultureOverviewSection from '../components/CultureOverviewSection';
@@ -9,6 +11,7 @@ import TeamCollaborationSection from '../components/TeamCollaborationSection';
 import MentalHealthSection from '../components/MentalHealthSection';
 import DiversitySection from '../components/DiversitySection';
 import EmployeeStoriesSection from '../components/EmployeeStoriesSection';
+import { WorkCultureProvider } from '../context/WorkCultureContext';
 
 const { width } = Dimensions.get('window');
 
@@ -43,9 +46,29 @@ const SECTIONS = {
   },
 };
 
-export default function WorkCulturePage() {
+export default function WorkCulturePage({ route }) {
+  console.log('[WorkCulturePage] route.params:', route.params);
+  console.log('[WorkCulturePage] rawData received:', route.params?.rawData);
+  console.log('[WorkCulturePage] cultureData:', route.params?.rawData?.cultureData);
+  return (
+    <WorkCultureProvider rawData={route.params?.rawData}>
+      <WorkCultureContent />
+    </WorkCultureProvider>
+  );
+}
+
+function WorkCultureContent() {
   const [activeSection, setActiveSection] = useState(SECTIONS.CULTURE);
-  const workCultureData = useWorkCulture();
+  const { workCultureData } = useWorkCulture();
+  console.log('[WorkCultureContent] workCultureData:', workCultureData);
+
+  if (!workCultureData) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <SimpleLoader />
+      </View>
+    );
+  }
 
   const renderContent = () => {
     switch (activeSection) {
@@ -69,63 +92,69 @@ export default function WorkCulturePage() {
   };
 
   return (
-    <LinearGradient
-      colors={['#ffffff', '#f8f9fa']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      <View style={styles.tabsWrapper}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContent}
-        >
-          {Object.entries(SECTIONS).map(([key, section]) => (
-            <TouchableOpacity
-              key={key}
-              style={[
-                styles.tab,
-                activeSection === SECTIONS[key] && styles.activeTab,
-              ]}
-              onPress={() => setActiveSection(SECTIONS[key])}
-            >
-              <LinearGradient
-                colors={
-                  activeSection === SECTIONS[key]
-                    ? ['#4158D0', '#C850C0']
-                    : ['transparent', 'transparent']
-                }
-                style={styles.tabGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+    <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={['#ffffff', '#f8f9fa']}
+        style={styles.gradientBackground}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.tabsWrapper}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContent}
+          >
+            {Object.entries(SECTIONS).map(([key, section]) => (
+              <TouchableOpacity
+                key={key}
+                style={[
+                  styles.tab,
+                  activeSection === SECTIONS[key] && styles.activeTab,
+                ]}
+                onPress={() => setActiveSection(SECTIONS[key])}
               >
-                <Text style={styles.tabIcon}>{section.icon}</Text>
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeSection === SECTIONS[key] && styles.activeTabText,
-                  ]}
+                <LinearGradient
+                  colors={
+                    activeSection === SECTIONS[key]
+                      ? ['#4158D0', '#C850C0']
+                      : ['transparent', 'transparent']
+                  }
+                  style={styles.tabGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                 >
-                  {section.title}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+                  <Text style={styles.tabIcon}>{section.icon}</Text>
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeSection === SECTIONS[key] && styles.activeTabText,
+                    ]}
+                  >
+                    {section.title}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.contentContainer}>{renderContent()}</View>
-      </ScrollView>
-    </LinearGradient>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.contentContainer}>{renderContent()}</View>
+        </ScrollView>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: '100',
     backgroundColor: '#fff',
+  },
+  gradientBackground: {
+    flex: 1,
   },
   tabsWrapper: {
     backgroundColor: '#ffffff',
@@ -134,7 +163,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 12,
+    marginBottom: 12,
   },
   tabsContent: {
     paddingHorizontal: 12,
@@ -175,6 +205,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 0,
+    marginTop: 8,
   },
-}); 
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

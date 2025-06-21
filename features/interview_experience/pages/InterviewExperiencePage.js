@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { InterviewProvider } from '../context/InterviewContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { InterviewProvider, useInterview } from '../context/InterviewContext';
 import InterviewJourney from '../components/InterviewJourney';
 import CandidateExperiences from '../components/CandidateExperiences';
 import TechnicalQuestions from '../components/TechnicalQuestions';
@@ -22,8 +23,50 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function InterviewExperiencePage() {
+export default function InterviewExperiencePage({ route }) {
+  console.log('[InterviewExperiencePage] route.params:', route.params);
+  console.log('[InterviewExperiencePage] rawData received:', route.params?.rawData);
+  console.log('[InterviewExperiencePage] interviewData:', route.params?.rawData?.interviewData);
+  return (
+    <InterviewProvider rawData={route.params?.rawData}>
+      <InterviewContent />
+    </InterviewProvider>
+  );
+}
+
+// Separate component to use the context
+function InterviewContent() {
+  const { loading, error, interviewData } = useInterview();
+  console.log('[InterviewContent] loading:', loading, 'error:', error, 'interviewData:', interviewData);
   const [activeSection, setActiveSection] = useState(SECTIONS.JOURNEY);
+
+  // Show loading indicator while data is being processed
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4158D0" />
+        <Text style={styles.loadingText}>Loading interview data...</Text>
+      </View>
+    );
+  }
+
+  // Show error message if there was a problem
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  // Ensure we have interview data before rendering
+  if (!interviewData) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>No interview data available</Text>
+      </View>
+    );
+  }
 
   const renderContent = () => {
     switch (activeSection) {
@@ -47,8 +90,7 @@ export default function InterviewExperiencePage() {
   };
 
   return (
-    <InterviewProvider>
-      <LinearGradient
+    <LinearGradient
         colors={['#ffffff', '#f8f9fa']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
@@ -91,18 +133,43 @@ export default function InterviewExperiencePage() {
           </ScrollView>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>
-            {renderContent()}
-          </View>
-        </ScrollView>
+        <SafeAreaView style={styles.content}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.contentContainer}>
+              {renderContent()}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
       </LinearGradient>
-    </InterviewProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#4158D0',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+  },
   container: {
+    marginTop: '100',
     flex: 1,
     backgroundColor: '#fff',
   },
@@ -113,7 +180,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   tabsContainer: {
     maxHeight: 44,
@@ -125,6 +192,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: 22,
     overflow: 'hidden',
+    marginTop: 2,
   },
   tabGradient: {
     flexDirection: 'row',
@@ -157,7 +225,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 0,
   },
   placeholderContainer: {
     padding: 20,
@@ -167,4 +236,4 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginVertical: 8,
   },
-}); 
+});

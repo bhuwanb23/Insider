@@ -52,7 +52,7 @@ export default function ColdOutreach() {
         <Text style={styles.sectionTitle}>Email Template</Text>
         <View style={styles.templateCard}>
           <View style={styles.templateHeader}>
-            <Text style={styles.templateSubject}>
+            <Text style={styles.templateSubject} numberOfLines={2} ellipsizeMode="tail">
               Subject: {coldOutreach.emailTemplate?.subject}
             </Text>
             <TouchableOpacity
@@ -65,13 +65,13 @@ export default function ColdOutreach() {
             </TouchableOpacity>
           </View>
           <View style={styles.templateBody}>
-            <Text style={styles.templateText}>
+            <Text style={styles.templateText} selectable={true}>
               {coldOutreach.emailTemplate?.body}
             </Text>
           </View>
           <View style={styles.templateNote}>
             <Text style={styles.noteIcon}>💡</Text>
-            <Text style={styles.noteText}>
+            <Text style={styles.noteText} numberOfLines={2} ellipsizeMode="tail">
               Remember to customize the placeholders marked with [brackets]
             </Text>
           </View>
@@ -117,13 +117,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionIcon: {
-    fontSize: 24,
-    marginRight: 8,
+    fontSize: 22,
+    marginRight: 10,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
+    marginBottom: 16,
   },
   mainCard: {
     padding: 20,
@@ -136,18 +137,30 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   description: {
+    fontSize: 13,
     color: '#fff',
-    fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 18,
   },
   section: {
-    marginBottom: 24,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#1a1a1a',
-    marginBottom: 16,
   },
   templateCard: {
     backgroundColor: '#fff',
@@ -171,6 +184,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1a1a1a',
+    flex: 1,
+    flexWrap: 'wrap',
   },
   shareButton: {
     flexDirection: 'row',
@@ -197,6 +212,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1a1a1a',
     lineHeight: 20,
+    flexWrap: 'wrap',
+    width: '100%',
   },
   templateNote: {
     flexDirection: 'row',
@@ -212,6 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#1a1a1a',
     flex: 1,
+    flexWrap: 'wrap',
   },
   tipsList: {
     gap: 12,
@@ -226,13 +244,16 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   tipIcon: {
-    fontSize: 20,
-    marginRight: 12,
+    fontSize: 14,
+    color: '#4CAF50',
+    marginRight: 8,
+    lineHeight: 18,
   },
   tipText: {
     flex: 1,
-    fontSize: 14,
-    color: '#1a1a1a',
+    fontSize: 13,
+    color: '#666',
+    lineHeight: 18,
   },
   warningCard: {
     flexDirection: 'row',

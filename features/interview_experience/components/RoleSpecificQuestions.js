@@ -18,12 +18,14 @@ export default function RoleSpecificQuestions() {
         horizontal 
         showsHorizontalScrollIndicator={false}
         style={styles.roleTabsContainer}
+        contentContainerStyle={styles.roleTabsContent}
       >
         {interviewData.roleSpecificQuestions.map((roleData, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => setSelectedRole(roleData.role)}
             style={styles.roleTab}
+            activeOpacity={0.8}
           >
             <LinearGradient
               colors={selectedRole === roleData.role ? ['#4158D0', '#C850C0'] : ['#f1f2f6', '#f1f2f6']}
@@ -75,11 +77,12 @@ export default function RoleSpecificQuestions() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     paddingHorizontal: 16,
   },
   sectionIcon: {
@@ -93,17 +96,28 @@ const styles = StyleSheet.create({
   },
   roleTabsContainer: {
     maxHeight: 44,
-    marginBottom: 16,
+    marginBottom: 12,
+  },
+  roleTabsContent: {
+    paddingHorizontal: 16,
+    alignItems: 'center',
   },
   roleTab: {
     marginHorizontal: 4,
-    borderRadius: 22,
+    borderRadius: 20,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   roleTabGradient: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 22,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   roleTabText: {
     fontSize: 14,
@@ -112,53 +126,58 @@ const styles = StyleSheet.create({
   },
   selectedRoleTabText: {
     color: '#fff',
+    fontWeight: '700',
   },
   questionsContainer: {
     flex: 1,
     paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   questionCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    elevation: 3,
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 14,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   questionText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#fff',
-    marginBottom: 12,
-    lineHeight: 22,
+    marginBottom: 10,
+    lineHeight: 19,
   },
   metaContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 12,
   },
   difficultyBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: 12,
     marginRight: 8,
   },
   difficultyText: {
     color: '#fff',
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   frequencyBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: 12,
   },
   frequencyText: {
     color: '#fff',
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '600',
   },
 }); 

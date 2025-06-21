@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
-import { StyleSheet, ScrollView, View, Animated } from 'react-native';
+import React, { useState, useRef, useCallback } from 'react';
+import { StyleSheet, ScrollView, View, Animated, InteractionManager, Platform } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import LandingHero from '../components/landing_page/LandingHero';
 import Features from '../components/landing_page/Features';
 import BackgroundEffects from '../components/landing_page/BackgroundEffects';
-import SearchPage from '../pages/SearchPage';
 
-export default function LandingPage() {
+const LandingPage = () => {
+  const navigation = useNavigation();
   const [showSearch, setShowSearch] = useState(false);
-  const scrollY = new Animated.Value(0);
+  const [isReady, setIsReady] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Use useFocusEffect to handle screen focus
+  useFocusEffect(
+    useCallback(() => {
+      const task = InteractionManager.runAfterInteractions(() => {
+        // Delay setting isReady to ensure smooth transition
+        setTimeout(() => {
+          setIsReady(true);
+        }, 100);
+      });
+
+      return () => {
+        task.cancel();
+        setIsReady(false);
+      };
+    }, [])
+  );
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -18,8 +37,21 @@ export default function LandingPage() {
     setShowSearch(false);
   };
 
-  if (showSearch) {
-    return <SearchPage onBack={handleBackToLanding} />;
+  const handleGetStarted = useCallback(() => {
+    InteractionManager.runAfterInteractions(() => {
+      navigation.navigate('Search');
+    });
+  }, [navigation]);
+
+  // If not ready, render a placeholder with the same background
+  if (!isReady) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.backgroundContainer}>
+          <BackgroundEffects />
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -33,20 +65,25 @@ export default function LandingPage() {
         contentContainerStyle={styles.scrollContent}
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        removeClippedSubviews={Platform.OS === 'android'}
+        initialNumToRender={1}
+        maxToRenderPerBatch={1}
+        windowSize={3}
+        overScrollMode="never"
       >
         <View style={styles.contentWrapper}>
-          <LandingHero onGetStarted={() => setShowSearch(true)} />
+          <LandingHero onGetStarted={handleGetStarted} />
           <Features />
         </View>
       </Animated.ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#f6f8fc',
     position: 'relative',
   },
   backgroundContainer: {
@@ -69,3 +106,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 }); 
+
+export default LandingPage; 

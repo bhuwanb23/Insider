@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions } from 'react-native';
-import { JobHiringProvider } from '../context/JobHiringContext';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { JobHiringProvider, useJobHiring } from '../context/JobHiringContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CommonRoles from '../components/CommonRoles';
 import InternshipConversion from '../components/InternshipConversion';
 import HiringChannels from '../components/HiringChannels';
@@ -22,41 +23,73 @@ const SECTIONS = {
 
 const { width } = Dimensions.get('window');
 
-export default function JobHiringsPage() {
+export default function JobHiringsPage({ navigation, route }) {
+  console.log('[JobHiringsPage] route.params:', route.params);
+  console.log('[JobHiringsPage] rawData received:', route.params?.rawData);
+  console.log('[JobHiringsPage] jobHiringData:', route.params?.rawData?.jobHiringData);
   const [activeSection, setActiveSection] = useState(SECTIONS.ROLES);
+  const rawData = route.params?.rawData;
 
-  const renderContent = () => {
-    switch (activeSection) {
-      case SECTIONS.ROLES:
-        return <CommonRoles />;
-      case SECTIONS.INTERNSHIP:
-        return <InternshipConversion />;
-      case SECTIONS.CHANNELS:
-        return <HiringChannels />;
-      case SECTIONS.TRENDS:
-        return <JobTrends />;
-      case SECTIONS.TIMELINE:
-        return <HiringTimeline />;
-      case SECTIONS.PROCESS:
-        return <HiringProcess />;
-      case SECTIONS.RESUME:
-        return <ResumeTips />;
-      default:
-        return <CommonRoles />;
+  function JobHiringsContent({ activeSection, setActiveSection }) {
+    const { loading, error, jobHiringData } = useJobHiring();
+    console.log('[JobHiringsContent] loading:', loading, 'error:', error, 'jobHiringData:', jobHiringData);
+
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4158D0" />
+          <Text style={styles.loadingText}>Loading hiring data...</Text>
+        </View>
+      );
     }
-  };
 
-  return (
-    <JobHiringProvider>
+    if (error) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      );
+    }
+
+    if (!jobHiringData) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>No hiring data available</Text>
+        </View>
+      );
+    }
+
+    const renderContent = () => {
+      switch (activeSection) {
+        case SECTIONS.ROLES:
+          return <CommonRoles />;
+        case SECTIONS.INTERNSHIP:
+          return <InternshipConversion />;
+        case SECTIONS.CHANNELS:
+          return <HiringChannels />;
+        case SECTIONS.TRENDS:
+          return <JobTrends />;
+        case SECTIONS.TIMELINE:
+          return <HiringTimeline />;
+        case SECTIONS.PROCESS:
+          return <HiringProcess />;
+        case SECTIONS.RESUME:
+          return <ResumeTips />;
+        default:
+          return <CommonRoles />;
+      }
+    };
+
+    return (
       <LinearGradient
-        colors={['#ffffff', '#f8f9fa']}
+        colors={["#ffffff", "#f8f9fa"]}
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
         <View style={styles.tabsWrapper}>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             style={styles.tabsContainer}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tabsContent}
@@ -71,7 +104,7 @@ export default function JobHiringsPage() {
                 onPress={() => setActiveSection(SECTIONS[key])}
               >
                 <LinearGradient
-                  colors={activeSection === SECTIONS[key] ? ['#4158D0', '#C850C0'] : ['transparent', 'transparent']}
+                  colors={activeSection === SECTIONS[key] ? ["#4158D0", "#C850C0"] : ["transparent", "transparent"]}
                   style={styles.tabGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
@@ -91,20 +124,53 @@ export default function JobHiringsPage() {
           </ScrollView>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>
-            {renderContent()}
-          </View>
-        </ScrollView>
+        <SafeAreaView style={styles.content}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.contentContainer}>{renderContent()}</View>
+          </ScrollView>
+        </SafeAreaView>
       </LinearGradient>
+    );
+  }
+
+  return (
+    <JobHiringProvider rawData={rawData}>
+      <JobHiringsContent 
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
     </JobHiringProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#4158D0',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    marginTop: '100',
   },
   tabsWrapper: {
     backgroundColor: '#ffffff',
@@ -113,7 +179,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   tabsContainer: {
     maxHeight: 44,
@@ -125,6 +191,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: 22,
     overflow: 'hidden',
+    marginTop: 2,
   },
   tabGradient: {
     flexDirection: 'row',
@@ -157,6 +224,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 0,
   },
-}); 
+});

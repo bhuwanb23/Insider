@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
+    marginBottom: 16,
   },
   mainCard: {
     padding: 20,
@@ -117,9 +118,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   description: {
+    fontSize: 13,
     color: '#fff',
-    fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 18,
+    marginBottom: 12,
   },
   statsCard: {
     backgroundColor: '#fff',

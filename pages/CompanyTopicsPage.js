@@ -2,11 +2,25 @@ import React, { useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Text, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import { useWaysToGetIn } from '../features/ways_to_get_in/context/WaysToGetInContext';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
-export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
+export default function CompanyTopicsPage({ company, onSelectTopic, onBack, navigation }) {
   const { waysData } = useWaysToGetIn();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
+  const nav = useNavigation();
+
+  const [loading, setLoading] = React.useState(true);
+  useFocusEffect(
+    React.useCallback(() => {
+      setLoading(true);
+      const timer = setTimeout(() => setLoading(false), 3500);
+      return () => clearTimeout(timer);
+    }, [])
+  );
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -53,38 +67,50 @@ export default function CompanyTopicsPage({ company, onSelectTopic, onBack }) {
   }
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <LinearGradient
-        colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
-        style={styles.header}
-      >
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{company}</Text>
-      </LinearGradient>
-      
-      <ScrollView 
-        style={styles.content} 
-        contentContainerStyle={styles.gridContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {Object.entries(waysData)
-          .filter(([_, data]) => data && data.title) // Filter out invalid data
-          .map(([key, data]) => renderTopicCard(key, data))}
-      </ScrollView>
-    </Animated.View>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <Animated.View style={[styles.container, { opacity: fadeAnim }]}> 
+        {loading && <LoadingSpinner message="Loading topics..." />}
+        <LinearGradient
+          colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
+          style={[styles.header, { paddingTop: insets.top }]}
+        >
+          <TouchableOpacity onPress={() => {
+            if (navigation) {
+              navigation.navigate('SearchPage');
+            } else if (onBack) {
+              onBack();
+            }
+          }} style={styles.backButton}>
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{company}</Text>
+        </LinearGradient>
+        
+        <ScrollView 
+          style={styles.content}
+          contentContainerStyle={styles.gridContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {Object.entries(waysData)
+            .filter(([_, data]) => data && data.title)
+            .map(([key, data]) => renderTopicCard(key, data))}
+        </ScrollView>
+      </Animated.View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 16,
     paddingBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
@@ -101,9 +127,10 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: '#333',
+    letterSpacing: 0.3,
   },
   content: {
     flex: 1,
@@ -164,4 +191,4 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
   },
-}); 
+});

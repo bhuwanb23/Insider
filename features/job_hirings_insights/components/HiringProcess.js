@@ -32,7 +32,7 @@ export default function HiringProcess() {
               {stage.successRate && (
                 <View style={styles.successRate}>
                   <Text style={styles.successLabel}>Success Rate</Text>
-                  <Text style={styles.successValue}>{stage.successRate}%</Text>
+                  <Text style={styles.successValue}>{stage.successRate}</Text>
                 </View>
               )}
 
@@ -166,16 +166,18 @@ const styles = StyleSheet.create({
   topicsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
   },
   topicTag: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 8,
   },
   topicText: {
     fontSize: 12,
     color: '#fff',
+    flexShrink: 1,
   },
 }); 

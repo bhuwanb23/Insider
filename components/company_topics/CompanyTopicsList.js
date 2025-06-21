@@ -1,9 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const { width } = Dimensions.get('window');
 
@@ -104,21 +106,48 @@ const topics = [
   },
 ];
 
-export default function CompanyTopicsList({ company }) {
+export default function CompanyTopicsList({ company, allData, onBack }) {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setLoading(true);
+      const timer = setTimeout(() => setLoading(false), 3500);
+      return () => clearTimeout(timer);
+    }, [])
+  );
 
   const handleBackPress = () => {
-    navigation.goBack();
+    if (onBack) {
+      onBack();
+    } else {
+      navigation.goBack();
+    }
   };
 
   const handleTopicPress = (topicKey) => {
     const route = TOPIC_ROUTES[topicKey];
     if (route) {
+      // Map topicKey to the correct rawData key
+      const rawDataKeyMap = {
+        core: 'coreData',
+        jobs: 'jobHiringData',
+        interview: 'interviewData',
+        culture: 'cultureData',
+        techstack: 'techStackData',
+        waysin: 'waysData',
+        insights: 'newsData'
+      };
+      const rawDataKey = rawDataKeyMap[topicKey];
+      const rawData = allData && rawDataKey ? { [rawDataKey]: allData[rawDataKey] } : undefined;
+
       navigation.navigate(route.screen, {
         company,
         ...route.params,
-        // Add any additional params needed by the feature
-        timestamp: new Date().getTime() // Ensure unique navigation
+        rawData, // Pass the correct rawData for the topic
+        timestamp: new Date().getTime()
       });
     } else {
       console.warn(`No route found for topic: ${topicKey}`);
@@ -162,6 +191,14 @@ export default function CompanyTopicsList({ company }) {
     </Animatable.View>
   );
 
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <LoadingSpinner message="Loading topics..." />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -171,7 +208,7 @@ export default function CompanyTopicsList({ company }) {
         end={{ x: 1, y: 1 }}
       />
       
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color="#4158D0" />
         </TouchableOpacity>
@@ -203,74 +240,88 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 40,
-    paddingHorizontal: 20,
-    marginBottom: 10,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 8 : 8,
+    paddingBottom: 12,
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(65, 88, 208, 0.95)',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    zIndex: 2,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(65, 88, 208, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
   headerText: {
     flex: 1,
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#2d3436',
-    letterSpacing: 1,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 3,
+    color: '#FFFFFF',
+    marginLeft: 8,
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   icon: {
     fontSize: 32,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   subHeader: {
-    fontSize: 16,
-    color: '#636e72',
-    marginBottom: 24,
+    fontSize: 14,
+    color: '#333',
     textAlign: 'center',
-    opacity: 0.85,
-    paddingHorizontal: 20,
+    marginTop: 2,
+    marginBottom: 8,
+    fontWeight: '500',
+    letterSpacing: 0.2,
   },
   list: {
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
   cardWrapper: {
-    marginBottom: 16,
+    marginBottom: 12,
     width: '100%',
   },
   card: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
-    elevation: 8,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
     backgroundColor: 'white',
   },
   cardGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    padding: 14,
   },
   iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   cardIcon: {
-    fontSize: 24,
+    fontSize: 20,
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
@@ -279,20 +330,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardLabel: {
-    fontSize: 18,
+    fontSize: 16,
     color: 'white',
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: 2,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
   cardDescription: {
-    fontSize: 14,
+    fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
-    lineHeight: 20,
+    lineHeight: 16,
   },
   arrowIcon: {
-    marginLeft: 12,
+    marginLeft: 8,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 9999,
   },
 }); 

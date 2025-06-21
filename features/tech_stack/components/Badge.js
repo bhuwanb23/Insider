@@ -3,31 +3,31 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const BADGE_COLORS = {
   default: {
-    background: 'rgba(255, 255, 255, 0.2)',
+    background: 'rgba(90, 70, 180, 0.7)',
     text: '#ffffff',
   },
   light: {
-    background: 'rgba(255, 255, 255, 0.2)',
+    background: 'rgba(150, 120, 200, 0.7)',
     text: '#ffffff',
   },
   primary: {
-    background: 'rgba(65, 88, 208, 0.3)',
+    background: 'rgba(65, 88, 208, 0.7)',
     text: '#ffffff',
   },
   secondary: {
-    background: 'rgba(200, 80, 192, 0.3)',
+    background: 'rgba(200, 80, 192, 0.7)',
     text: '#ffffff',
   },
   success: {
-    background: 'rgba(16, 185, 129, 0.3)',
+    background: 'rgba(80, 180, 100, 0.7)',
     text: '#ffffff',
   },
   warning: {
-    background: 'rgba(245, 158, 11, 0.3)',
+    background: 'rgba(240, 170, 0, 0.7)',
     text: '#ffffff',
   },
   info: {
-    background: 'rgba(99, 102, 241, 0.3)',
+    background: 'rgba(99, 102, 241, 0.7)',
     text: '#ffffff',
   },
 };

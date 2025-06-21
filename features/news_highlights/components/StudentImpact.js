@@ -6,6 +6,8 @@ import { useNews } from '../context/NewsContext';
 export default function StudentImpact() {
   const { newsData } = useNews();
 
+  if (!newsData || !Array.isArray(newsData.studentImpact)) return null;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -55,6 +57,7 @@ export default function StudentImpact() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 24,
   },
   header: {
     flexDirection: 'row',

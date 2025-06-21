@@ -13,6 +13,9 @@ const SENTIMENT_COLORS = {
 
 export default function SocialSentiment() {
   const { newsData } = useNews();
+
+  if (!newsData || !newsData.socialSentiment) return null;
+
   const { overall, sources, trends } = newsData.socialSentiment;
 
   const renderSentimentBar = (data, showLabels = true) => {
@@ -21,32 +24,32 @@ export default function SocialSentiment() {
         <View style={styles.sentimentBar}>
           <LinearGradient
             colors={SENTIMENT_COLORS.positive}
-            style={[styles.sentimentFill, { width: `${data.positive}%` }]}
+            style={[styles.sentimentFill, { width: `${data.positive}` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
             {showLabels && (
-              <Text style={styles.sentimentText}>{data.positive}%</Text>
+              <Text style={styles.sentimentText}>{data.positive}</Text>
             )}
           </LinearGradient>
           <LinearGradient
             colors={SENTIMENT_COLORS.neutral}
-            style={[styles.sentimentFill, { width: `${data.neutral}%` }]}
+            style={[styles.sentimentFill, { width: `${data.neutral}` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
             {showLabels && (
-              <Text style={styles.sentimentText}>{data.neutral}%</Text>
+              <Text style={styles.sentimentText}>{data.neutral}</Text>
             )}
           </LinearGradient>
           <LinearGradient
             colors={SENTIMENT_COLORS.negative}
-            style={[styles.sentimentFill, { width: `${data.negative}%` }]}
+            style={[styles.sentimentFill, { width: `${data.negative}` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
             {showLabels && (
-              <Text style={styles.sentimentText}>{data.negative}%</Text>
+              <Text style={styles.sentimentText}>{data.negative}</Text>
             )}
           </LinearGradient>
         </View>
@@ -101,7 +104,7 @@ export default function SocialSentiment() {
               ].map((item, idx) => (
                 <View key={idx} style={styles.statRow}>
                   <Text style={styles.statLabel}>{item.label}</Text>
-                  <Text style={styles.statValue}>{item.value}%</Text>
+                  <Text style={styles.statValue}>{item.value}</Text>
                 </View>
               ))}
             </View>
@@ -116,6 +119,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+    paddingBottom: 24,
   },
   header: {
     paddingVertical: 16,

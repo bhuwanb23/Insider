@@ -14,28 +14,30 @@ export default function EmployeeStoryCard({ story }) {
       style={styles.container}
     >
       <View style={styles.header}>
-        <Text style={styles.image}>{image}</Text>
+        <Text style={styles.image}>{image || '👤'}</Text>
         <View style={styles.headerInfo}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.role}>{role}</Text>
-          <Text style={styles.tenure}>{tenure}</Text>
+          <Text style={styles.name}>{name || 'N/A'}</Text>
+          <Text style={styles.role}>{role || 'N/A'}</Text>
+          <Text style={styles.tenure}>{tenure || ''}</Text>
         </View>
       </View>
 
       <View style={styles.quoteContainer}>
         <Text style={styles.quoteIcon}>"</Text>
-        <Text style={styles.quote}>{quote}</Text>
+        <Text style={styles.quote}>{quote || 'No quote provided.'}</Text>
       </View>
 
-      <View style={styles.highlightsContainer}>
-        {highlights.map((highlight, index) => (
-          <Badge
-            key={index}
-            label={highlight}
-            variant="light"
-          />
-        ))}
-      </View>
+      {highlights && highlights.length > 0 && (
+        <View style={styles.highlightsContainer}>
+          {highlights.map((highlight, index) => (
+            <Badge
+              key={index}
+              label={highlight}
+              variant="light"
+            />
+          ))}
+        </View>
+      )}
     </LinearGradient>
   );
 }

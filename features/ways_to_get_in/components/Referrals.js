@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
+    marginBottom: 16,
   },
   mainCard: {
     padding: 20,
@@ -85,9 +86,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   description: {
+    fontSize: 13,
     color: '#fff',
-    fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 18,
+    marginBottom: 12,
   },
   section: {
     marginBottom: 24,
@@ -120,14 +122,16 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   stepNumber: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
     color: '#4158D0',
+    lineHeight: 18,
   },
   stepText: {
     flex: 1,
-    fontSize: 14,
-    color: '#1a1a1a',
+    fontSize: 13,
+    color: '#666',
+    lineHeight: 18,
   },
   tipsList: {
     gap: 12,
@@ -145,12 +149,15 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   tipIcon: {
-    fontSize: 20,
-    marginRight: 12,
+    fontSize: 14,
+    color: '#4CAF50',
+    marginRight: 8,
+    lineHeight: 18,
   },
   tipText: {
     flex: 1,
-    fontSize: 14,
-    color: '#1a1a1a',
+    fontSize: 13,
+    color: '#666',
+    lineHeight: 18,
   },
 }); 

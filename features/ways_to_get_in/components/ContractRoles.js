@@ -54,7 +54,7 @@ export default function ContractRoles() {
                   <Text style={styles.platformName}>{platform.name}</Text>
                   <Text style={styles.platformUrl}>{platform.url}</Text>
                 </View>
-                <Text style={styles.visitText}>Visit →</Text>
+                <Text style={styles.visitText}>Visit</Text>
               </LinearGradient>
             </TouchableOpacity>
           ))}
@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
+    marginBottom: 16,
   },
   mainCard: {
     padding: 20,
@@ -175,14 +176,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   platformName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: 'bold',
     color: '#1a1a1a',
     marginBottom: 4,
   },
   platformUrl: {
     fontSize: 12,
-    color: '#666',
+    color: '#4158D0',
   },
   visitText: {
     fontSize: 14,
@@ -215,8 +216,9 @@ const styles = StyleSheet.create({
   },
   tipText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     color: '#fff',
+    lineHeight: 18,
   },
   benefitsCard: {
     backgroundColor: '#fff',

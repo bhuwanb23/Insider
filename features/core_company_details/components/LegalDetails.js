@@ -197,7 +197,7 @@ export default function LegalDetails({ data }) {
         )}
 
         {/* Stock Information Section */}
-        {legalData.stockInfo && (
+        {legalData.stockInfo && legalData.stockInfo.exchange && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>📈</Text>

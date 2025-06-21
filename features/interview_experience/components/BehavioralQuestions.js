@@ -13,7 +13,7 @@ export default function BehavioralQuestions() {
         <Text style={styles.title}>Behavioral & HR Questions</Text>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {interviewData.behavioralQuestions.map((question, index) => (
           <LinearGradient
             key={index}
@@ -48,11 +48,12 @@ export default function BehavioralQuestions() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     paddingHorizontal: 16,
   },
   sectionIcon: {
@@ -64,67 +65,72 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1a1a1a',
   },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
   card: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    marginHorizontal: 16,
-    elevation: 3,
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 14,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   questionText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#fff',
-    marginBottom: 12,
-    lineHeight: 22,
+    marginBottom: 10,
+    lineHeight: 20,
   },
   metaContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   categoryBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: 12,
     marginRight: 8,
   },
   categoryText: {
     color: '#fff',
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   frequencyBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: 12,
   },
   frequencyText: {
     color: '#fff',
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   tipContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 8,
-    borderRadius: 6,
-    marginTop: 6,
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 8,
   },
   tipLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     color: '#fff',
-    marginBottom: 2,
+    marginBottom: 3,
   },
   tipText: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
-    lineHeight: 16,
+    lineHeight: 17,
   },
 }); 

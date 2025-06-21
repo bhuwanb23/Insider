@@ -32,30 +32,38 @@ export default function Leadership({ data }) {
       <View style={styles.grid}>
         {leadershipData.map((leader, index) => (
           <View key={index} style={styles.leaderCard}>
-            <Image 
-              source={{ uri: leader.image }} 
-              style={styles.leaderImage}
-              resizeMode="cover"
-            />
-            <View style={styles.leaderInfo}>
-              <Text style={styles.leaderName}>{leader.name}</Text>
-              <Text style={styles.leaderRole}>{leader.role}</Text>
-              {leader.linkedIn && (
-                <TouchableOpacity
-                  onPress={() => handleLinkedInPress(leader.linkedIn)}
-                  style={styles.linkedInButton}
-                >
-                  <LinearGradient
-                    colors={['#0077B5', '#00A0DC']}
-                    style={styles.linkedInGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+            <LinearGradient
+              colors={["#f6f9fc", "#e9e4f0"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradient}
+            >
+              <Image 
+                source={{ uri: leader.image }} 
+                style={styles.leaderImage}
+                resizeMode="cover"
+              />
+              <View style={styles.leaderInfo}>
+                <Text style={styles.leaderName}>{leader.name}</Text>
+                <Text style={styles.leaderRole}>{leader.role}</Text>
+                {leader.linkedIn && (
+                  <TouchableOpacity
+                    onPress={() => handleLinkedInPress(leader.linkedIn)}
+                    style={styles.linkedInButton}
+                    activeOpacity={0.85}
                   >
-                    <Text style={styles.linkedInText}>View Profile</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              )}
-            </View>
+                    <LinearGradient
+                      colors={["#0077B5", "#00A0DC"]}
+                      style={styles.linkedInGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                    >
+                      <Text style={styles.linkedInText}>LinkedIn</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </LinearGradient>
           </View>
         ))}
       </View>
@@ -66,62 +74,86 @@ export default function Leadership({ data }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#f8f9fa',
+    padding: 14,
+    backgroundColor: 'transparent',
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
     gap: 16,
   },
   leaderCard: {
-    width: '48%',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    width: '100%',
+    borderRadius: 18,
+    shadowColor: '#4158D0',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.10,
+    shadowRadius: 12,
+    elevation: 6,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: 'rgba(208, 71, 239, 0.08)',
+    overflow: 'hidden',
+  },
+  cardGradient: {
+    flex: 1,
+    borderRadius: 18,
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   leaderImage: {
-    width: '100%',
-    height: 120,
-    borderRadius: 8,
-    marginBottom: 12,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 16,
+    borderWidth: 2,
+    borderColor: '#fff',
+    backgroundColor: '#e0e0e0',
+    alignSelf: 'center',
   },
   leaderInfo: {
-    alignItems: 'center',
+    flex: 1,
+    alignItems: 'flex-start',
+    marginTop: 0,
+    marginBottom: 0,
   },
   leaderName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 4,
-    textAlign: 'center',
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 2,
+    textAlign: 'left',
+    fontFamily: 'sans-serif-medium',
+    letterSpacing: 0.2,
   },
   leaderRole: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    textAlign: 'center',
+    fontSize: 13,
+    color: '#4158D0',
+    marginBottom: 8,
+    textAlign: 'left',
+    fontWeight: '500',
+    fontFamily: 'sans-serif',
+    letterSpacing: 0.1,
   },
   linkedInButton: {
-    width: '100%',
-    borderRadius: 8,
+    width: 120,
+    borderRadius: 7,
     overflow: 'hidden',
+    marginTop: 4,
+    elevation: 2,
+    alignSelf: 'flex-start',
   },
   linkedInGradient: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 7,
     alignItems: 'center',
+    borderRadius: 7,
   },
   linkedInText: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+    fontFamily: 'sans-serif-condensed',
   },
   centerContainer: {
     flex: 1,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CampusRecruitment from '../components/CampusRecruitment';
 import JobPortals from '../components/JobPortals';
 import Referrals from '../components/Referrals';
@@ -9,6 +10,7 @@ import ColdOutreach from '../components/ColdOutreach';
 import InternshipConversion from '../components/InternshipConversion';
 import ContractRoles from '../components/ContractRoles';
 import { useWaysToGetIn } from '../context/WaysToGetInContext';
+import { WaysToGetInProvider } from '../context/WaysToGetInContext';
 
 const SECTIONS = {
   CAMPUS: { title: 'Campus Recruitment', icon: '🎓', key: 'campusRecruitment' },
@@ -16,14 +18,26 @@ const SECTIONS = {
   REFERRALS: { title: 'Referrals', icon: '👥', key: 'referrals' },
   HACKATHONS: { title: 'Hackathons', icon: '🧩', key: 'hackathons' },
   OUTREACH: { title: 'Cold Outreach', icon: '✉️', key: 'coldOutreach' },
-  INTERNSHIP: { title: 'Internship → Full-Time', icon: '🚀', key: 'internshipConversion' },
+  INTERNSHIP: { title: 'Internship - Full-Time', icon: '🚀', key: 'internshipConversion' },
   CONTRACT: { title: 'Contract Roles', icon: '💼', key: 'contractRoles' },
 };
 
 const { width } = Dimensions.get('window');
 
 export default function WaysToGetInPage({ route }) {
-  const { waysData } = useWaysToGetIn();
+  console.log('[WaysToGetInPage] route.params:', route.params);
+  console.log('[WaysToGetInPage] rawData received:', route.params?.rawData);
+  console.log('[WaysToGetInPage] waysData:', route.params?.rawData?.waysData);
+  return (
+    <WaysToGetInProvider rawData={route.params?.rawData}>
+      <WaysToGetInContent route={route} />
+    </WaysToGetInProvider>
+  );
+}
+
+function WaysToGetInContent({ route }) {
+  const { waysData, loading, error } = useWaysToGetIn();
+  console.log('[WaysToGetInContent] loading:', loading, 'error:', error, 'waysData:', waysData);
   const [activeSection, setActiveSection] = useState(SECTIONS.CAMPUS || Object.values(SECTIONS)[0]);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(50)).current;
@@ -77,9 +91,7 @@ export default function WaysToGetInPage({ route }) {
 
   const renderTab = (key, section) => {
     if (!section) return null;
-    
     const isActive = activeSection?.key === section.key;
-    
     return (
       <TouchableOpacity
         key={key}
@@ -110,6 +122,22 @@ export default function WaysToGetInPage({ route }) {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading ways to get in...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <LinearGradient
       colors={['#ffffff', '#f8f9fa']}
@@ -118,8 +146,8 @@ export default function WaysToGetInPage({ route }) {
       end={{ x: 1, y: 1 }}
     >
       <View style={styles.tabsWrapper}>
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           style={styles.tabsContainer}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}
@@ -128,7 +156,7 @@ export default function WaysToGetInPage({ route }) {
         </ScrollView>
       </View>
 
-      <Animated.View 
+      <Animated.View
         style={[
           styles.content,
           {
@@ -137,19 +165,46 @@ export default function WaysToGetInPage({ route }) {
           }
         ]}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.contentContainer}>
-            {renderContent()}
-          </View>
-        </ScrollView>
+        <SafeAreaView style={{ flex: 1 }}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.contentContainer}>
+              {renderContent()}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
       </Animated.View>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 12,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#dc3545',
+    textAlign: 'center',
+    marginTop: 12,
+  },
   container: {
     flex: 1,
+    marginTop: '100',
     backgroundColor: '#fff',
   },
   tabsWrapper: {
@@ -159,7 +214,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   tabsContainer: {
     maxHeight: 44,
@@ -171,6 +226,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: 22,
     overflow: 'hidden',
+    marginTop: 2,
   },
   tabGradient: {
     flexDirection: 'row',
@@ -203,6 +259,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 0,
   },
-}); 
+});

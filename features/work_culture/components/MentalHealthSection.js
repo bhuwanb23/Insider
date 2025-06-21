@@ -1,26 +1,71 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import RatingIndicator from './RatingIndicator';
 
 export default function MentalHealthSection({ data }) {
+  // Helper to extract numeric score from strings like '4.5/5'
+  const parseScore = (val) => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const match = val.match(/([\d.]+)/);
+      return match ? parseFloat(match[1]) : NaN;
+    }
+    return NaN;
+  };
+
   return (
     <View style={styles.sectionContent}>
       <View style={styles.wellnessScore}>
         <Text style={styles.subheading}>Wellness Support Rating</Text>
-        <RatingIndicator score={data.overallScore} size="large" />
+        <RatingIndicator score={parseScore(data.overallScore)} size="large" />
       </View>
 
-      <View style={styles.programsContainer}>
+      <LinearGradient
+        colors={['#4158D0', '#C850C0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.programsContainer}
+      >
         {data.programs.map((program, index) => (
-          <View key={index} style={styles.programCard}>
+          <View
+            key={index}
+            style={[
+              styles.programCard,
+              index === data.programs.length - 1 && { marginBottom: 0 },
+            ]}
+          >
             <Text style={styles.programIcon}>{program.icon}</Text>
             <View style={styles.programInfo}>
               <Text style={styles.programName}>{program.name}</Text>
               <Text style={styles.programDetails}>Coverage: {program.coverage}</Text>
+              {program.sessions && (
+                <Text style={styles.programDetails}>Sessions: {program.sessions}</Text>
+              )}
+              {program.apps && program.apps.length > 0 && (
+                <Text style={styles.programDetails}>Apps: {program.apps.join(', ')}</Text>
+              )}
             </View>
           </View>
         ))}
-      </View>
+      </LinearGradient>
+
+      {/* EAP Services Section */}
+      {data.eapServices && (
+        <LinearGradient
+          colors={['#4158D0', '#C850C0']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.eapContainer}
+        >
+          <Text style={styles.eapTitle}>EAP Services</Text>
+          <Text style={styles.eapDetail}>Available: {data.eapServices.available}</Text>
+          <Text style={styles.eapDetail}>Coverage: {data.eapServices.coverage}</Text>
+          {data.eapServices.includes && data.eapServices.includes.length > 0 && (
+            <Text style={styles.eapDetail}>Includes: {data.eapServices.includes.join(', ')}</Text>
+          )}
+        </LinearGradient>
+      )}
     </View>
   );
 }
@@ -40,36 +85,66 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   programsContainer: {
-    marginTop: 16,
+    borderRadius: 14,
+    padding: 16,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   programCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   programIcon: {
-    fontSize: 24,
+    fontSize: 22,
     marginRight: 12,
   },
   programInfo: {
     flex: 1,
   },
   programName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 2,
   },
   programDetails: {
     fontSize: 12,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  eapContainer: {
+    borderRadius: 14,
+    padding: 16,
+    marginTop: 16,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  eapTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  eapDetail: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 4,
+    lineHeight: 18,
   },
 }); 

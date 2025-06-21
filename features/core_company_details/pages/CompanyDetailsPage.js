@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCoreCompanyDetails } from '../context/CoreCompanyDetailsContext';
 import { useRoute } from '@react-navigation/native';
 import BasicIdentity from '../components/BasicIdentity';
@@ -9,6 +10,9 @@ import LegalDetails from '../components/LegalDetails';
 import Leadership from '../components/Leadership';
 import Timeline from '../components/Timeline';
 import Awards from '../components/Awards';
+import Culture from '../components/Culture';
+import Contact from '../components/Contact';
+import { CoreCompanyDetailsProvider } from '../context/CoreCompanyDetailsContext';
 
 const SECTIONS = {
   BASIC: { title: 'Basic', icon: '🏢' },
@@ -17,32 +21,44 @@ const SECTIONS = {
   LEADERSHIP: { title: 'Leaders', icon: '👥' },
   TIMELINE: { title: 'Timeline', icon: '📅' },
   AWARDS: { title: 'Awards', icon: '🏆' },
+  CULTURE: { title: 'Culture', icon: '❤️' },
+  CONTACT: { title: 'Contact', icon: '📞' },
 };
 
 const { width } = Dimensions.get('window');
 
-export default function CompanyDetailsPage() {
+export default function CompanyDetailsPage({ route, navigation }) {
+  const rawData = route.params?.rawData;
+  const rawCoreData = rawData?.coreData?.raw || rawData?.coreData;
+
+  return (
+    <CoreCompanyDetailsProvider parsedData={rawCoreData}>
+      <CompanyDetailsContent route={route} navigation={navigation} />
+    </CoreCompanyDetailsProvider>
+  );
+}
+
+function CompanyDetailsContent({ route, navigation }) {
   const [activeSection, setActiveSection] = useState(SECTIONS.BASIC);
-  const route = useRoute();
   const { company } = route.params;
   const { loading, error, companyData, fetchCompanyData } = useCoreCompanyDetails();
 
   useEffect(() => {
-    // console.log('CompanyDetailsPage mounted with company:', company);
     if (company && !companyData) {
-      // console.log('Fetching company data for:', company);
-      fetchCompanyData(company);
+      const rawData = route.params?.rawData;
+      if (rawData?.coreData?.raw || rawData?.coreData) {
+        fetchCompanyData(company, rawData.coreData.raw || rawData.coreData);
+      } else {
+        console.error('No core data available in navigation params');
+      }
     }
-  }, [company]);
+  }, [company, companyData, route.params]);
 
-  useEffect(() => {
-    // console.log('CompanyData updated:', companyData);
-  }, [companyData]);
+  const handleBack = () => {
+    navigation.goBack();
+  };
 
   const renderContent = () => {
-    // console.log('Rendering content with activeSection:', activeSection.title);
-    // console.log('Current companyData:', companyData);
-
     if (loading) {
       return (
         <View style={styles.centerContainer}>
@@ -55,6 +71,12 @@ export default function CompanyDetailsPage() {
       return (
         <View style={styles.centerContainer}>
           <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={handleBack}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -63,6 +85,12 @@ export default function CompanyDetailsPage() {
       return (
         <View style={styles.centerContainer}>
           <Text style={styles.noDataText}>No company data available for {company}</Text>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={handleBack}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -80,6 +108,10 @@ export default function CompanyDetailsPage() {
         return <Timeline data={companyData.timeline} />;
       case SECTIONS.AWARDS:
         return <Awards data={companyData.recognition} />;
+      case SECTIONS.CULTURE:
+        return <Culture data={companyData.culture} />;
+      case SECTIONS.CONTACT:
+        return <Contact data={companyData.contact} />;
       default:
         return <BasicIdentity data={companyData.basicIdentity} />;
     }
@@ -92,13 +124,13 @@ export default function CompanyDetailsPage() {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>{company}</Text>
-      </View>
+      </View> */}
 
       <View style={styles.tabsWrapper}>
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           style={styles.tabsContainer}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabsContent}
@@ -133,9 +165,11 @@ export default function CompanyDetailsPage() {
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.content}>
-        {renderContent()}
-      </ScrollView>
+      <SafeAreaView style={styles.content}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {renderContent()}
+        </ScrollView>
+      </SafeAreaView>
     </LinearGradient>
   );
 }
@@ -143,6 +177,7 @@ export default function CompanyDetailsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: '100',
     backgroundColor: '#fff',
   },
   header: {
@@ -164,7 +199,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   tabsContainer: {
     maxHeight: 44,
@@ -176,6 +211,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: 22,
     overflow: 'hidden',
+    marginTop: 2,
   },
   tabGradient: {
     flexDirection: 'row',
@@ -206,6 +242,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingTop: 0,
   },
   centerContainer: {
     padding: 20,
@@ -225,4 +262,16 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
-}); 
+  backButton: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#4158D0',
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

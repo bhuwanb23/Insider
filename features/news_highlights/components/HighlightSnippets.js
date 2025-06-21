@@ -26,6 +26,8 @@ const CATEGORY_ICONS = {
 export default function HighlightSnippets() {
   const { newsData } = useNews();
 
+  if (!newsData || !Array.isArray(newsData.highlights)) return null;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -84,6 +86,7 @@ export default function HighlightSnippets() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 24,
   },
   header: {
     flexDirection: 'row',

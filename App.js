@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as NavigationBar from 'expo-navigation-bar';
 import LandingPage from './pages/LandingPage';
 import CompanyDetailsPage from './features/core_company_details/pages/CompanyDetailsPage';
 import JobHiringsPage from './features/job_hirings_insights/pages/JobHiringsPage';
@@ -12,11 +13,13 @@ import NewsHighlightsPage from './features/news_highlights/pages/NewsHighlightsP
 import WaysToGetInPage from './features/ways_to_get_in/pages/WaysToGetInPage';
 import TechStackPage from './features/tech_stack/pages/TechStackPage';
 import WorkCulturePage from './features/work_culture/pages/WorkCulturePage';
+import SettingsPage from './pages/Settings';
 import { NewsProvider } from './features/news_highlights/context/NewsContext';
 import { WaysToGetInProvider } from './features/ways_to_get_in/context/WaysToGetInContext';
 import { TechStackProvider } from './features/tech_stack/context/TechStackContext';
 import { WorkCultureProvider } from './features/work_culture/context/WorkCultureContext';
 import { CoreCompanyDetailsProvider } from './features/core_company_details/context/CoreCompanyDetailsContext';
+import SearchPage from './pages/SearchPage';
 
 const Stack = createStackNavigator();
 
@@ -24,16 +27,24 @@ const HEADER_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight || 0;
 
 export default function App() {
+  React.useEffect(() => {
+    if (Platform.OS === 'android') {
+      // Set the navigation bar color and make buttons dark
+      NavigationBar.setBackgroundColorAsync('rgba(65, 88, 208, 0.85)');
+      NavigationBar.setButtonStyleAsync('dark');
+    }
+  }, []);
+
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
         <StatusBar
-          barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'}
+          barStyle={'light-content'}
           backgroundColor="transparent"
           translucent={true}
         />
         <LinearGradient
-          colors={['#ffffff', '#f8f9fa']}
+          colors={['rgba(65, 88, 208, 0.85)', 'rgba(200, 80, 192, 0.85)', 'rgba(255, 194, 68, 0.85)']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -48,15 +59,19 @@ export default function App() {
                       initialRouteName="Landing"
                       screenOptions={{
                         headerStyle: {
-                          backgroundColor: '#ffffff',
+                          backgroundColor: 'transparent',
                           elevation: 0,
                           shadowOpacity: 0,
                           height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                          borderBottomWidth: 0,
                         },
+                        headerTransparent: true,
                         headerTitleStyle: {
                           fontWeight: 'bold',
                           fontSize: 18,
+                          color: '#fff',
                         },
+                        headerTintColor: '#fff',
                         headerBackTitleVisible: false,
                         headerTitleAlign: 'center',
                         headerLeftContainerStyle: {
@@ -68,6 +83,13 @@ export default function App() {
                         cardStyle: {
                           backgroundColor: 'transparent',
                         },
+                        presentation: 'card',
+                        animationEnabled: true,
+                        cardStyleInterpolator: ({ current: { progress } }) => ({
+                          cardStyle: {
+                            opacity: progress,
+                          },
+                        }),
                       }}
                     >
                       <Stack.Screen 
@@ -76,15 +98,21 @@ export default function App() {
                         options={{ headerShown: false }}
                       />
                       <Stack.Screen
+                        name="Search"
+                        component={SearchPage}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
                         name="CompanyDetails"
                         component={CompanyDetailsPage}
                         options={{ 
                           title: 'Company Details',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -94,10 +122,11 @@ export default function App() {
                         options={{ 
                           title: 'Jobs & Hiring Insights',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -107,10 +136,11 @@ export default function App() {
                         options={{ 
                           title: 'Interview Experience',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -120,10 +150,11 @@ export default function App() {
                         options={{ 
                           title: 'News & Highlights',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -133,10 +164,11 @@ export default function App() {
                         options={{ 
                           title: 'Ways to Get In',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -146,10 +178,11 @@ export default function App() {
                         options={{ 
                           title: 'Tech Stack & Tools',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
                         }}
                       />
@@ -159,11 +192,19 @@ export default function App() {
                         options={{ 
                           title: 'Work Culture & Life',
                           headerStyle: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'transparent',
                             elevation: 0,
                             shadowOpacity: 0,
                             height: HEADER_HEIGHT + STATUSBAR_HEIGHT,
+                            borderBottomWidth: 0,
                           },
+                        }}
+                      />
+                      <Stack.Screen
+                        name="Settings"
+                        component={SettingsPage}
+                        options={{
+                          headerShown: false,
                         }}
                       />
                     </Stack.Navigator>

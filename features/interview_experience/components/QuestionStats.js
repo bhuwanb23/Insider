@@ -25,7 +25,7 @@ export default function QuestionStats() {
       case 'decreasing':
         return '#ff4757';
       default:
-        return '#fff';
+        return '#575fcf';
     }
   };
 
@@ -45,24 +45,18 @@ export default function QuestionStats() {
         >
           <Text style={styles.cardTitle}>Top Categories</Text>
           {questionStats.topCategories.map((category, index) => (
-            <View key={index} style={styles.categoryRow}>
-              <View style={styles.categoryInfo}>
-                <Text style={styles.categoryName}>{category.name}</Text>
-                <View style={[
-                  styles.trendBadge,
-                  { backgroundColor: `${getTrendColor(category.trend)}20` }
-                ]}>
-                  <Text style={[
-                    styles.trendText,
-                    { color: getTrendColor(category.trend) }
-                  ]}>
+            <View key={index} style={styles.statItem}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>{category.name}</Text>
+                <View style={styles.trendContainer}>
+                  <Text style={styles.statValue}>{category.percentage}%</Text>
+                  <Text style={[styles.trendIcon, { color: getTrendColor(category.trend) }]}>
                     {getTrendIcon(category.trend)}
                   </Text>
                 </View>
               </View>
-              <View style={styles.percentageBar}>
-                <View style={[styles.percentageFill, { width: `${category.percentage}%` }]} />
-                <Text style={styles.percentageText}>{category.percentage}%</Text>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${category.percentage}%`, backgroundColor: getTrendColor(category.trend) }]} />
               </View>
             </View>
           ))}
@@ -75,13 +69,15 @@ export default function QuestionStats() {
           style={styles.card}
         >
           <Text style={styles.cardTitle}>Difficulty Distribution</Text>
-          <View style={styles.difficultyContainer}>
+          <View>
             {Object.entries(questionStats.difficultyDistribution).map(([level, percentage], index) => (
-              <View key={index} style={styles.difficultyItem}>
-                <Text style={styles.difficultyLabel}>{level}</Text>
-                <View style={styles.difficultyBar}>
-                  <View style={[styles.difficultyFill, { width: `${percentage}%` }]} />
-                  <Text style={styles.difficultyPercentage}>{percentage}%</Text>
+              <View key={index} style={styles.statItem}>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>{level}</Text>
+                  <Text style={styles.statValue}>{percentage}%</Text>
+                </View>
+                <View style={styles.progressBar}>
+                  <View style={[styles.progressFill, { width: `${percentage}%`, backgroundColor: '#fff' }]} />
                 </View>
               </View>
             ))}
@@ -95,6 +91,8 @@ export default function QuestionStats() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
+    paddingTop: 16,
   },
   header: {
     flexDirection: 'row',
@@ -103,112 +101,71 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionIcon: {
-    fontSize: 24,
-    marginRight: 8,
+    fontSize: 28,
+    marginRight: 12,
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: '#4158D0',
   },
   statsContainer: {
     paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   card: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    elevation: 3,
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 20,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#fff',
-    marginBottom: 16,
+    marginBottom: 24,
+    letterSpacing: 0.5,
   },
-  categoryRow: {
-    marginBottom: 12,
+  statItem: {
+    marginBottom: 20,
   },
-  categoryInfo: {
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statLabel: {
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textTransform: 'capitalize',
+    fontWeight: '500',
+  },
+  statValue: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  trendContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
-  categoryName: {
-    fontSize: 14,
-    color: '#fff',
-    marginRight: 8,
+  trendIcon: {
+    fontSize: 16,
+    marginLeft: 8,
   },
-  trendBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 24,
-  },
-  trendText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  percentageBar: {
+  progressBar: {
     height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 4,
     overflow: 'hidden',
-    position: 'relative',
   },
-  percentageFill: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  progressFill: {
+    height: '100%',
     borderRadius: 4,
-  },
-  percentageText: {
-    position: 'absolute',
-    right: -24,
-    top: -4,
-    fontSize: 12,
-    color: '#fff',
-  },
-  difficultyContainer: {
-    marginTop: 8,
-  },
-  difficultyItem: {
-    marginBottom: 12,
-  },
-  difficultyLabel: {
-    fontSize: 14,
-    color: '#fff',
-    marginBottom: 4,
-    textTransform: 'capitalize',
-  },
-  difficultyBar: {
-    height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 4,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  difficultyFill: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 4,
-  },
-  difficultyPercentage: {
-    position: 'absolute',
-    right: -24,
-    top: -4,
-    fontSize: 12,
-    color: '#fff',
   },
 }); 

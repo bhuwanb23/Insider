@@ -51,7 +51,7 @@ export default function HackathonsCompetitions() {
                   <Text style={styles.platformName}>{platform.name}</Text>
                   <Text style={styles.platformUrl}>{platform.url}</Text>
                 </View>
-                <Text style={styles.visitText}>Visit →</Text>
+                <Text style={styles.visitText}>Visit</Text>
               </LinearGradient>
             </TouchableOpacity>
           ))}
@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
+    marginBottom: 16,
   },
   mainCard: {
     padding: 20,
@@ -172,14 +173,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   platformName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: 'bold',
     color: '#1a1a1a',
     marginBottom: 4,
   },
   platformUrl: {
     fontSize: 12,
-    color: '#666',
+    color: '#4158D0',
   },
   visitText: {
     fontSize: 14,
@@ -197,10 +198,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   contestName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 4,
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
   },
   contestDeadline: {
     fontSize: 12,
@@ -229,5 +229,80 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1a1a1a',
     lineHeight: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cardIcon: {
+    fontSize: 22,
+    marginRight: 10,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+  },
+  subheading: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#4158D0',
+    marginBottom: 8,
+  },
+  platformsContainer: {
+    gap: 10,
+    marginBottom: 12,
+  },
+  platformItem: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+  },
+  platformGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  platformIcon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  platformInfo: {
+    flex: 1,
+  },
+  platformName: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  platformUrl: {
+    fontSize: 12,
+    color: '#4158D0',
+  },
+  contestsContainer: {
+    gap: 10,
+  },
+  contestItem: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+  },
+  contestName: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
   },
 }); 
