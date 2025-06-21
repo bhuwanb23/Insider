@@ -38,7 +38,7 @@ export default function Overview({ data }) {
           <View style={styles.quickInfoCard}>
             <Text style={styles.quickInfoIcon}>💡</Text>
             <Text style={styles.quickInfoTitle}>What We Do</Text>
-            <Text style={styles.quickInfoText} numberOfLines={3}>{overviewData.whatWeDo}</Text>
+            <Text style={styles.quickInfoText}>{overviewData.whatWeDo}</Text>
           </View>
         </View>
 

@@ -81,13 +81,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   valuesList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
     marginBottom: 20,
   },
   valueItem: {
-    width: '48%',
+    width: '100%',
     backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,

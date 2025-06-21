@@ -10,6 +10,8 @@ import LegalDetails from '../components/LegalDetails';
 import Leadership from '../components/Leadership';
 import Timeline from '../components/Timeline';
 import Awards from '../components/Awards';
+import Culture from '../components/Culture';
+import Contact from '../components/Contact';
 import { CoreCompanyDetailsProvider } from '../context/CoreCompanyDetailsContext';
 
 const SECTIONS = {
@@ -19,6 +21,8 @@ const SECTIONS = {
   LEADERSHIP: { title: 'Leaders', icon: '👥' },
   TIMELINE: { title: 'Timeline', icon: '📅' },
   AWARDS: { title: 'Awards', icon: '🏆' },
+  CULTURE: { title: 'Culture', icon: '❤️' },
+  CONTACT: { title: 'Contact', icon: '📞' },
 };
 
 const { width } = Dimensions.get('window');
@@ -104,6 +108,10 @@ function CompanyDetailsContent({ route, navigation }) {
         return <Timeline data={companyData.timeline} />;
       case SECTIONS.AWARDS:
         return <Awards data={companyData.recognition} />;
+      case SECTIONS.CULTURE:
+        return <Culture data={companyData.culture} />;
+      case SECTIONS.CONTACT:
+        return <Contact data={companyData.contact} />;
       default:
         return <BasicIdentity data={companyData.basicIdentity} />;
     }

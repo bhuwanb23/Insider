@@ -464,116 +464,248 @@ Ensure all information is specific to ${companyName}, accurate, and follows this
 };
 
 
+// export const getCoreCompanyDetailsPrompt = (companyName) => {
+//     return `Analyze ${companyName}'s core company details and provide information in the following EXACT JSON structure:
+// Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+// No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+// {
+//     "basicIdentity": {
+//         "name": "${companyName}",
+//         "logo": "URL to company logo",
+//         "tagline": "Company tagline",
+//         "industry": "Primary industry",
+//         "headquarters": "HQ location",
+//         "foundedYear": "Year founded",
+//         "keyPeople": [
+//             {
+//                 "name": "Leader name",
+//                 "role": "Role/Position",
+//                 "image": "Profile image URL",
+//                 "linkedIn": "LinkedIn profile URL"
+//             }
+//         ],
+//         "employees": {
+//             "global": "Total global employees",
+//             "india": "Employees in India"
+//         }
+//     },
+//     "overview": {
+//         "description": "Comprehensive company description",
+//         "whatWeDo": "Core business activities",
+//         "keyMarkets": ["List of key markets/domains"],
+//         "vision": "Company vision statement",
+//         "mission": "Company mission statement",
+//         "coreValues": ["List of core values"],
+//         "globalPresence": ["List of countries with presence"]
+//     },
+//     "legalDetails": {
+//         "companyType": "Type of company",
+//         "legalStructure": {
+//             "type": "Legal entity type",
+//             "registrationNumber": "Company registration number",
+//             "registrationCountry": "Country of registration",
+//             "incorporationDate": "Date of incorporation",
+//             "fiscalYear": "Fiscal year period"
+//         },
+//         "fundingHistory": {
+//             "currentStage": "Current funding stage",
+//             "rounds": [
+//                 {
+//                     "stage": "Funding round",
+//                     "year": "Year",
+//                     "amount": "Amount raised",
+//                     "leadInvestor": "Lead investor name"
+//                 }
+//             ]
+//         },
+//         "stockInfo": {
+//             "exchange": "Stock exchange if public",
+//             "ticker": "Stock ticker symbol",
+//             "marketCap": "Current market cap",
+//             "sharesOutstanding": "Number of shares"
+//         }
+//     },
+//     "timeline": [
+//         {
+//             "year": "Year of event",
+//             "event": "Significant company event"
+//         }
+//     ],
+//     "recognition": {
+//         "workplace": [
+//             {
+//                 "title": "Award/recognition title",
+//                 "year": "Year received",
+//                 "description": "Description of recognition",
+//                 "source": "Source URL"
+//             }
+//         ],
+//         "rankings": [
+//             {
+//                 "title": "Ranking title",
+//                 "year": "Year",
+//                 "rank": "Numerical rank",
+//                 "description": "Description",
+//                 "source": "Source URL"
+//             }
+//         ],
+//         "product": [
+//             {
+//                 "title": "Award title",
+//                 "year": "Year",
+//                 "description": "Description",
+//                 "source": "Source URL"
+//             }
+//         ]
+//     },
+//     "contact": {
+//         "website": "Company website URL",
+//         "careersPage": "Careers page URL",
+//         "socialMedia": {
+//             "linkedin": "LinkedIn URL",
+//             "twitter": "Twitter URL",
+//             "glassdoor": "Glassdoor URL"
+//         },
+//         "support": "Support email"
+//     },
+//     "culture": {
+//         "pillars": ["List of cultural pillars"],
+//         "foundersMessage": "Message from founders",
+//         "heroBanner": "URL to hero banner image"
+//     }
+// }
+
+// Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Include real URLs where applicable and maintain consistent formatting.`;
+// }; 
+
 export const getCoreCompanyDetailsPrompt = (companyName) => {
-    return `Analyze ${companyName}'s core company details and provide information in the following EXACT JSON structure:
-Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
-No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+  return `Analyze ${companyName}'s core company details using official and credible sources—such as the company’s website, annual reports, LinkedIn, Crunchbase, company blogs, press releases, and verified news articles.
+
+Return ONLY the JSON object in the exact format below—no additional text, no explanations.
 {
-    "basicIdentity": {
-        "name": "${companyName}",
-        "logo": "URL to company logo",
-        "tagline": "Company tagline",
-        "industry": "Primary industry",
-        "headquarters": "HQ location",
-        "foundedYear": "Year founded",
-        "keyPeople": [
-            {
-                "name": "Leader name",
-                "role": "Role/Position",
-                "image": "Profile image URL",
-                "linkedIn": "LinkedIn profile URL"
-            }
-        ],
-        "employees": {
-            "global": "Total global employees",
-            "india": "Employees in India"
-        }
-    },
-    "overview": {
-        "description": "Comprehensive company description",
-        "whatWeDo": "Core business activities",
-        "keyMarkets": ["List of key markets/domains"],
-        "vision": "Company vision statement",
-        "mission": "Company mission statement",
-        "coreValues": ["List of core values"],
-        "globalPresence": ["List of countries with presence"]
-    },
-    "legalDetails": {
-        "companyType": "Type of company",
-        "legalStructure": {
-            "type": "Legal entity type",
-            "registrationNumber": "Company registration number",
-            "registrationCountry": "Country of registration",
-            "incorporationDate": "Date of incorporation",
-            "fiscalYear": "Fiscal year period"
-        },
-        "fundingHistory": {
-            "currentStage": "Current funding stage",
-            "rounds": [
-                {
-                    "stage": "Funding round",
-                    "year": "Year",
-                    "amount": "Amount raised",
-                    "leadInvestor": "Lead investor name"
-                }
-            ]
-        },
-        "stockInfo": {
-            "exchange": "Stock exchange if public",
-            "ticker": "Stock ticker symbol",
-            "marketCap": "Current market cap",
-            "sharesOutstanding": "Number of shares"
-        }
-    },
-    "timeline": [
-        {
-            "year": "Year of event",
-            "event": "Significant company event"
-        }
-    ],
-    "recognition": {
-        "workplace": [
-            {
-                "title": "Award/recognition title",
-                "year": "Year received",
-                "description": "Description of recognition",
-                "source": "Source URL"
-            }
-        ],
-        "rankings": [
-            {
-                "title": "Ranking title",
-                "year": "Year",
-                "rank": "Numerical rank",
-                "description": "Description",
-                "source": "Source URL"
-            }
-        ],
-        "product": [
-            {
-                "title": "Award title",
-                "year": "Year",
-                "description": "Description",
-                "source": "Source URL"
-            }
-        ]
-    },
-    "contact": {
-        "website": "Company website URL",
-        "careersPage": "Careers page URL",
-        "socialMedia": {
-            "linkedin": "LinkedIn URL",
-            "twitter": "Twitter URL",
-            "glassdoor": "Glassdoor URL"
-        },
-        "support": "Support email"
-    },
-    "culture": {
-        "pillars": ["List of cultural pillars"],
-        "foundersMessage": "Message from founders",
-        "heroBanner": "URL to hero banner image"
-    }
+  "basicIdentity": {
+      "name": "${companyName}",
+      "logo": "URL to company logo",
+      "tagline": "Company tagline",
+      "industry": "Primary industry",
+      "headquarters": "HQ location",
+      "foundedYear": "Year founded",
+      "keyPeople": [
+          {
+              "name": "Leader name",
+              "role": "Role/Position",
+              "image": "Profile image URL",
+              "linkedIn": "LinkedIn profile URL"
+          }
+      ],
+      "employees": {
+          "global": "Total global employees",
+          "india": "Employees in India"
+      }
+  },
+  "overview": {
+      "description": "Comprehensive company description in 100 words atleast which should be real and correct and should be based on the official sources",
+      "whatWeDo": "Core business activities in 50 words atleast which should be real and correct and should be based on the official sources",
+      "keyMarkets": ["List of key markets/domains"],
+      "vision": "Company vision statement",
+      "mission": "Company mission statement",
+      "coreValues": ["List of core values"],
+      "globalPresence": ["List of countries with presence"]
+  },
+  "legalDetails": {
+      "companyType": "Type of company",
+      "legalStructure": {
+          "type": "Legal entity type",
+          "registrationNumber": "Company registration number",
+          "registrationCountry": "Country of registration",
+          "incorporationDate": "Date of incorporation",
+          "fiscalYear": "Fiscal year period"
+      },
+      "fundingHistory": {
+          "currentStage": "Current funding stage",
+          "rounds": [
+              {
+                  "stage": "Funding round",
+                  "year": "Year",
+                  "amount": "Amount raised",
+                  "leadInvestor": "Lead investor name"
+              }
+          ]
+      },
+      "stockInfo": {
+          "exchange": "Stock exchange if public",
+          "ticker": "Stock ticker symbol",
+          "marketCap": "Current market cap",
+          "sharesOutstanding": "Number of shares"
+      }
+  },
+  "timeline": [
+      {
+          "year": "Year of event",
+          "event": "Significant company event in 50 words atleast which should be real and correct and should be based on the official sources"
+      }
+  ],
+  "recognition": {
+      "workplace": [
+          {
+              "title": "Award/recognition title",
+              "year": "Year received",
+              "description": "Description of recognition",
+              "source": "Source URL"
+          }
+      ],
+      "rankings": [
+          {
+              "title": "Ranking title",
+              "year": "Year",
+              "rank": "Numerical rank",
+              "description": "Description",
+              "source": "Source URL"
+          }
+      ],
+      "product": [
+          {
+              "title": "Award title",
+              "year": "Year",
+              "description": "Description",
+              "source": "Source URL"
+          }
+      ]
+  },
+  "contact": {
+      "website": "Company website URL",
+      "careersPage": "Careers page URL",
+      "socialMedia": {
+          "linkedin": "LinkedIn URL",
+          "twitter": "Twitter URL",
+          "glassdoor": "Glassdoor URL"
+      },
+      "support": "Support email"
+  },
+  "culture": {
+      "pillars": ["List of cultural pillars"],
+      "foundersMessage": "Message from founders",
+      "heroBanner": "URL to hero banner image"
+  }
 }
+
+🔒 **Instructions for AI Model**:
+
+1. Fill every field with real, sourced information specific to ${companyName}.
+
+2. Use official sources for legal, funding, and stock details.
+
+3. Include accurate URLs for images, social profiles, awards, and recognitions.
+
+4. Ensure consistency in formatting—quotes, arrays, and URL structure.
+
+5. No placeholders—every field must be populated with actual data or omitted if not publicly available.
+
+6. For key people, Give atleast 4-5 people and use the official LinkedIn profile of the person.
+
+7. For stockInfo, give the data based on the official sources, If not available then give the data based on your understanding.
+
+8. For timeline, give the data based on the official sources, If not available then give the data based on your understanding. Try to give atleast 7-8 events.
 
 Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Include real URLs where applicable and maintain consistent formatting.`;
 }; 
@@ -588,7 +720,7 @@ Return ONLY the structured JSON response below — no introduction, notes, or ex
       {
         "title": "Stage title",
         "duration": "Typical duration",
-        "description": "Stage description",
+        "description": "Stage description in 20 - 30 words atleast which should be real and correct and should be based on the official sources",
         "icon": "Emoji",
         "status": "Stage status (e.g., Technical, Final)"
       }
@@ -601,7 +733,7 @@ Return ONLY the structured JSON response below — no introduction, notes, or ex
       "date": "Date",
       "status": "Outcome status",
       "sentiment": "Sentiment (e.g., Positive, Challenging)",
-      "summary": "Summary of experience in 50 words atleast",
+      "summary": "Summary of experience in 100 words atleast which should be real and correct and should be based on the official sources",
       "tags": ["List of tags"]
     }
   ],
@@ -662,15 +794,15 @@ Return ONLY the structured JSON response below — no introduction, notes, or ex
 
 2. For the "journey" field, include a realistic breakdown of the actual stages — e.g., Online Assessment → Technical Round → Managerial Round → HR Round.
 
-3. For "candidateExperiences", use real testimonials or summaries from candidates across platforms. Include accurate tags like “DSA-heavy”, “HR ghosted”, “Resume Shortlisting”, etc.
+3. For "candidateExperiences", use real testimonials or summaries from candidates across platforms. Include accurate tags like “DSA-heavy”, “HR ghosted”, “Resume Shortlisting”, etc. Try to give atleast 5 experiences.
 
-4. For "technicalQuestions" and "roleSpecificQuestions", include authentic examples categorized by difficulty and tagged with technologies or concepts (e.g., React, REST API, System Design, SQL Joins).
+4. For "technicalQuestions" and "roleSpecificQuestions", include authentic examples categorized by difficulty and tagged with technologies or concepts (e.g., React, REST API, System Design, SQL Joins). Try to give atleast 10 questions for technical questions and atleast 3 for each role in the role specific questions.
 
-5. For "behavioralQuestions", focus on questions related to teamwork, conflict resolution, and culture fit — include practical tips for answering.
+5. For "behavioralQuestions", focus on questions related to teamwork, conflict resolution, and culture fit — include practical tips for answering. Try to give atleast 7-8 questions.
 
-6. "questionStats" must reflect true distribution percentages and trends (based on frequency of reports or reviews).
+6. "questionStats" must reflect true distribution percentages and trends (based on frequency of reports or reviews). Try to give atleast 5 categories in the topCategories and atleast 3 for each difficulty level in the difficultyDistribution.
 
-7. "mockInterviewTips" should be directly relevant to the interview pattern of ${companyName} and may include common pitfalls or misconceptions.
+7. "mockInterviewTips" should be directly relevant to the interview pattern of ${companyName} and may include common pitfalls or misconceptions. Try to give atleast 5 tips.
 
 Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
 };

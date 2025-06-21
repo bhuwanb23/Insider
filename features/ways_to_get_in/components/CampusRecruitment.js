@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
+    marginBottom: 16,
   },
   mainCard: {
     padding: 20,
