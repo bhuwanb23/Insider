@@ -7,44 +7,37 @@ export default function HiringTimeline() {
   const { jobHiringData } = useJobHiring();
   const { hiringTimeline } = jobHiringData;
 
-  const renderTimelineItem = (title, data) => (
-    <LinearGradient
-      colors={["#4158D0", "#C850C0"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.timelineCard}
-    >
-      <Text style={styles.timelineTitle}>{title}</Text>
-      <View style={styles.timelineDetails}>
-        <View style={styles.timelineItem}>
-          <Text style={styles.itemLabel}>Period</Text>
-          <Text style={styles.itemValue}>{data.period}</Text>
+  const renderTimelineItem = (title, data, icon) => {
+    const details = [
+      { label: 'Period', value: data.period },
+      { label: 'Frequency', value: data.frequency },
+    ];
+    if (data.nextDrive) details.push({ label: 'Next Drive', value: data.nextDrive });
+    if (data.averageOpenings) details.push({ label: 'Avg. Openings', value: data.averageOpenings });
+    if (data.lastEvent) details.push({ label: 'Last Event', value: data.lastEvent });
+
+    return (
+      <LinearGradient
+        colors={["#4158D0", "#C850C0"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.timelineCard}
+      >
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardIcon}>{icon}</Text>
+          <Text style={styles.timelineTitle}>{title}</Text>
         </View>
-        <View style={styles.timelineItem}>
-          <Text style={styles.itemLabel}>Frequency</Text>
-          <Text style={styles.itemValue}>{data.frequency}</Text>
+        <View>
+          {details.map((item, index) => (
+            <View key={index} style={[styles.timelineRow, index === details.length - 1 && styles.lastTimelineRow]}>
+              <Text style={styles.itemLabel}>{item.label}</Text>
+              <Text style={styles.itemValue}>{item.value}</Text>
+            </View>
+          ))}
         </View>
-        {data.nextDrive && (
-          <View style={styles.timelineItem}>
-            <Text style={styles.itemLabel}>Next Drive</Text>
-            <Text style={styles.itemValue}>{data.nextDrive}</Text>
-          </View>
-        )}
-        {data.averageOpenings && (
-          <View style={styles.timelineItem}>
-            <Text style={styles.itemLabel}>Avg. Openings</Text>
-            <Text style={styles.itemValue}>{data.averageOpenings}</Text>
-          </View>
-        )}
-        {data.lastEvent && (
-          <View style={styles.timelineItem}>
-            <Text style={styles.itemLabel}>Last Event</Text>
-            <Text style={styles.itemValue}>{data.lastEvent}</Text>
-          </View>
-        )}
-      </View>
-    </LinearGradient>
-  );
+      </LinearGradient>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -53,9 +46,9 @@ export default function HiringTimeline() {
         <Text style={styles.title}>Hiring Timeline</Text>
       </View>
       <View style={styles.timelineContainer}>
-        {renderTimelineItem('Campus Hiring', hiringTimeline.campus)}
-        {renderTimelineItem('Off-Campus', hiringTimeline.offCampus)}
-        {renderTimelineItem('Hackathons', hiringTimeline.hackathons)}
+        {renderTimelineItem('Campus Hiring', hiringTimeline.campus, '🎓')}
+        {renderTimelineItem('Off-Campus', hiringTimeline.offCampus, '🏢')}
+        {renderTimelineItem('Hackathons', hiringTimeline.hackathons, '💻')}
       </View>
     </View>
   );
@@ -63,57 +56,68 @@ export default function HiringTimeline() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 16,
+    paddingVertical: 16,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
+    paddingHorizontal: 16,
   },
   sectionIcon: {
-    fontSize: 24,
-    marginRight: 8,
+    fontSize: 28,
+    marginRight: 12,
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: '#4158D0',
   },
   timelineContainer: {
-    gap: 12,
+    gap: 16,
+    paddingHorizontal: 16,
   },
   timelineCard: {
-    padding: 12,
-    borderRadius: 10,
+    padding: 20,
+    borderRadius: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  cardIcon: {
+    fontSize: 22,
+    marginRight: 12,
   },
   timelineTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#fff',
-    marginBottom: 10,
   },
-  timelineDetails: {
+  timelineRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.15)',
   },
-  timelineItem: {
-    width: '47%',
+  lastTimelineRow: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
   },
   itemLabel: {
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginBottom: 2,
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
   },
   itemValue: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
     color: '#fff',
   },

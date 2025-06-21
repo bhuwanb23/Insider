@@ -579,9 +579,9 @@ Ensure all information is specific to ${companyName}, accurate, and follows this
 }; 
 
 export const getCompanyInterviewExperiencePrompt = (companyName) => {
-    return `Analyze the interview experience at ${companyName} and provide information in the following EXACT JSON structure:
-Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
-No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+    return `Analyze the interview experience at ${companyName} using credible, up-to-date sources such as Glassdoor, LinkedIn, AmbitionBox, Blind, Reddit, company blogs, and real candidate testimonials.
+
+Return ONLY the structured JSON response below — no introduction, notes, or extra explanation. Ensure that the data is real, recent, and specific to ${companyName}.
 {
   "journey": {
     "steps": [
@@ -601,7 +601,7 @@ No need to add any details like here is the response or the JSON data is provide
       "date": "Date",
       "status": "Outcome status",
       "sentiment": "Sentiment (e.g., Positive, Challenging)",
-      "summary": "Summary of experience",
+      "summary": "Summary of experience in 50 words atleast",
       "tags": ["List of tags"]
     }
   ],
@@ -610,7 +610,7 @@ No need to add any details like here is the response or the JSON data is provide
       "category": "Question category",
       "difficulty": "Difficulty level",
       "frequency": "Frequency percentage",
-      "question": "Sample question",
+      "question": "Real world scenario question in 50 words atleast which are asked in the interview of ${companyName}",
       "tags": ["List of tags"]
     }
   ],
@@ -619,7 +619,7 @@ No need to add any details like here is the response or the JSON data is provide
       "role": "Role name",
       "questions": [
         {
-          "question": "Sample question",
+          "question": "Real world scenario question in 50 words atleast which are asked in the interview of ${companyName}",
           "frequency": "Frequency percentage",
           "difficulty": "Difficulty level"
         }
@@ -628,10 +628,10 @@ No need to add any details like here is the response or the JSON data is provide
   ],
   "behavioralQuestions": [
     {
-      "question": "Sample behavioral question",
+      "question": "Real world scenario behavioral question in 50 words atleast which are asked in the interview of ${companyName}",
       "frequency": "Frequency percentage",
       "category": "Category",
-      "tip": "Answering tip"
+      "tip": "Answering tip in 50 words atleast which should be helpful for the candidate and it should be based on the professional,company culture and values of ${companyName}"
     }
   ],
   "questionStats": {
@@ -651,244 +651,538 @@ No need to add any details like here is the response or the JSON data is provide
   "mockInterviewTips": [
     {
       "title": "Tip category",
-      "tips": ["List of tips"],
-      "items": ["List of common pitfalls (if applicable)"]
+      "tips": ["List of tips in 50 words atleast which should be helpful for the candidate and it should be based on the professional,company culture and values of ${companyName}"],
+      "items": ["List of common pitfalls in 50 words atleast which should be helpful for the candidate and it should be based on the professional,company culture and values of ${companyName}"]
     }
   ]
 }
 
+🔒 **Instructions for AI Model**:
+1. All data must be real and directly linked to ${companyName}’s actual interview processes.
+
+2. For the "journey" field, include a realistic breakdown of the actual stages — e.g., Online Assessment → Technical Round → Managerial Round → HR Round.
+
+3. For "candidateExperiences", use real testimonials or summaries from candidates across platforms. Include accurate tags like “DSA-heavy”, “HR ghosted”, “Resume Shortlisting”, etc.
+
+4. For "technicalQuestions" and "roleSpecificQuestions", include authentic examples categorized by difficulty and tagged with technologies or concepts (e.g., React, REST API, System Design, SQL Joins).
+
+5. For "behavioralQuestions", focus on questions related to teamwork, conflict resolution, and culture fit — include practical tips for answering.
+
+6. "questionStats" must reflect true distribution percentages and trends (based on frequency of reports or reviews).
+
+7. "mockInterviewTips" should be directly relevant to the interview pattern of ${companyName} and may include common pitfalls or misconceptions.
+
 Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
 };
+
+
+
+// export const getCompanyJobHiringInsightsPrompt = (companyName) => {
+//     return `Analyze the job hiring insights for ${companyName} and provide information in the following EXACT JSON structure:
+// Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+// No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+// {
+//   "commonRoles": [
+//     {
+//       "title": "Role title",
+//       "department": "Department",
+//       "experienceLevel": "Experience level",
+//       "location": "Location type",
+//       "icon": "Emoji"
+//     }
+//   ],
+//   "internshipConversion": {
+//     "rate": "Conversion rate percentage",
+//     "totalInterns": "Total number of interns",
+//     "convertedCount": "Number converted",
+//     "yearOverYearGrowth": "YoY growth percentage"
+//   },
+//   "hiringChannels": [
+//     {
+//       "name": "Channel name",
+//       "logo": "Logo URL",
+//       "successRate": "Success rate percentage",
+//       "activeListings": "Number of active listings (if applicable)",
+//       "partnerInstitutes": "Number of partner institutes (if applicable)",
+//       "bonusAmount": "Referral bonus (if applicable)",
+//       "directApplications": "Number of direct applications (if applicable)"
+//     }
+//   ],
+//   "jobTrends": {
+//     "quarterlyGrowth": {
+//       "tech": "Tech growth percentage",
+//       "design": "Design growth percentage",
+//       "marketing": "Marketing growth percentage"
+//     },
+//     "topLocations": [
+//       {
+//         "city": "City name",
+//         "country": "Country name",
+//         "openings": "Number of openings"
+//       }
+//     ],
+//     "topDepartments": [
+//       {
+//         "name": "Department name",
+//         "openings": "Number of openings",
+//         "growth": "Growth percentage"
+//       }
+//     ]
+//   },
+//   "hiringTimeline": {
+//     "campus": {
+//       "period": "Period",
+//       "frequency": "Frequency",
+//       "nextDrive": "Next drive date"
+//     },
+//     "offCampus": {
+//       "period": "Period",
+//       "frequency": "Frequency",
+//       "averageOpenings": "Average number of openings"
+//     },
+//     "hackathons": {
+//       "period": "Period",
+//       "frequency": "Frequency",
+//       "lastEvent": "Last event date"
+//     }
+//   },
+//   "hiringProcess": [
+//     {
+//       "stage": "Stage name",
+//       "duration": "Stage duration",
+//       "successRate": "Success rate percentage (if applicable)",
+//       "tips": "Tips (if applicable)",
+//       "topics": ["List of topics (if applicable)"],
+//       "rounds": "Number of rounds (if applicable)",
+//       "focusAreas": ["List of focus areas (if applicable)"],
+//       "includes": ["List of included items (if applicable)"]
+//     }
+//   ],
+//   "resumeTips": {
+//     "preferences": ["List of resume preferences"],
+//     "tools": [
+//       {
+//         "name": "Tool name",
+//         "purpose": "Purpose of tool",
+//         "keywords": ["List of keywords (if applicable)"],
+//         "platform": "Platform name (if applicable)",
+//         "focusAreas": ["List of focus areas (if applicable)"]
+//       }
+//     ],
+//     "optimization": ["List of optimization tips"]
+//   }
+// }
+
+// Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+// };
+
 
 export const getCompanyJobHiringInsightsPrompt = (companyName) => {
-    return `Analyze the job hiring insights for ${companyName} and provide information in the following EXACT JSON structure:
-Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
-No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+  return `Analyze the job hiring insights for ${companyName} from verified sources including company career pages, LinkedIn jobs, AmbitionBox, Glassdoor, job forums, internship portals, and recruitment platforms.
+
+Return ONLY the JSON structure below with no extra explanation or headers. Ensure all data is authentic, recent, and accurate for ${companyName}.
+
 {
-  "commonRoles": [
-    {
-      "title": "Role title",
-      "department": "Department",
-      "experienceLevel": "Experience level",
-      "location": "Location type",
-      "icon": "Emoji"
-    }
-  ],
-  "internshipConversion": {
-    "rate": "Conversion rate percentage",
-    "totalInterns": "Total number of interns",
-    "convertedCount": "Number converted",
-    "yearOverYearGrowth": "YoY growth percentage"
-  },
-  "hiringChannels": [
-    {
-      "name": "Channel name",
-      "logo": "Logo URL",
-      "successRate": "Success rate percentage",
-      "activeListings": "Number of active listings (if applicable)",
-      "partnerInstitutes": "Number of partner institutes (if applicable)",
-      "bonusAmount": "Referral bonus (if applicable)",
-      "directApplications": "Number of direct applications (if applicable)"
-    }
-  ],
-  "jobTrends": {
-    "quarterlyGrowth": {
-      "tech": "Tech growth percentage",
-      "design": "Design growth percentage",
-      "marketing": "Marketing growth percentage"
-    },
-    "topLocations": [
-      {
-        "city": "City name",
-        "country": "Country name",
-        "openings": "Number of openings"
-      }
-    ],
-    "topDepartments": [
-      {
-        "name": "Department name",
-        "openings": "Number of openings",
-        "growth": "Growth percentage"
-      }
-    ]
-  },
-  "hiringTimeline": {
-    "campus": {
-      "period": "Period",
-      "frequency": "Frequency",
-      "nextDrive": "Next drive date"
-    },
-    "offCampus": {
-      "period": "Period",
-      "frequency": "Frequency",
-      "averageOpenings": "Average number of openings"
-    },
-    "hackathons": {
-      "period": "Period",
-      "frequency": "Frequency",
-      "lastEvent": "Last event date"
-    }
-  },
-  "hiringProcess": [
-    {
-      "stage": "Stage name",
-      "duration": "Stage duration",
-      "successRate": "Success rate percentage (if applicable)",
-      "tips": "Tips (if applicable)",
-      "topics": ["List of topics (if applicable)"],
-      "rounds": "Number of rounds (if applicable)",
-      "focusAreas": ["List of focus areas (if applicable)"],
-      "includes": ["List of included items (if applicable)"]
-    }
-  ],
-  "resumeTips": {
-    "preferences": ["List of resume preferences"],
-    "tools": [
-      {
-        "name": "Tool name",
-        "purpose": "Purpose of tool",
-        "keywords": ["List of keywords (if applicable)"],
-        "platform": "Platform name (if applicable)",
-        "focusAreas": ["List of focus areas (if applicable)"]
-      }
-    ],
-    "optimization": ["List of optimization tips"]
+"commonRoles": [
+  {
+    "title": "Role title",
+    "department": "Department",
+    "experienceLevel": "Experience level",
+    "location": "Location type",
+    "icon": "Emoji"
   }
+],
+"internshipConversion": {
+  "rate": "Conversion rate percentage",
+  "totalInterns": "Total number of interns",
+  "convertedCount": "Number converted",
+  "yearOverYearGrowth": "YoY growth percentage"
+},
+"hiringChannels": [
+  {
+    "name": "Channel name",
+    "logo": "Logo URL",
+    "successRate": "Success rate percentage",
+    "activeListings": "Number of active listings (if applicable)",
+    "partnerInstitutes": "Number of partner institutes (if applicable)",
+    "bonusAmount": "Referral bonus (if applicable)",
+    "directApplications": "Number of direct applications (if applicable)"
+  }
+],
+"jobTrends": {
+  "quarterlyGrowth": {
+    "tech": "Tech growth percentage",
+    "design": "Design growth percentage",
+    "marketing": "Marketing growth percentage"
+  },
+  "topLocations": [
+    {
+      "city": "City name",
+      "country": "Country name",
+      "openings": "Number of openings"
+    }
+  ],
+  "topDepartments": [
+    {
+      "name": "Department name",
+      "openings": "Number of openings",
+      "growth": "Growth percentage"
+    }
+  ]
+},
+"hiringTimeline": {
+  "campus": {
+    "period": "Period",
+    "frequency": "Frequency",
+    "nextDrive": "Next drive date"
+  },
+  "offCampus": {
+    "period": "Period",
+    "frequency": "Frequency",
+    "averageOpenings": "Average number of openings"
+  },
+  "hackathons": {
+    "period": "Period",
+    "frequency": "Frequency",
+    "lastEvent": "Last event date"
+  }
+},
+"hiringProcess": [
+  {
+    "stage": "Stage name",
+    "duration": "Stage duration",
+    "successRate": "Success rate percentage (if applicable)",
+    "tips": "Tips (if applicable)",
+    "topics": ["List of topics (if applicable)"],
+    "rounds": "Number of rounds (if applicable)",
+    "focusAreas": ["List of focus areas (if applicable)"],
+    "includes": ["List of included items (if applicable)"]
+  }
+],
+"resumeTips": {
+  "preferences": ["List of resume preferences"],
+  "tools": [
+    {
+      "name": "Tool name",
+      "purpose": "Purpose of tool in 50 words atleast which should be helpful for the candidate and it should be based on the professional,company culture and values of ${companyName}",
+      "keywords": ["List of keywords (if applicable)"],
+      "platform": "Platform name (if applicable)",
+      "focusAreas": ["List of focus areas (if applicable)"]
+    }
+  ],
+  "optimization": ["List of optimization tips in 50 words atleast which should be helpful for the candidate and it should be based on the professional,company culture and values of ${companyName}"]
 }
+}
+
+🔒 **Instructions for AI Model**:
+
+1. For "commonRoles", extract job titles most frequently posted by ${companyName} and specify the department and seniority level (e.g., Entry-level, Mid-level, Senior).
+
+2. Use actual internship-to-full-time conversion data (from company reports or testimonials) for "internshipConversion", including total intern count and YoY growth.
+
+3. Populate "hiringChannels" using verified sources like LinkedIn, Naukri, campus partnerships, and referrals. Add success rates and visuals if available.
+
+4. For "jobTrends", highlight department- or location-specific growth patterns and hiring density.
+
+5. "hiringTimeline" should reflect real-world seasonality in their campus/off-campus/hackathon hiring cycles.
+
+6. "hiringProcess" should map each stage with estimated duration, tips, rounds involved, and what’s evaluated (e.g., resume screening, coding test, technical interview, cultural fit).
+
+7. "resumeTips" should include tools and AI-based optimizers used for resume screening or tailoring to ${companyName}, as well as strong keyword and formatting preferences.
+
+
 
 Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
 };
 
+// export const getCompanyNewsHighlightsPrompt = (companyName) => {
+//     return `Analyze the latest news and highlights for ${companyName} and provide information in the following EXACT JSON structure:
+// Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+// No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+// {
+//   "headlines": [
+//     {
+//       "title": "Headline title",
+//       "source": "Source name",
+//       "date": "Date",
+//       "summary": "Summary of the news",
+//       "url": "URL to the news article",
+//       "image": "Image URL or filename"
+//     }
+//   ],
+//   "socialSentiment": {
+//     "overall": {
+//       "positive": "Percentage",
+//       "neutral": "Percentage",
+//       "negative": "Percentage"
+//     },
+//     "trends": [
+//       { "date": "Date", "sentiment": "Sentiment score" }
+//     ],
+//     "sources": {
+//       "twitter": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
+//       "linkedin": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
+//       "reddit": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" }
+//     }
+//   },
+//   "highlights": [
+//     {
+//       "title": "Highlight title",
+//       "description": "Highlight description",
+//       "date": "Date",
+//       "category": "Category"
+//     }
+//   ],
+//   "studentImpact": [
+//     {
+//       "title": "Impact title",
+//       "description": "Impact description",
+//       "impact": "Impact details"
+//     }
+//   ]
+// }
+
+// Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+// };
+
 export const getCompanyNewsHighlightsPrompt = (companyName) => {
-    return `Analyze the latest news and highlights for ${companyName} and provide information in the following EXACT JSON structure:
-Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
-No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+  return `Analyze the latest verified news, updates, achievements, and public sentiment for ${companyName} from official company press releases, LinkedIn, Twitter, trusted news platforms, developer communities, and job forums.
+
+Return ONLY the exact JSON structure below with no explanation or introduction. Ensure each value is authentic, timely, and specific to ${companyName}. No placeholders unless explicitly unknown.
 {
-  "headlines": [
-    {
-      "title": "Headline title",
-      "source": "Source name",
-      "date": "Date",
-      "summary": "Summary of the news",
-      "url": "URL to the news article",
-      "image": "Image URL or filename"
-    }
-  ],
-  "socialSentiment": {
-    "overall": {
-      "positive": "Percentage",
-      "neutral": "Percentage",
-      "negative": "Percentage"
-    },
-    "trends": [
-      { "date": "Date", "sentiment": "Sentiment score" }
-    ],
-    "sources": {
-      "twitter": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
-      "linkedin": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
-      "reddit": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" }
-    }
+"headlines": [
+  {
+    "title": "Headline title",
+    "source": "Source name",
+    "date": "Date",
+    "summary": "Summary of the news in 50 words atleast which should be real and correct",
+    "url": "URL to the news article",
+    "image": "Image URL or filename"
+  }
+],
+"socialSentiment": {
+  "overall": {
+    "positive": "Percentage",
+    "neutral": "Percentage",
+    "negative": "Percentage"
   },
-  "highlights": [
+  "trends": [
+    { "date": "Date", "sentiment": "Sentiment score" }
+  ],
+  "sources": {
+    "twitter": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
+    "linkedin": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" },
+    "reddit": { "positive": "Percentage", "neutral": "Percentage", "negative": "Percentage" }
+  }
+},
+"highlights": [
+  {
+    "title": "Highlight title",
+    "description": "Highlight description in 50 words atleast which should be real and correct",
+    "date": "Date",
+    "category": "Category"
+  }
+],
+"studentImpact": [
+  {
+    "title": "Impact title",
+    "description": "Impact description in 60 -70 words atleast which should be real and correct",
+    "impact": "Impact details"
+  }
+]
+}
+
+🔒 **Instructions for AI Model**:
+
+1. Under "headlines", include actual titles, dates, and summaries from credible sources (e.g., TechCrunch, YourStory, Business Insider).
+
+2. For "socialSentiment", analyze sentiment scores using tools like Talkwalker, Brand24, or sentiment APIs across Twitter, LinkedIn, Reddit. Include time-based trend data.
+
+3. "highlights" should showcase real achievements: new product launches, funding rounds, hiring announcements, CSR events, feature rollouts.
+
+4. "studentImpact" must include programs, internships, events, or hackathons by ${companyName} that directly benefited students or early professionals.
+
+Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+};
+
+// export const getCompanyTechStackPrompt = (companyName) => {
+//     return `Analyze the technology stack at ${companyName} and provide information in the following EXACT JSON structure:
+// Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
+// No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
+// {
+//   "frontend": {
+//     "title": "Frontend section title",
+//     "icon": "Icon name or emoji",
+//     "categories": [
+//       {
+//         "title": "Category title",
+//         "tags": ["List of technologies"],
+//         "description": "Category description",
+//         "badges": ["List of badges (if applicable)"]
+//       }
+//     ],
+//     "badges": ["List of badges (if applicable)"]
+//   },
+//   "backend": {
+//     "title": "Backend section title",
+//     "icon": "Icon name or emoji",
+//     "categories": [
+//       {
+//         "title": "Category title",
+//         "tags": ["List of technologies"],
+//         "description": "Category description",
+//         "badges": ["List of badges (if applicable)"]
+//       }
+//     ]
+//   },
+//   "cloud": {
+//     "title": "Cloud & DevOps section title",
+//     "icon": "Icon name or emoji",
+//     "categories": [
+//       {
+//         "title": "Category title",
+//         "tags": ["List of technologies"],
+//         "description": "Category description",
+//         "badges": ["List of badges (if applicable)"]
+//       }
+//     ]
+//   },
+//   "database": {
+//     "title": "Database section title",
+//     "icon": "Icon name or emoji",
+//     "categories": [
+//       {
+//         "title": "Category title",
+//         "tags": ["List of technologies"],
+//         "description": "Category description",
+//         "badges": ["List of badges (if applicable)"]
+//       }
+//     ]
+//   },
+//   "analytics": {
+//     "title": "Analytics section title",
+//     "icon": "Icon name or emoji",
+//     "categories": [
+//       {
+//         "title": "Category title",
+//         "tags": ["List of technologies"],
+//         "description": "Category description",
+//         "badges": ["List of badges (if applicable)"]
+//       }
+//     ],
+//     "badges": ["List of badges (if applicable)"]
+//   },
+//   "team": {
+//     "title": "Team tools section title",
+//     "icon": "Icon name or emoji",
+//     "categories": [
+//       {
+//         "title": "Category title",
+//         "tags": ["List of technologies"],
+//         "description": "Category description",
+//         "badges": ["List of badges (if applicable)"]
+//       }
+//     ]
+//   }
+// }
+
+// Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
+// };
+
+export const getCompanyTechStackPrompt = (companyName) => {
+  return `Analyze the technology stack used at ${companyName} across all major areas: frontend, backend, cloud infrastructure, databases, analytics, and team collaboration tools. Use information from public documentation, developer blogs, tech case studies, open roles, engineering talks, GitHub repos, and tech review platforms.
+
+Return ONLY the following JSON structure with no introduction or explanation. All information must be real, specific to ${companyName}, and up-to-date.
+{
+"frontend": {
+  "title": "Frontend section title",
+  "icon": "Icon name or emoji",
+  "categories": [
     {
-      "title": "Highlight title",
-      "description": "Highlight description",
-      "date": "Date",
-      "category": "Category"
+      "title": "Category title",
+      "tags": ["List of technologies used at ${companyName} in recent projects"],
+      "description": "Category description in 100 words atleast which should be real and up to date, describe the use of the specific technology in the company at the particular part",
+      "badges": ["List of badges (if applicable)"]
     }
   ],
-  "studentImpact": [
+  "badges": ["List of badges (if applicable)"]
+},
+"backend": {
+  "title": "Backend section title",
+  "icon": "Icon name or emoji",
+  "categories": [
     {
-      "title": "Impact title",
-      "description": "Impact description",
-      "impact": "Impact details"
+      "title": "Category title",
+      "tags": ["List of technologies used at ${companyName} in recent projects"],
+      "description": "Category description in 100 words atleast which should be real and up to date, describe the use of the specific technology in the company at the particular part",
+      "badges": ["List of badges (if applicable)"]
+    }
+  ]
+},
+"cloud": {
+  "title": "Cloud & DevOps section title",
+  "icon": "Icon name or emoji",
+  "categories": [
+    {
+      "title": "Category title",
+      "tags": ["List of technologies used at ${companyName} in recent projects"],
+      "description": "Category description in 100 words atleast which should be real and up to date, describe the use of the specific technology in the company at the particular part",
+      "badges": ["List of badges (if applicable)"]
+    }
+  ]
+},
+"database": {
+  "title": "Database section title",
+  "icon": "Icon name or emoji",
+  "categories": [
+    {
+      "title": "Category title",
+      "tags": ["List of technologies used at ${companyName} in recent projects"],
+      "description": "Category description in 100 words atleast which should be real and up to date, describe the use of the specific technology in the company at the particular part",
+      "badges": ["List of badges (if applicable)"]
+    }
+  ]
+},
+"analytics": {
+  "title": "Analytics section title",
+  "icon": "Icon name or emoji",
+  "categories": [
+    {
+      "title": "Category title",
+      "tags": ["List of technologies used at ${companyName} in recent projects"],
+      "description": "Category description in 100 words atleast which should be real and up to date, describe the use of the specific technology in the company at the particular part",
+      "badges": ["List of badges (if applicable)"]
+    }
+  ],
+  "badges": ["List of badges (if applicable)"]
+},
+"team": {
+  "title": "Team tools section title",
+  "icon": "Icon name or emoji",
+  "categories": [
+    {
+      "title": "Category title",
+      "tags": ["List of technologies used at ${companyName} in recent projects"],
+      "description": "Category description in 100 words atleast which should be real and up to date, describe the use of the specific technology in the company at the particular part",
+      "badges": ["List of badges (if applicable)"]
     }
   ]
 }
-
-Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
-};
-
-export const getCompanyTechStackPrompt = (companyName) => {
-    return `Analyze the technology stack at ${companyName} and provide information in the following EXACT JSON structure:
-Return ONLY the following JSON structure for ${companyName}'s technology stack with no additional text or introduction:
-No need to add any details like here is the response or the JSON data is provided, Nothing needed other than JSON response
-{
-  "frontend": {
-    "title": "Frontend section title",
-    "icon": "Icon name or emoji",
-    "categories": [
-      {
-        "title": "Category title",
-        "tags": ["List of technologies"],
-        "description": "Category description",
-        "badges": ["List of badges (if applicable)"]
-      }
-    ],
-    "badges": ["List of badges (if applicable)"]
-  },
-  "backend": {
-    "title": "Backend section title",
-    "icon": "Icon name or emoji",
-    "categories": [
-      {
-        "title": "Category title",
-        "tags": ["List of technologies"],
-        "description": "Category description",
-        "badges": ["List of badges (if applicable)"]
-      }
-    ]
-  },
-  "cloud": {
-    "title": "Cloud & DevOps section title",
-    "icon": "Icon name or emoji",
-    "categories": [
-      {
-        "title": "Category title",
-        "tags": ["List of technologies"],
-        "description": "Category description",
-        "badges": ["List of badges (if applicable)"]
-      }
-    ]
-  },
-  "database": {
-    "title": "Database section title",
-    "icon": "Icon name or emoji",
-    "categories": [
-      {
-        "title": "Category title",
-        "tags": ["List of technologies"],
-        "description": "Category description",
-        "badges": ["List of badges (if applicable)"]
-      }
-    ]
-  },
-  "analytics": {
-    "title": "Analytics section title",
-    "icon": "Icon name or emoji",
-    "categories": [
-      {
-        "title": "Category title",
-        "tags": ["List of technologies"],
-        "description": "Category description",
-        "badges": ["List of badges (if applicable)"]
-      }
-    ],
-    "badges": ["List of badges (if applicable)"]
-  },
-  "team": {
-    "title": "Team tools section title",
-    "icon": "Icon name or emoji",
-    "categories": [
-      {
-        "title": "Category title",
-        "tags": ["List of technologies"],
-        "description": "Category description",
-        "badges": ["List of badges (if applicable)"]
-      }
-    ]
-  }
 }
+
+🔒 **Instructions for AI Model**:
+
+1. Populate each "tags" list with real technologies used at ${companyName}.
+
+2. "description" should concisely explain each category’s purpose or context within the company.
+
+3. Use emojis or tech-themed icon keywords for each section (e.g., 🖥️ for frontend).
+
+4. Include "badges" only where applicable (e.g., "Modern Stack", "Highly Scalable", "Cloud Native").
+
+5. try to give atleast 5 technologies in each category.
+
+6. try to give atleast 5 categories in each section.
 
 Ensure all information is specific to ${companyName}, accurate, and follows this exact structure. Use real examples and maintain consistent formatting.`;
 };

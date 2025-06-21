@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   policyHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: 20,
     borderRadius: 16,
     marginBottom: 20,
@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     flex: 1,
+    lineHeight: 28,
   },
   sectionHeader: {
     fontSize: 16,
@@ -128,13 +129,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   detailsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
     marginBottom: 18,
   },
   detailCardModern: {
-    width: '48%',
+    width: '100%',
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 14,
@@ -160,15 +158,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#333',
     marginBottom: 2,
+    lineHeight: 18,
   },
   benefitsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
     marginBottom: 18,
   },
   benefitCard: {
-    width: '48%',
+    width: '100%',
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 12,
@@ -185,6 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#555',
     flex: 1,
+    lineHeight: 18,
   },
   leavesContainerModern: {
     backgroundColor: '#fff',

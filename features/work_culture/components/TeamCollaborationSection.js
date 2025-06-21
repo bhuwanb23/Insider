@@ -48,13 +48,18 @@ export default function TeamCollaborationSection({ data }) {
 
       {/* Manager Support Section */}
       {data.managerSupport && (
-        <View style={styles.managerSupportContainer}>
+        <LinearGradient
+          colors={['#4158D0', '#C850C0']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.managerSupportContainer}
+        >
           <Text style={styles.managerSupportTitle}>Manager Support</Text>
           <Text style={styles.managerSupportDetail}>Rating: {data.managerSupport.rating || 'N/A'}/5</Text>
           <Text style={styles.managerSupportDetail}>Feedback Frequency: {data.managerSupport.feedbackFrequency || 'N/A'}</Text>
           <Text style={styles.managerSupportDetail}>1:1 Meetings: {data.managerSupport.oneOnOneMeetings || 'N/A'}</Text>
           <Text style={styles.managerSupportTestimonial}>{data.managerSupport.testimonial || 'No testimonial provided.'}</Text>
-        </View>
+        </LinearGradient>
       )}
     </View>
   );
@@ -112,30 +117,36 @@ const styles = StyleSheet.create({
   activityDetails: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: 18,
   },
   managerSupportContainer: {
-    backgroundColor: '#f5f6fa',
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: 14,
+    padding: 16,
     marginTop: 16,
-    marginHorizontal: 2,
-    elevation: 2,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   managerSupportTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 6,
-    color: '#4158D0',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 12,
   },
   managerSupportDetail: {
     fontSize: 13,
-    color: '#333',
-    marginBottom: 2,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 4,
   },
   managerSupportTestimonial: {
     fontSize: 13,
-    color: '#555',
-    marginTop: 6,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginTop: 10,
     fontStyle: 'italic',
+    lineHeight: 18,
   },
 }); 
