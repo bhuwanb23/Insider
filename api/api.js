@@ -4,16 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // OpenRouter API config
 export const API_KEY_STORAGE_KEY = 'openrouter_api_key';
 export const API_REQUEST_COUNT_KEY = 'openrouter_api_request_count'; // New storage key for the counter
-const OPENROUTER_API_KEY_FALLBACK = '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'; // Keep your current hardcoded key as a fallback
-
-// const OPENROUTER_API_KEY = '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';
-
-// const OPENROUTER_API_KEY = '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';
-// Bhuwan api
-// const OPENROUTER_API_KEY = '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';
-// trndship api
-// const OPENROUTER_API_KEY = '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';
-
+    
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // const OPENROUTER_MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
 const OPENROUTER_MODEL = 'deepseek/deepseek-chat-v3-0324:free';
