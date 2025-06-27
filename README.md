@@ -1,6 +1,6 @@
 <!-- HEADER BANNER -->
-<p align="center">
-  <img src="https://your-image-link.com/banner.png" alt="Insider Banner" width="100%" />
+<p align="center">  
+  <img src="./assets/logo.png" alt="Insider Banner" width="100px" height="100px" />
 </p>
 
 <h1 align="center">📊 Insider – AI-Powered Company Analysis App</h1>
@@ -30,9 +30,11 @@
 
 ## 🖼️ Screenshots
 
-| Home | Company Input | Insights |
-|------|---------------|----------|
-| ![Home](https://your-image-link.com/home.png) | ![Input](https://your-image-link.com/input.png) | ![Insights](https://your-image-link.com/insight.png) |
+<p align="center">
+  <img src="./assets/Home.jpg" alt="Home Page" width="300px" height="600px"  />
+  <img src="./assets/Search.jpg" alt="Search Page" width="300px" height="600px" />
+  <img src="./assets/Topics.jpg" alt="Topics Page" width="300px" height="600px" />
+</p>
 
 ---
 
