@@ -66,7 +66,7 @@ Insider
 
 ```bash
 # Clone the repo
-git clone https://github.com/bhuwanb23/insider.git
+git clone https://github.com/bhuwanb23/Insider.git
 cd insider-app
 ```
 ```bash
